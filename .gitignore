@@ -1,1 +1,3 @@
-.venv
+BACK/.venv
+FRONT/.venv
+.env
