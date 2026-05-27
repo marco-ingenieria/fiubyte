@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Panel Docente{% endblock %}
+
+{% block content %}
+<h1>Bienvenido, Profesor</h1>
+<p>Seleccione una opción para gestionar la materia:</p>
+
+<section>
+    <article>
+        <h3>Gestión de Alumnos</h3>
+        <p>Vea el listado de estudiantes, cargue notas de parciales y condiciones.</p>
+        <!-- Este enlace se transforma automáticamente en el botón redondeado -->
+        <a href="{{ url_for('seccion_alumnos') }}">Ingresar</a>
+    </article>
+
+    <article>
+        <h3>Asistencia</h3>
+        <p>Registro de presencias, ausentes e historial de clases de la cursada.</p>
+        <a href="#">Próximamente</a>
+    </article>
+
+    <article>
+        <h3>Ayudantes</h3>
+        <p>Control de usuarios auxiliares y ayudantes asignados a la cátedra.</p>
+        <a href="#">Próximamente</a>
+    </article>
+</section>
+{% endblock %}
