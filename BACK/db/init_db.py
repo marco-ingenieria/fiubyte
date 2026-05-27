@@ -1,5 +1,8 @@
+from dotenv import load_dotenv
 import mysql.connector
 import os
+
+load_dotenv()
 
 def inicializarBase():
     print("BASE DE DATOS INICIALIZADA")
@@ -11,24 +14,24 @@ def inicializarBase():
 
     # Primera conexion: crear la BD
     connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="sql01",
-        port=3306
+        host    = os.getenv("DB_HOST"),
+        user    = os.getenv("DB_USER"),
+        password= os.getenv("DB_PASSWORD"),
+        port    = os.getenv("DB_PORT")
     )
     cursor = connection.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS TP_FUBYTE")
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv("DB_NAME")}")
     connection.commit()
     cursor.close()
     connection.close()
 
     # Segunda conexion: crear las tablas
     connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="sql01",
-        port=3306,
-        database="TP_FUBYTE"
+        host    = os.getenv("DB_HOST"),
+        user    = os.getenv("DB_USER"),
+        password= os.getenv("DB_PASSWORD"),
+        port    = os.getenv("DB_PORT"),
+        database= os.getenv("DB_NAME")
     )
     cursor = connection.cursor()
     for statement in sql.split(";"):
