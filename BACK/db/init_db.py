@@ -20,7 +20,7 @@ def inicializarBase():
         port    = os.getenv("DB_PORT")
     )
     cursor = connection.cursor()
-    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv("DB_NAME")}")
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {os.getenv('DB_NAME')}")
     connection.commit()
     cursor.close()
     connection.close()
