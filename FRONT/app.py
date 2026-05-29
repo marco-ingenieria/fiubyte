@@ -2,6 +2,10 @@ from flask import Flask, render_template,request
 
 app = Flask(__name__)
 
+# 3. Ruta de la sección de Usuarios
+@app.route('/users')
+def seccion_usuarios():
+    return render_template('usuarios.html')
 
 # 2. Ruta de la sección de Alumnos y Notas (Se activa al ir a /alumnos)
 @app.route('/alumnos')
