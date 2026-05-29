@@ -3,3 +3,6 @@ FRONT/.venv
 .env
 
 BACK/__pycache__/
+BACK/db/__pycache__/
+BACK/services/__pycache__/
+BACK/routes/__pycache__/

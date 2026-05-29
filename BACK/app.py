@@ -1,5 +1,8 @@
 from flask import Flask
+from routes.alumnos import alumnos_bp 
 app = Flask(__name__)
+
+app.register_blueprint(alumnos_bp, url_prefix='/alumnos')
 
 @app.route("/")
 def index():    
