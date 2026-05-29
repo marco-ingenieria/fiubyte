@@ -1,0 +1,53 @@
+{% extends 'base_sistema.html' %}
+
+{% block title %}Inicio - Panel Docente{% endblock %}
+
+{% block content %}
+
+<h1>Bienvenido, Profesor</h1>
+
+<p>Seleccione una opción para gestionar la materia:</p>
+
+<!-- Contenedor principal de tarjetas -->
+<div id="contenedor-tarjetas">
+
+    <!-- Tarjeta 1 -->
+    <div>
+        <h2>Gestión de Alumnos</h2>
+
+        <p>
+            Vea el listado de estudiantes, cargue notas de parciales y condiciones.
+        </p>
+
+
+    </div>
+
+    <!-- Tarjeta 2 -->
+    <div>
+        <h2>Asistencia</h2>
+
+        <p>
+            Registro de presencias, ausentes e historial de clases de la cursada.
+        </p>
+
+        <a href="#">
+            Próximamente
+        </a>
+    </div>
+
+    <!-- Tarjeta 3 -->
+    <div>
+        <h2>Ayudantes</h2>
+
+        <p>
+            Control de usuarios auxiliares y ayudantes asignados a la cátedra.
+        </p>
+
+        <a href="#">
+            Próximamente
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

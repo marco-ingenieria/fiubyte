@@ -392,3 +392,83 @@ footer {
 
     opacity: 0.75;
 }
+```css id="q8r4v9"
+/* ===== PANTALLA DE INICIO ===== */
+
+#inicio-bienvenida {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+#inicio-bienvenida h1 {
+    font-size: 56px;
+    margin-bottom: 20px;
+    color: #0f172a;
+}
+
+#descripcion-inicio {
+    font-size: 18px;
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+    line-height: 1.7;
+}
+
+#panel-info {
+    max-width: 700px;
+    margin: 0 auto 45px auto;
+    padding: 35px;
+
+    background: var(--blanco-vidrio);
+
+    border: 1px solid var(--borde-vidrio);
+
+    border-radius: 22px;
+
+    backdrop-filter: blur(10px);
+
+    box-shadow: var(--sombra-suave);
+}
+
+#panel-info h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+#panel-info ul {
+    list-style: none;
+}
+
+#panel-info li {
+    margin-bottom: 14px;
+    font-size: 16px;
+    color: var(--texto-mutado);
+}
+
+#boton-login {
+    display: inline-block;
+
+    padding: 16px 38px;
+
+    background: var(--color-primario);
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 40px;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    transition: 0.3s ease;
+
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+}
+
+#boton-login:hover {
+    background: var(--color-primario-hover);
+
+    transform: translateY(-2px);
+}
+```

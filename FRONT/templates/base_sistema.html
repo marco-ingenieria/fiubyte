@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-<html>
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Sistema Universitario{% endblock %}</title>
@@ -8,16 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style/global.css') }}">
 </head>
 <body>
-
-    <!-- Menú con ID simple -->
+   
     <div id="menu-superior">
         <strong>Panel Docente</strong>
-        <a 
-          href="https://fi.uba.ar">
-          FIUBA
-        </a>
-    </div>
+        <div id="usuario-profesor">
+            <p>Profesor: {{ nombre_profesor }}</p>
+        </div>
 
+
+    </div>
     <!-- Caja contenedora general de las páginas -->
     <div id="contenedor-principal">
         {% block content %}{% endblock %}
