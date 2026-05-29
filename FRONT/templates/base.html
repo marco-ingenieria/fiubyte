@@ -1,34 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema Universitario{% endblock %}</title>
-    
-    <!-- Vinculación al CSS global mediante Flask -->
+    <!-- Conexión al CSS potente -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style/global.css') }}">
 </head>
 <body>
 
-    <!-- Menú superior de navegación -->
-    <header>
-        <nav>
-            <strong>Panel Docente</strong>
-            <ul>
-                <li><a href="{{ url_for('panel_principal') }}">Inicio</a></li>
-                <li><a href="{{ url_for('seccion_alumnos') }}">Alumnos y Notas</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- Menú con ID simple -->
+    <div id="menu-superior">
+        <strong>Panel Docente</strong>
+        <ul>
+            <li><a href="{{ url_for('panel_principal') }}">Inicio</a></li>
+            <li><a href="{{ url_for('seccion_alumnos') }}">Alumnos y Notas</a></li>
+        </ul>
+    </div>
 
-    <!-- El contenido de cada página se inyectará aquí -->
-    <main>
+    <!-- Caja contenedora general de las páginas -->
+    <div id="contenedor-principal">
         {% block content %}{% endblock %}
-    </main>
+    </div>
 
-    <!-- Pie de página -->
+    <!-- Pie de página simple con etiqueta footer que te dieron en el ejemplo -->
     <footer>
-        <p>&copy; 2026 - Introducción al Desarrollo de Software - Grupo 7</p>
+        <p>2026 - Introducción al Desarrollo de Software - Grupo 7</p>
+        <p id="texto-footer">
+            Facultad de Ingeniería - UBA
+        </p>
     </footer>
 
 </body>
