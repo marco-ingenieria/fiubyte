@@ -1,0 +1,173 @@
+:root {
+    --blanco: #ffffff;
+    --negro: #1a1a1a;
+    --gris-claro: #f4f6f9;
+    --gris-plata: #bdc3c7;
+    --azul-fiuba: #00529B;      
+    --azul-oscuro: #002d57;     
+    --fuente-fiuba: 'Helvetica Neue', Arial, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* GENERAL & FONDO */
+body {
+    font-family: var(--fuente-fiuba);
+    background-image: url('img/Facultad.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 82, 155, 0.85), rgba(0, 20, 40, 0.95));
+    z-index: -1;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.wrapper {
+    background-color: rgba(255, 255, 255, 0.08); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 3.5rem 4rem;
+    border-radius: 1.2rem; 
+    width: min(90%, 40rem);
+    color: var(--blanco);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
+                0 0 20px rgb(255, 255, 255);
+}
+
+.wrapper h1 {
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--blanco);
+}
+
+.login-instruction {
+    font-size: 1rem;
+    color: var(--gris-plata);
+    text-align: center;
+    margin-bottom: 3rem;
+    line-height: 1.5;
+    font-weight: 300;
+}
+
+/* CAMPOS DE ENTRADA */
+.input-box {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2.5rem;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 1rem 3.5rem 0.8rem 0.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+    outline: none;
+    font-size: 1.2rem;
+    color: var(--blanco);
+    transition: all 0.3s ease;
+}
+
+.input-box input:focus {
+    border-bottom-color: #0084ff; 
+    box-shadow: 0 1px 0 #0084ff;
+}
+
+.input-box input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.input-box i {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.3s ease;
+}
+
+.input-box input:focus ~ i {
+    color: #0084ff; 
+}
+
+/* CHECKBOX */
+.remember-forgot {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 3rem;
+    font-size: 1rem;
+    color: var(--gris-plata);
+}
+
+.remember-forgot label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: color 0.2s;
+}
+
+.remember-forgot label:hover {
+    color: var(--blanco);
+}
+
+.remember-forgot input[type="checkbox"] {
+    accent-color: var(--azul-fiuba); 
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+}
+
+/* BOTÓN DE INGRESO */
+.btn {
+    display: block;
+    width: 100%;
+    font-family: var(--fuente-fiuba);
+    color: var(--blanco);
+    background: var(--azul-fiuba); 
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.6rem; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    background-color: var(--azul-oscuro); 
+    box-shadow: 0 6px 20px rgba(0, 82, 155, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}

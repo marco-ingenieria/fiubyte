@@ -1,50 +1,8 @@
-{% extends 'base.html' %}
+{%- extends 'base_sistema.html' -%}
 
-{% block title %}Alumnos - Panel Docente{% endblock %}
+{%- block title -%}Alumnos - Panel Docente{%- endblock -%}
 
-{% block content %}
-<h1>Listado de Alumnos y Notas</h1>
-<p>Administre las calificaciones y las condiciones académicas de los estudiantes.</p>
-
-<!-- Caja para dar estilo a los botones -->
-<div id="grupo-botones">
-    <button>Exportar Acta</button>
-    <button>Cargar Nueva Nota</button>
-</div>
-
-<!-- Tabla tradicional -->
-<table>
-    <thead>
-        <tr>
-            <th>Legajo</th>
-            <th>Nombre y Apellido</th>
-            <th>Parcial 1</th>
-            <th>Parcial 2</th>
-            <th>Estado</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>45992</td>
-            <td>Juan Pérez</td>
-            <td>8</td>
-            <td>7</td>
-            <td>Promocionado</td>
-        </tr>
-        <tr>
-            <td>46112</td>
-            <td>María López</td>
-            <td>4</td>
-            <td>5</td>
-            <td>Regular</td>
-        </tr>
-        <tr>
-            <td>45881</td>
-            <td>Carlos Gómez</td>
-            <td>2</td>
-            <td>-</td>
-            <td>Libre</td>
-        </tr>
-    </tbody>
-</table>
+{%- block content -%}
+    <h1>Alumnos</h1>
+    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar los alumnos y sus datos.</p>
 {% endblock %}

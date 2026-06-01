@@ -1,21 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/login.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>Iniciar Sesión</title>
 </head>
 <body>
-    <h1>Iniciar Sesión</h1>
 
-    <form method="POST">
-        <p>Ingrese su nombre de profesor para acceder al panel:</p>
-    <input name="nombre_profesor">
+<div class="wrapper">
+    <form method="POST" action="">
+        <h1>FIUBA - Iniciar Sesión</h1>
+        
+        <p class="login-instruction">
+            Ingresá con tu usuario completo (usuario@fi.uba.ar) y contraseña.
+        </p>
 
-    <button type="submit">
-        Ingresar
-    </button>
+        <div class="input-box">
+            <input type="text" id="nombre_profesor" name="nombre_profesor" placeholder="Usuario" required autocomplete="username">
+            <i class='bx bxs-user'></i>
+        </div>
 
-</form>
+        <div class="input-box">
+            <input type="password" id="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
+            <i class='bx bxs-lock-alt'></i>
+        </div>
+
+        <div class="remember-forgot">
+            <label>
+                <input type="checkbox" name="remember"> Recordarme en este equipo
+            </label>
+        </div>
+        <!--ESTO AGREGE PARA MANEJAR ERROR Pd: AgusBack-->
+        {% if error %}
+            <p style="color:red">{{ error }}</p>
+        {% endif %}
+        <button type="submit" class="btn">Ingresar</button>
+    </form>
+</div>
+
 </body>
 </html>

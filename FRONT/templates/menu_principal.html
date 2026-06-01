@@ -8,15 +8,29 @@
 
 <p>Seleccione una opción para gestionar la materia:</p>
 
+<form id="buscador-secciones" action="{{ url_for('buscar_seccion') }}" method="GET">
+
+    <input 
+        id="entrada-busqueda"
+        name="busqueda"
+        placeholder="Buscar sección..." >
+
+</form>
+
+{% if error_busqueda %}
+<p id="mensaje-error"> La sección ingresada no existe. </p>
+{% endif %}
+
+
 <!-- Contenedor principal de tarjetas -->
 <div id="contenedor-tarjetas">
 
     <!-- Tarjeta 1 -->
     <div>
-        <h2>Gestión de Alumnos</h2>
+        <h2>👥 Usuarios</h2>
 
         <p>
-            Vea el listado de estudiantes, cargue notas de parciales y condiciones.
+            Vea el listado de ayudantes, editelos o agregue nuevos.
         </p>
         <a href="{{ url_for('seccion_usuarios', nombre_profesor=nombre_profesor) }}">
             Usuarios
@@ -25,30 +39,74 @@
 
     <!-- Tarjeta 2 -->
     <div>
-        <h2>Asistencia</h2>
-
+        <h2>🎓 Alumnos</h2>
         <p>
-            Registro de presencias, ausentes e historial de clases de la cursada.
+            Control de estudiantes y sus datos.
         </p>
-
-        <a href="#">
-            Próximamente
+        <a href="{{ url_for('seccion_alumnos', nombre_profesor=nombre_profesor) }}">
+            Alumnos
         </a>
     </div>
 
     <!-- Tarjeta 3 -->
     <div>
-        <h2>Ayudantes</h2>
+        <h2>📚 Historial</h2>
 
         <p>
-            Control de usuarios auxiliares y ayudantes asignados a la cátedra.
+            Registro de movimientos, cambios y actividades realizadas en la plataforma.
         </p>
 
-        <a href="#">
-            Próximamente
+        <a href="{{ url_for('seccion_historial', nombre_profesor=nombre_profesor) }}">
+            Historial
         </a>
     </div>
 
-</div>
+    <!-- Tarjeta 4 -->
+    <div>
+        <h2>👨‍👩‍👧‍👦 Grupos</h2>
+
+        <p>
+            Control de equipos y participantes.
+        </p>
+
+        <a href="{{ url_for('seccion_grupos', nombre_profesor=nombre_profesor) }}">
+            Grupos
+        </a>
+    </div>
+
+    <!-- Tarjeta 5 -->
+    <div>
+        <h2>📝 Evaluaciones</h2>
+        <p>
+            Control de examenes y resultados.
+        </p>
+        <a href="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
+            Evaluaciones
+        </a>
+    </div>
+
+    <!-- Tarjeta 6 -->
+    <div>
+        <h2>📊 Notas</h2>
+        <p>
+            Control de calificaciones y estadísticas.
+        </p>
+        <a href="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}">
+            Notas
+        </a>
+    </div>
+
+    <!-- Tarjeta 7 -->
+    <div>
+        <h2>✅ Asistencias</h2>
+        <p>
+            Control de asistencias y clases.
+        </p>
+        <a href="{{ url_for('seccion_asistencias', nombre_profesor=nombre_profesor) }}">
+            Asistencias
+        </a>    
+    </div>
+
+    
 
 {% endblock %}
