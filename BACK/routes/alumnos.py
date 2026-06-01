@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 import json
-from ..services import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente)
-from ..utils import (construir_error)
+from services.alumnos import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente)
+from utils import (construir_error)
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
@@ -9,16 +9,23 @@ alumnos_bp = Blueprint('alumnos', __name__)
 
 @alumnos_bp.route('/', methods=['GET'])
 def get_alumnos():
+    base_url = request.base_url
     limit = request.args.get('limit', type=int)
     offset = request.args.get('offset', type=int)
 
-    alumnos = listar_alumnos(limit, offset)
+    if limit is None or limit < 0:
+        limit = 10
+
+    if offset is None or offset < 0:
+        offset = 0
+
+    alumnos = listar_alumnos(limit, offset, base_url)
 
     return alumnos
 
 
 
-@alumnos_bp.route('/<int:id', methods=['GET'])
+@alumnos_bp.route('/<int:id>', methods=['GET'])
 def get_alumno(id):
     alumno = buscar_alumno(id)
 
@@ -40,11 +47,12 @@ def post_alumno():
     nombre      = body.get('nombre')
     apellido    = body.get('apellido')
     email       = body.get('email')
+    #abandono es 0 por default, no entra en POST
 
     if len(body) == 0:
-        return construir_error("Datos vacíos", 400)
+        return construir_error(400, "Datos vacíos")
     if not padron or not nombre or not apellido or not email:
-        return construir_error("Faltan campos obligatorios", 400)
+        return construir_error(400, "Faltan campos obligatorios")
     
     alumno = crear_alumno(body)
     return alumno
@@ -56,7 +64,7 @@ def patch_alumno(id):
     body = request.get_json()
 
     if len(body) == 0:
-        return construir_error("Datos vacíos", 400)
+        return construir_error(400, "Datos vacíos")
     
     alumno = actualizar_alumno(body, id)
     return alumno
@@ -65,10 +73,10 @@ def patch_alumno(id):
 
 @alumnos_bp.route('/<int:id>', methods=['DELETE'])
 def delete_alumno_virtual(id):
-    return eliminar_alumno()
+    return eliminar_alumno(id)
 
 
 
 @alumnos_bp.route('/perma/<int:id>', methods=['DELETE'])
-def delete_alumno_virtual(id):
-    return eliminar_alumno_permanente()
+def delete_alumno(id):
+    return eliminar_alumno_permanente(id)

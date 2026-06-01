@@ -1,21 +1,26 @@
 from flask import jsonify
-from ..db.init_db import get_connection
-from ..utils import (construir_paginacion, construir_error)
+from db.init_db import get_connection
+from utils import (construir_paginacion, construir_error)
+import traceback
 
 
-def listar_alumnos(limit, offset):
+def listar_alumnos(limit, offset, base_url):
+    connection = None
+    cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM alumnos LIMIT %s OFFSET %s"
+        select_stmt = "SELECT * FROM ALUMNOS ORDER BY PADRON LIMIT %s OFFSET %s"
         cursor.execute(select_stmt, [limit, offset])
 
         alumnos = cursor.fetchall()
-        listado = construir_paginacion(alumnos, limit, offset)
+        listado = construir_paginacion(alumnos, base_url, limit, offset)
         
-        return (jsonify({"listado": listado}), 200)
+        return listado
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        traceback.print_exc()
+
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
@@ -25,16 +30,24 @@ def listar_alumnos(limit, offset):
 
 
 def buscar_alumno(id):
+    connection = None
+    cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM alumnos WHERE id = %s"
+        select_stmt = "SELECT * FROM ALUMNOS WHERE PADRON = %s"
         cursor.execute(select_stmt, [id])
 
         alumno = cursor.fetchone()
+
+        if not alumno:
+            return construir_error(404, f"Alumno no encontrado")
+        
         return (jsonify({"alumno": alumno}), 200)
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        traceback.print_exc()
+
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
@@ -44,21 +57,30 @@ def buscar_alumno(id):
 
 
 def crear_alumno(body):
-    padron      = body.get('padron')
-    nombre      = body.get('nombre')
-    apellido    = body.get('apellido')
-    email       = body.get('email')
+    connection = None
+    cursor = None
+
+    padron      = body.get("padron")
+    nombre      = body.get("nombre")
+    apellido    = body.get("apellido")
+    email       = body.get("email")
+    abandono    = body.get("abandono")
+
 
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO alumnos (padron, nombre, apellido, email) VALUES (%s, %s, %s, %s) RETURNING id"
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
         cursor.execute(create_stmt, [padron, nombre, apellido, email])
 
-        id = cursor.fetchone()
-        return (jsonify({"id": id}), 201)
+        filas_afectadas = cursor.rowcount
+        
+        connection.commit()
+        return (jsonify({"filas afectadas": filas_afectadas}), 201)
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        traceback.print_exc()
+
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
@@ -68,45 +90,51 @@ def crear_alumno(body):
 
 
 def actualizar_alumno(body, id):
-    padron      = body.get('padron')
-    nombre      = body.get('nombre')
-    apellido    = body.get('apellido')
-    email       = body.get('email')
+    connection = None
+    cursor = None
+
+    nombre      = body.get("nombre")
+    apellido    = body.get("apellido")
+    email       = body.get("email")
+    abandono    = body.get("abandono")
 
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        select_stmt = "SELECT * FROM alumnos WHERE id = %s"
+        select_stmt = "SELECT * FROM ALUMNOS WHERE PADRON = %s"
         cursor.execute(select_stmt, [id])
         alumno = cursor.fetchone()
         
         if not alumno:
-            return construir_error(f"Alumno no encontrado", 404)
+            return construir_error(404, f"Alumno no encontrado")
         
         #rellenar datos que no vengan en el body
-        padron      = padron    or alumno["padron"]
-        nombre      = nombre    or alumno["nombre"]
-        apellido    = apellido  or alumno["apellido"]
-        email       = email     or alumno["email"]
+        nombre      = nombre    or alumno["NOMBRE"]
+        apellido    = apellido  or alumno["APELLIDO"]
+        email       = email     or alumno["MAIL"]
+        abandono    = abandono  or alumno["ABANDONO"]
 
         update_stmt = """
-        UPDATE alumnos SET
-        padron = %s,
-        nombre = %s,
-        apellido = %s,
-        email = %s
-        WHERE id = %s
+        UPDATE ALUMNOS SET
+        NOMBRE = %s,
+        APELLIDO = %s,
+        MAIL = %s,
+        ABANDONO = %s
+        WHERE PADRON = %s
         """
-        cursor.execute(update_stmt, [padron, nombre, apellido, email, id])
+        cursor.execute(update_stmt, [nombre, apellido, email, abandono, id])
         filas_afectadas = cursor.rowcount
 
         cursor.execute(select_stmt, [id])
         alumno_actualizado = cursor.fetchone()
+        connection.commit()
         return (jsonify({"filas afectadas": filas_afectadas, "alumno_actualizado": alumno_actualizado}), 200)
 
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        traceback.print_exc()
+
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
@@ -116,27 +144,55 @@ def actualizar_alumno(body, id):
 
 
 def eliminar_alumno(id):
+    connection = None
+    cursor = None
+    # try:
+    #     connection = get_connection()
+    #     cursor = connection.cursor(dictionary=True)
+
+    #     update_stmt = "UPDATE ALUMNOS SET ELIMINADO = 1 WHERE PADRON = %s"
+    #     cursor.execute(update_stmt, [id])
+
+    #     filas_afectadas = cursor.rowcount
+    #     if filas_afectadas == 0:
+    #         construir_error(404, "No se encontró el alumno")
+
+    #     connection.commit()
+    #     return (jsonify({}), 204)
+    # except Exception as e:
+    #     traceback.print_exc()
+        
+    #     return construir_error(500, f"Error inesperado: {e}")
+    # finally:
+    #     if cursor:
+    #         cursor.close()
+    #     if connection and connection.is_connected():
+    #         connection.close()
+
+
+
+def eliminar_alumno_permanente(id):
+    connection = None
+    cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        update_stmt = "UPDATE alumnos SET eliminado = 1 WHERE id = %s"
+        update_stmt = "DELETE FROM ALUMNOS WHERE PADRON = %s"
         cursor.execute(update_stmt, [id])
 
         filas_afectadas = cursor.rowcount
         if filas_afectadas == 0:
-            construir_error("No se encontró el alumno", 404)
+            construir_error(404, "No se encontró el alumno")
 
-        return (jsonify({"filas afectadas": filas_afectadas}), 204)
+        connection.commit()
+        return (jsonify({}), 204)
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        traceback.print_exc()
+        
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
-
-
-
-def eliminar_alumno_permanente(id):
-    pass
