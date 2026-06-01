@@ -80,6 +80,7 @@ def seccion_usuarios():
 def inicio():
     return render_template('inicio.html')
 
+#Modifique un toque para pasar contrasenia aparte de nombre al back
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
