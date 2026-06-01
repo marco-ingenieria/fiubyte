@@ -3,3 +3,9 @@ Proyecto final integrador - Introducción al Desarrollo de Software - Lanzillota
 
 # completen el .env y ejecuten el comando para arrancar docker
 docker compose up --build
+
+USUARIO ADMIN:
+http://localhost:5000/usuarios/login
+
+    "nombre": "BrunoLanzillota",
+    "contrasenia": "linustorvaldsroot"
