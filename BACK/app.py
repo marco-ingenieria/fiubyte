@@ -1,9 +1,9 @@
 from flask import Flask
-#from routes.alumnos import alumnos_bp
+from routes.alumnos import alumnos_bp
 from routes.usuarios import usuarios_bp
 app = Flask(__name__)
 
-#app.register_blueprint(alumnos_bp, url_prefix='/alumnos')
+app.register_blueprint(alumnos_bp, url_prefix='/alumnos')
 app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
 
 @app.route("/")
