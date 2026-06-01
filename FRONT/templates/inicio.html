@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Panel Docente{% endblock %}
+
+{% block content %}
+
+<div id="inicio_bienvenida">
+    <h1>Sistema Universitario</h1>
+
+    <p id="descricpion-inicio">
+        Plataforma académica orientada a la gestión docente, administración de alumnos y seguimiento de cursadas.
+    </p>
+
+   <div id="panel-info">
+        <h2>Funcionalidades principales</h2>
+        <ul> <li>Gestión de alumnos y notas</li> 
+            <li>Seguimiento académico</li> 
+            <li>Administración de asistencia</li> 
+            <li>Control de ayudantes</li> 
+        </ul>
+   </div> 
+   <!--BOTON PRINCIPAL-->
+   <a id="boton-login" href="{{ url_for('login') }}">
+        Iniciar Sesion
+    </a>
+</div>
+
+{% endblock %}
