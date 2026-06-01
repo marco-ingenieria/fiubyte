@@ -1,0 +1,78 @@
+/* Estilos para la página de usuarios */
+#delete-button:hover {
+    color: rgb(255, 0, 0);
+
+}
+dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 20px;
+    width: 350px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #eaf4ff;
+}
+
+/* El fondo oscuro cuando el dialog está abierto */
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+/* El formulario interno */
+dialog form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+dialog input[type="text"], 
+dialog input[type="email"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* El contenedor de los botones (el div de abajo) */
+dialog form > div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Estilo general para los botones de los modales */
+dialog button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Estilos específicos usando IDs o atributos */
+#modal-crear button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+}
+
+#modal-eliminar button[type="submit"] {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Botones de cancelar (los que son de tipo "button") */
+dialog button[type="button"] {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Botón deshabilitado */
+dialog button:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}

@@ -3,47 +3,105 @@
 {% block title %}Usuarios - Panel Docente{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='style/users.css') }}">
-<h1>Listado de Usuarios</h1>
-<p>Administre los usuarios del sistema, incluyendo docentes y alumnos.</p>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/usuarios.css') }}">
+<h1 style="text-align: center;">Listado de Usuarios</h1>
+<p style="text-align: center;">Administre los usuarios del sistema, incluyendo docentes y alumnos.</p>
 <!-- Caja para dar estilo a los botones -->
 <div id="grupo-botones">
-    <button>Agregar Usuario</button>
-    <button id="delete-button">Eliminar Usuario</button>
+    <button type="button" onclick="abrirModal('crear')">Crear Usuario</button>
+    <button type="button" onclick="abrirModal('eliminar')">Eliminar Usuario</button>
 </div>
+<dialog id="modal-crear">
+    <h3>Crear Nuevo Usuario</h3>
+    <form id="form-crear">
+        <label>Nombre:</label>
+        <input type="text" placeholder="Nombre completo" required>
+        
+        <label>Email:</label>
+        <input type="email" placeholder="correo@universidad.edu" required>
+        
+        <div>
+            <button type="submit">Guardar</button>
+            <button type="button" onclick="cerrarModal('crear')">Cancelar</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="modal-eliminar">
+    <h3>Eliminar Usuario</h3>
+    <p>Introduce el ID del usuario que deseas dar de baja y confirma la acción.</p>
+    
+    <form id="form-eliminar">
+        <label for="eliminar-usuario-id">ID o Legajo del Usuario:</label>
+        <input type="text" id="eliminar-usuario-id" placeholder="Ej: 1042" required>
+        
+        <label for="confirmar-palabra">Confirmación:</label>
+        <input type="text" id="confirmar-palabra" placeholder="Escribe ELIMINAR" required>
+        
+        <div>
+            <button type="submit" id="btn-eliminar-submit" disabled>Eliminar permanentemente</button>
+            <button type="button" onclick="cerrarModal('eliminar')">Cancelar</button>
+        </div>
+    </form>
+</dialog>
 <!-- Tabla tradicional -->
-<table id="users-table">
+<table>
     <thead>
         <tr>
             <th>ID</th>
-            <th>Nombre de Usuario</th>
+            <th>Nombre</th>
             <th>Email</th>
             <th>Rol</th>
-            <th>Historial</th>
+            <th>Historiales</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td>1</td>
-            <td>Juan Pérez</td>
-            <td>juan.perez@example.com</td>
+            <td>Ana García</td>
+            <td>ana.garcia@universidad.edu</td>
             <td>Docente</td>
-                <td><a href="#">Ver Historial</a></td>
+            <td>
+                <a href="#">Ver Historial</a>
+            </td>
         </tr>
         <tr>
             <td>2</td>
-            <td>Maria López</td>
-            <td>maria.lopez@example.com</td>
-            <td>Alumno</td>
-                <td><a href="#">Ver Historial</a></td>
+            <td>Diego Fernández</td>
+            <td>diego.fernandez@universidad.edu</td>
+            <td>Docente</td>
+            <td>
+                <a href="#">Ver Historial</a>
+            </td>
         </tr>
         <tr>
             <td>3</td>
-            <td>Carlos Gómez</td>
-            <td>carlos.gomez@example.com</td>
+            <td>Lucía Martínez</td>
+            <td>lucia.martinez@universidad.edu</td>
             <td>Alumno</td>
-                <td><a href="#">Ver Historial</a></td>
+            <td>
+                <a href="#">Ver Historial</a>
+            </td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Fernando Rojas</td>
+            <td>fernando.rojas@universidad.edu</td>
+            <td>Docente</td>
+            <td>
+                <a href="#">Ver Historial</a>
+            </td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>María Silva</td>
+            <td>maria.silva@universidad.edu</td>
+            <td>Alumno</td>
+            <td>
+                <a href="#">Ver Historial</a>
+            </td>
         </tr>
     </tbody>
 </table>
+<script src="{{ url_for('static', filename='javascript/usuarios.js') }}"></script>
 {% endblock %}

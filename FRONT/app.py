@@ -1,9 +1,9 @@
-from flask import Flask, render_template,request
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 # 3. Ruta de la sección de Usuarios
-@app.route('/users')
+@app.route('/usuarios')
 def seccion_usuarios():
     nombre = request.args.get('nombre_profesor', '')
     return render_template('usuarios.html', nombre_profesor=nombre)
