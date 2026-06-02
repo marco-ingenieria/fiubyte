@@ -10,7 +10,7 @@ def listar_evaluaciones(limit, offset, base_url):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM EVALUACIONES ORDER BY ID_MATERIA, FECHA_CREACION, ID LIMIT %s OFFSET %s"
+        select_stmt = "SELECT * FROM EVALUACIONES WHERE ELIMINADO = 0 ORDER BY ID_MATERIA, FECHA_CREACION, ID LIMIT %s OFFSET %s"
         cursor.execute(select_stmt, [limit, offset])
 
         evaluaciones = cursor.fetchall()
@@ -35,7 +35,7 @@ def buscar_evaluacion(id):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM EVALUACIONES WHERE ID = %s"
+        select_stmt = "SELECT * FROM EVALUACIONES WHERE ID = %s AND ELIMINADO = 0"
         cursor.execute(select_stmt, [id])
 
         evaluacion = cursor.fetchone()
@@ -97,7 +97,7 @@ def actualizar_evaluacion(body, id):
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        select_stmt = "SELECT * FROM EVALUACIONES WHERE ID = %s"
+        select_stmt = "SELECT * FROM EVALUACIONES WHERE ID = %s AND ELIMINADO = 0"
         cursor.execute(select_stmt, [id])
         evaluacion = cursor.fetchone()
         
@@ -137,28 +137,28 @@ def actualizar_evaluacion(body, id):
 def eliminar_evaluacion(id):
     connection = None
     cursor = None
-    # try:
-    #     connection = get_connection()
-    #     cursor = connection.cursor(dictionary=True)
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
 
-    #     update_stmt = "UPDATE EVALUACIONES SET ELIMINADO = 1 WHERE ID = %s"
-    #     cursor.execute(update_stmt, [id])
+        update_stmt = "UPDATE EVALUACIONES SET ELIMINADO = 1 WHERE ID = %s AND ELIMINADO = 0"
+        cursor.execute(update_stmt, [id])
 
-    #     filas_afectadas = cursor.rowcount
-    #     if filas_afectadas == 0:
-    #         return construir_error(404, "No se encontró la evaluación")
+        filas_afectadas = cursor.rowcount
+        if filas_afectadas == 0:
+            return construir_error(404, "No se encontró la evaluación")
 
-    #     connection.commit()
-    #     return (jsonify({}), 204)
-    # except Exception as e:
-    #     traceback.print_exc()
+        connection.commit()
+        return (jsonify({}), 204)
+    except Exception as e:
+        traceback.print_exc()
         
-    #     return construir_error(500, f"Error inesperado: {e}")
-    # finally:
-    #     if cursor:
-    #         cursor.close()
-    #     if connection and connection.is_connected():
-    #         connection.close()
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
 
 
 
