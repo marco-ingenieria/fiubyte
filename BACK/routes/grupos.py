@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from services.grupos import listar_grupos
+from services.grupos import (listar_grupos, obtener_grupo)
 from utils import construir_error
 import json
 
@@ -21,4 +21,14 @@ def get_grupos():
         offset = 0
 
     return listar_grupos(base_url, limit, offset)
+
+
+
+@grupos_bp.route("/<int:id>", methods=['GET'])
+def get_grupo(id):
+
+    return obtener_grupo(id)
+
+
+
 

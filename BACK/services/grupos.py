@@ -40,7 +40,29 @@ def listar_grupos(base_url, limit, offset):
     
 
 
+def obtener_grupo(id):
+    connection = None
+    cursor = None 
 
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        query = "SELECT * FROM GRUPOS WHERE ID=%s;"
+        cursor.execute(query, [id])
+        registro = cursor.fetchone()
 
+        return registro
     
+    except Exception:
+
+        traceback.print_exc()
+        return  construir_error(500, "Error inesperado del servidor")
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+
 
