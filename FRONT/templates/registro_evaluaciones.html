@@ -2,7 +2,62 @@
 
 {%- block title -%}Evaluaciones - Panel Docente{%- endblock -%}
 
+{%- block head -%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/registro_evaluaciones.css') }}">
+{%- endblock -%}
+
 {%- block content -%}
-    <h1>Evaluaciones</h1>
-    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar las evaluaciones, notas y resultados de la plataforma.</p>
+    <div>
+        <h1>Evaluaciones</h1>
+        <p>Bienvenido, {{ nombre_profesor if nombre_profesor else 'eve' }}. Aquí puedes gestionar las evaluaciones, notas y resultados de la plataforma.</p>
+    </div>
+
+    <div>
+        <button type="button">
+            <span>+</span> Agregar Tipo de Evaluación
+        </button>
+    </div>
+
+    <div>
+        <header>
+            <div>
+                <span>Configuración ABM</span>
+                <h2>Tipos de Evaluación</h2>
+            </div>
+            <div>
+                <button type="button">Tipos</button>
+                <button type="button">Historial</button>
+            </div>
+        </header>
+
+        <section>
+            {% set lista_evaluaciones = [
+                'TRABAJO PRACTICO 1 - 2026',
+                'TRABAJO PRACTICO 2 - 2026',
+                '1ER PARCIAL - 2026',
+                '2DO PARCIAL - 2026',
+                'FINAL 1 - 2026',
+                '1ER RECUPERATORIO - 2026',
+                '2DO RECUPERATORIO - 2026',
+                '3ER RECUPERATORIO - 2026'
+            ] %}
+
+            {% for tipo in lista_evaluaciones %}
+                <article>
+                    <div>
+                        <span>A</span>
+                        <strong>{{ tipo }}</strong>
+                    </div>
+                    
+                    <nav>
+                        <button type="button" onclick="window.location.href='{{ url_for('seccion_notas', evaluacion_nombre=tipo) }}'">
+                            ▶ ver
+                        </button>
+                        <button type="button" title="Editar">✏️</button>
+                        <button type="button" title="Eliminar">🗑️</button>
+                    </nav>
+                </article>
+            {% endfor %}
+        </section>
+    </div>
 {%- endblock -%}
