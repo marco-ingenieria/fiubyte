@@ -1,0 +1,235 @@
+/* ==========================================================================
+   ESTILOS CONTROLADOR ABM: REGISTRO EVALUACIONES (SIN CLASES)
+   ========================================================================= */
+
+/* Estilos de Tipografía y Contenedores Base */
+div[style*="max-width"], .seccion-encabezado-abm, h1, p {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 35px;
+    color: #64748b;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Contenedor del Botón de Alta Superior */
+div:has(> button[type="button"]:first-of-type) {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto 20px auto;
+    text-align: right;
+}
+
+/* Estilo del Botón "+ Agregar Tipo de Evaluación" */
+div:has(> button[type="button"]) > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--color-primario, #4f46e5);
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+div:has(> button[type="button"]) > button:hover {
+    background: var(--color-primario-hover, #4338ca);
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+}
+
+div:has(> button[type="button"]) > button span {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+/* Tarjeta Principal Panel Glassmorphism */
+div:has(> header) {
+    background: var(--blanco-vidrio, rgba(255, 255, 255, 0.45));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--borde-vidrio, rgba(255, 255, 255, 0.6));
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: var(--sombra-suave, 0 8px 32px 0 rgba(31, 38, 135, 0.06));
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+/* Cabecera Interna del Panel */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding-bottom: 15px;
+}
+
+header div:first-of-type span {
+    font-size: 13px;
+    color: var(--texto-mutado, #64748b);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+header div:first-of-type h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* Botonera de Tabs (Tipos / Historial) */
+header div:last-of-type {
+    display: flex;
+    gap: 10px;
+}
+
+header div:last-of-type button {
+    padding: 8px 22px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+header div:last-of-type button:first-of-type {
+    background: rgba(79, 70, 229, 0.1);
+    color: var(--color-primario, #4f46e5);
+    border-color: rgba(79, 70, 229, 0.2);
+}
+
+header div:last-of-type button:last-of-type {
+    background: transparent;
+    color: var(--texto-mutado, #64748b);
+    border-color: #cbd5e1;
+}
+
+header div:last-of-type button:last-of-type:hover {
+    background: #f1f5f9;
+    color: var(--texto-oscuro, #1e293b);
+}
+
+/* Cuerpo del Listado (Contenedor Violeta) */
+section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(79, 70, 229, 0.02);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(79, 70, 229, 0.05);
+}
+
+/* Filas individuales de la lista */
+article {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    transition: all 0.25s ease-in-out;
+}
+
+article:hover {
+    background: rgba(255, 255, 255, 0.85);
+    transform: translateX(4px);
+}
+
+article div {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Avatar Circular "A" */
+article div span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: rgba(79, 70, 229, 0.12);
+    color: var(--color-primario, #4f46e5);
+    font-weight: 800;
+    border-radius: 50%;
+    font-size: 14px;
+    border: 1px solid rgba(79, 70, 229, 0.05);
+}
+
+article div strong {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--texto-oscuro, #1e293b);
+    letter-spacing: 0.2px;
+}
+
+/* Botonera de Acciones en las Filas */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Botón Azul "▶ ver" */
+nav button:first-of-type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;
+    background: #0084ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 132, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+nav button:first-of-type:hover {
+    background: #0070d6;
+    box-shadow: 0 6px 14px rgba(0, 132, 255, 0.35);
+}
+
+/* Botones de Iconos Rápidos (✏️ y 🗑️) */
+nav button:not(:first-of-type) {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+}
+
+nav button:not(:first-of-type):hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
