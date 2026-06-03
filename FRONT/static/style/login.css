@@ -3,9 +3,11 @@
     --negro: #1a1a1a;
     --gris-claro: #f4f6f9;
     --gris-plata: #bdc3c7;
-    --azul-fiuba: #00529B;      
+    --azul-fiuba: #00539ba8;      
     --azul-oscuro: #002d57;     
+    --azul-foco: #fffffff5;
     --fuente-fiuba: 'Helvetica Neue', Arial, sans-serif;
+    --filtro-glass: blur(16px);
 }
 
 * {
@@ -14,20 +16,20 @@
     box-sizing: border-box;
 }
 
-/* GENERAL & FONDO */
 body {
     font-family: var(--fuente-fiuba);
-    background-image: url('img/Facultad.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: var(--azul-oscuro);
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* CAPA DE IMÁGENES ANIMADAS */
 body::before {
     content: '';
     position: absolute;
@@ -35,22 +37,46 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 82, 155, 0.85), rgba(0, 20, 40, 0.95));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+    animation: cambiarFondo 24s infinite ease-in-out;
+}
+
+/* CAPA DE GRADIENTE INTEGRANTE FIUBA */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 83, 155, 0.21), rgba(0, 45, 87, 0.9));
     z-index: -1;
 }
 
-/* CONTENEDOR PRINCIPAL */
+/* EFECTO GLASSMORPHISM AVANZADO CON SOMBRA BLANCA */
 .wrapper {
-    background-color: rgba(255, 255, 255, 0.08); 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.06); 
+    backdrop-filter: var(--filtro-glass);
+    -webkit-backdrop-filter: var(--filtro-glass);
     padding: 3.5rem 4rem;
     border-radius: 1.2rem; 
-    width: min(90%, 40rem);
+    width: min(90%, 38rem);
     color: var(--blanco);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4),
-                0 0 20px rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    /* Se combinan la sombra oscura profunda y el resplandor blanco perimetral */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35),
+                0 0 15px rgba(255, 255, 255, 0.898);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.wrapper:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    /* El resplandor blanco se intensifica y expande al hacer hover */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45),
+                0 0 25px rgba(255, 255, 255, 0.25);
 }
 
 .wrapper h1 {
@@ -60,18 +86,19 @@ body::before {
     font-weight: 700;
     letter-spacing: 0.5px;
     color: var(--blanco);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .login-instruction {
-    font-size: 1rem;
-    color: var(--gris-plata);
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.812);
     text-align: center;
     margin-bottom: 3rem;
     line-height: 1.5;
     font-weight: 300;
 }
 
-/* CAMPOS DE ENTRADA */
+/* ENTRADAS DE TEXTO ESTILIZADAS */
 .input-box {
     position: relative;
     width: 100%;
@@ -83,21 +110,21 @@ body::before {
     padding: 1rem 3.5rem 0.8rem 0.5rem;
     background: transparent;
     border: none;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
     outline: none;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     color: var(--blanco);
-    transition: all 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .input-box input:focus {
-    border-bottom-color: #0084ff; 
-    box-shadow: 0 1px 0 #0084ff;
+    border-bottom-color: var(--azul-foco); 
+    box-shadow: 0 1px 0 var(--azul-foco);
 }
 
 .input-box input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.95rem;
     letter-spacing: 0.5px;
 }
 
@@ -106,22 +133,24 @@ body::before {
     right: 0.8rem;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.4rem;
-    color: rgba(255, 255, 255, 0.6);
-    transition: color 0.3s ease;
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.5);
+    transition: color 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
 }
 
 .input-box input:focus ~ i {
-    color: #0084ff; 
+    color: var(--azul-foco); 
+    transform: translateY(-50%) scale(1.05);
 }
 
-/* CHECKBOX */
+/* CHECKBOX & LINKS */
 .remember-forgot {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     margin-bottom: 3rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--gris-plata);
 }
 
@@ -130,7 +159,8 @@ body::before {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    transition: color 0.2s;
+    user-select: none;
+    transition: color 0.2s ease;
 }
 
 .remember-forgot label:hover {
@@ -139,12 +169,13 @@ body::before {
 
 .remember-forgot input[type="checkbox"] {
     accent-color: var(--azul-fiuba); 
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1.15rem;
+    height: 1.15rem;
     cursor: pointer;
+    border-radius: 4px;
 }
 
-/* BOTÓN DE INGRESO */
+/* BOTÓN DE ACCESO ERGONÓMICO */
 .btn {
     display: block;
     width: 100%;
@@ -153,21 +184,51 @@ body::before {
     background: var(--azul-fiuba); 
     text-align: center;
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     padding: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.6rem; 
+    border-radius: 0.5rem; 
     cursor: pointer;
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 82, 155, 0.3);
+    transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
     letter-spacing: 0.5px;
 }
 
 .btn:hover {
     background-color: var(--azul-oscuro); 
-    box-shadow: 0 6px 20px rgba(0, 82, 155, 0.4);
-    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 45, 87, 0.5);
+    transform: translateY(-1.5px);
 }
 
 .btn:active {
-    transform: translateY(1px);
+    transform: translateY(0.5px);
+}
+
+/* CICLO DE TRANSICIÓN SUAVE (CROSSFADE EQUILIBRADO) */
+@keyframes cambiarFondo {
+    0%, 18% {
+        background-image: url('../img/Facultad.png');
+    }
+    25%, 43% {
+        background-image: url('../img/Facultad1.png');
+    }
+    50%, 68% {
+        background-image: url('../img/Facultad2.png');
+    }
+    75%, 93% {
+        background-image: url('../img/Facultad3.png');
+    }
+    100% {
+        background-image: url('../img/Facultad.png');
+    }
+}
+
+/* RESPONSIVE PARA DISPOSITIVOS MÓVILES */
+@media (max-width: 480px) {
+    .wrapper {
+        padding: 2.5rem 2rem;
+    }
+    .wrapper h1 {
+        font-size: 1.8rem;
+    }
 }
