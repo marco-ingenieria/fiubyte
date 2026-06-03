@@ -1,8 +1,39 @@
-{%- extends 'base_sistema.html' -%}
+{% extends "base_sistema.html" %}
 
-{%- block title -%}Asistencias - Panel Docente{%- endblock -%}
+{% block content %}
 
-{%- block content -%}
-    <h1>Asistencias</h1>
-    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar las asistencias y registros de la plataforma.</p>
-{%- endblock -%}
+<div id="contenedor-asistencia">
+
+    <h1>Asistencia</h1>
+
+    <div id="contenedor-clases">
+
+        <div class="tarjeta-clase">
+            <h3>Clase 13/05</h3>
+            <p>Prof. X</p>
+            <p>Finalizado</p>
+
+            <button>Generar QR</button>
+        </div>
+
+        <div class="tarjeta-clase">
+            <h3>Clase 20/05</h3>
+            <p>Prof. X</p>
+            <p>Finalizado</p>
+
+            <button>Generar QR</button>
+        </div>
+
+        <div class="tarjeta-clase">
+            <h3>Clase 27/05</h3>
+            <p>Prof. X</p>
+            <p>Finalizado</p>
+
+            <button>Generar QR</button>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
