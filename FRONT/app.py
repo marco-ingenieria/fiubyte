@@ -68,7 +68,7 @@ def seccion_alumnos():
     return render_template('alumnos.html', nombre_profesor=nombre)
 
 # 1. Ruta de la sección de Usuarios
-@app.route('/users')
+@app.route('/usuarios')
 def seccion_usuarios():
     nombre = request.args.get('nombre_profesor', '')
     return render_template('usuarios.html', nombre_profesor=nombre)
