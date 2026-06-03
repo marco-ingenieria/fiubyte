@@ -1,0 +1,260 @@
+/* ==========================================================================
+   HOJA DE ESTILOS DE NOTAS - MAQUETADO EXCLUSIVO POR ETIQUETAS
+   ========================================================================== */
+
+/* Fuentes generales del módulo */
+div[style*="max-width"], h1, p, form {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 35px;
+    color: #64748b;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* El panel principal de formulario (Efecto Vidrio Glassmorphism) */
+form {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+    width: 100%;
+    max-width: 1200px;
+    margin: 15px auto 0 auto;
+}
+
+/* Caja contenedora que habilita el scroll horizontal en celulares */
+form > div:first-of-type {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.2);
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estructura general de la Tabla Excel */
+table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Encabezados de la Tabla */
+th {
+    padding: 14px 10px;
+    font-weight: 700;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Aplicación de colores Excel usando selectores de columna avanzados */
+tr th:nth-of-type(3) { background-color: #ffeaa7 !important; } /* Trabajos Prácticos Amarillo */
+tr th:nth-of-type(4) { background-color: #fab1a0 !important; } /* Exámenes Naranja */
+
+/* Sub-encabezados de la segunda fila */
+thead tr:last-of-type th {
+    background-color: rgba(255, 255, 255, 0.6);
+    font-size: 11px !important;
+    padding: 8px 4px !important;
+}
+
+/* Celdas del Cuerpo */
+td {
+    padding: 10px 8px;
+    border: 1px solid #e2e8f0;
+    height: 54px;
+    vertical-align: middle;
+}
+
+tbody tr:hover td {
+    background-color: rgba(79, 70, 229, 0.04);
+}
+
+/* COLUMNAS FIJAS IZQUIERDA (PADRÓN Y NOMBRE) */
+thead tr:first-of-type th:first-of-type,
+tbody td:first-of-type {
+    position: sticky;
+    left: 0;
+    background-color: #f1f5f9;
+    z-index: 10;
+    width: 100px;
+    min-width: 100px;
+    border-right: 1px solid #cbd5e1 !important;
+}
+
+thead tr:first-of-type th:nth-of-type(2),
+tbody td:nth-of-type(2) {
+    position: sticky;
+    left: 100px;
+    background-color: #f8fafc;
+    z-index: 10;
+    width: 240px;
+    min-width: 240px;
+    border-right: 2px solid #cbd5e1 !important;
+    text-align: left;
+    padding-left: 15px !important;
+}
+
+/* Resaltado de la columna Nota Final */
+tbody td:nth-last-of-type(2) {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+tbody td:nth-last-of-type(2) input {
+    font-weight: 800 !important;
+    border-color: #a8a29e !important;
+}
+
+/* VALIDACIÓN TP: ALUMNO QUE ABANDONÓ LA MATERIA */
+tr[data-status="bloqueado"] td {
+    background-color: #f1f5f9 !important;
+    color: #94a3b8 !important;
+}
+
+tr[data-status="bloqueado"] td span {
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    text-transform: uppercase;
+}
+
+/* Ocultación absoluta de flechas de incremento numérico */
+input[type="number"] {
+    width: 100%;
+    max-width: 60px;
+    height: 34px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    outline: none;
+    border-radius: 6px;
+    appearance: textfield;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    transition: all 0.2s ease;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
+}
+
+input[type="number"]:focus:not(:disabled) {
+    border-color: #4f46e5;
+    box-shadow: 0 0 4px rgba(79, 70, 229, 0.3);
+}
+
+input[type="number"]:disabled {
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+    border-color: #e2e8f0 !important;
+}
+
+/* MENÚS DESPLEGABLES DE ESTADO CONDICIONAL POR COLORES */
+select {
+    width: 100%;
+    max-width: 140px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+select:disabled {
+    cursor: not-allowed;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+select[data-color="aprobado"] { background-color: #d4edda !important; color: #155724 !important; }
+select[data-color="libre"] { background-color: #fff3cd !important; color: #856404 !important; }
+select[data-color="desaprobado"] { background-color: #f8d7da !important; color: #721c24 !important; }
+
+/* PANEL ACCIONES INFERIOR (BOTONERA) */
+form > div:last-of-type {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 25px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 20px;
+}
+
+form > div:last-of-type button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+}
+
+/* Botón Volver */
+form > div:last-of-type button:first-of-type {
+    background: rgba(255, 255, 255, 0.6);
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+
+form > div:last-of-type button:first-of-type:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #1e293b;
+    transform: translateY(-1px);
+}
+
+/* Botón Guardar Planilla */
+form > div:last-of-type button:last-of-type {
+    background: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+}
+
+form > div:last-of-type button:last-of-type:hover {
+    background: #4338ca;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    transform: translateY(-1.5px);
+}
