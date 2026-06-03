@@ -10,12 +10,10 @@ function abrirModal(tipo) {
 function cerrarModal(tipo) {
     if (tipo === 'crear') {
         document.getElementById('modal-crear').close();
+        document.getElementById('form-crear').reset(); // Limpiar el formulario al cerrar
     } else if (tipo === 'eliminar') {
-        // Limpiamos los campos al cerrar para que no queden datos viejos si vuelve a abrir
-        document.getElementById('eliminar-usuario-id').value = "";
-        document.getElementById('confirmar-palabra').value = "";
-        document.getElementById('btn-eliminar-submit').disabled = true;
         document.getElementById('modal-eliminar').close();
+        document.getElementById('form-eliminar').reset(); // Limpiar el formulario al cerrar
     }
 }
 

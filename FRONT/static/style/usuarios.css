@@ -31,7 +31,7 @@ dialog form {
 }
 
 dialog input[type="text"], 
-dialog input[type="email"] {
+dialog input[type="password"] {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
