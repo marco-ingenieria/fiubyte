@@ -4,30 +4,125 @@
 
 <div id="contenedor-asistencia">
 
-    <h1>Asistencia</h1>
+    <h1 id="titulo-asistencia">Asistencia</h1>
+
+    <details id="nueva-clase">
+
+        <summary>➕ Añadir clase</summary>
+
+        <form id="formulario-clase" method="POST">
+
+            <label>Fecha de clase</label>
+            <input type="date" name="fecha">
+
+            <label>Docente 1</label>
+            <input type="text" name="docente1">
+
+            <label>Docente 2</label>
+            <input type="text" name="docente2">
+
+            <label>Docente 3</label>
+            <input type="text" name="docente3">
+
+            <button type="submit">
+                Guardar clase
+            </button>
+
+        </form>
+
+    </details>
+
+    <div id="barra-filtros">
+
+        <form method="GET">
+
+            <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+
+            <label>Ordenar:</label>
+
+            <select name="orden">
+                <option value="asc">Más antiguas</option>
+                <option value="desc">Más recientes</option>
+            </select>
+
+            <button type="submit">Aplicar</button>
+
+        </form>
+
+    </div>
 
     <div id="contenedor-clases">
 
-        <div>
-            <h3>Clase 13/05</h3>
-            <p>Prof. X</p>
-            <p>Finalizado</p>
-            <button>Generar QR</button>
-        </div>
+        {% for clase in clases %}
 
-        <div>
-            <h3>Clase 20/05</h3>
-            <p>Prof. X</p>
-            <p>Finalizado</p>
-            <button>Generar QR</button>
-        </div>
+            {% if clase.estado == "Finalizada" %}
+                <div data-estado="finalizada">
 
-        <div>
-            <h3>Clase 27/05</h3>
-            <p>Prof. X</p>
-            <p>Finalizado</p>
-            <button>Generar QR</button>
-        </div>
+            {% elif clase.estado == "Actual" %}
+                <div data-estado="actual">
+
+            {% else %}
+                <div data-estado="proxima">
+            {% endif %}    
+
+                <div>
+                    <h3>Clase</h3>
+                    <details>
+                        <summary>✏</summary>
+
+                        <form method="POST" action="/editar_clase/{{ clase.id }}">#RUTA BACKEND
+                            <label>Fecha</label>
+                            <input type="date" name="fecha" value="{{ clase.fecha }}">
+
+                            <label>Docente 1</label>
+                            <input type="text" name="docente1" value="{{ clase.docente1 }}">
+
+                            <label>Docente 2</label>
+                            <input type="text" name="docente2" value="{{ clase.docente2 }}">
+
+                            <label>Docente 3</label>
+                            <input type="text" name="docente3" value="{{ clase.docente3 }}">
+
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+
+                        <form method="POST" action="/eliminar_clase/{{ clase.id }}">#RUTA BACKEND
+                            <button type="submit">Eliminar clase</button>
+                        </form>
+
+                    </details>
+
+                </div>
+
+                <p>
+                    {{ clase.fecha[8:10] }}/{{ clase.fecha[5:7] }}/{{ clase.fecha[0:4] }}
+                </p>
+
+                {% if clase.docente1 %}
+                    <p>👨‍🏫 {{ clase.docente1 }}</p>
+                {% endif %}
+
+                {% if clase.docente2 %}
+                    <p>👨‍🏫 {{ clase.docente2 }}</p>
+                {% endif %}
+
+                {% if clase.docente3 %}
+                    <p>👨‍🏫 {{ clase.docente3 }}</p>
+                {% endif %}
+
+                <p data-estado="{{ clase.estado|lower }}">
+                    ● {{ clase.estado }}
+                </p>
+
+                {% if clase.estado == "Actual" %}
+                    <button class="btn-qr">
+                        Generar QR
+                    </button>
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
 
     </div>
 

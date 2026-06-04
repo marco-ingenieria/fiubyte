@@ -1,4 +1,5 @@
-from flask import Flask, render_template,request,url_for,redirect
+from flask import Flask, render_template,request,url_for,request
+from datetime import date, datetime
 
 app = Flask(__name__)
 
@@ -32,10 +33,43 @@ def buscar_seccion():
     return render_template('menu_principal.html', nombre_profesor=nombre, error_busqueda=True)
 
 # 7. Ruta de la sección de Asistencias
-@app.route('/asistencias')
+
+clases = [] #la idea de dejarla afuera es para q acumule las clses agregadas, si la dejo adentro se reinicia cada vez que se hace un POST
+
+@app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
+
     nombre = request.args.get('nombre_profesor', '')
-    return render_template('asistencias.html', nombre_profesor=nombre)  
+
+    if request.method == "POST":
+
+        fecha = request.form["fecha"]
+        fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date() #fecha en formato datetime para poder compararla con la fecha actual y determinar el estado de la clase
+
+        if fecha_obj < date.today():
+            estado = "Finalizada"
+        elif fecha_obj == date.today():
+            estado = "Actual"
+        else:
+            estado = "Próximamente"
+
+        clases.append({
+            "fecha": fecha,
+            "docente1": request.form["docente1"],
+            "docente2": request.form["docente2"],
+            "docente3": request.form["docente3"],
+            "estado": estado
+        })
+    orden=request.args.get("orden", "asc")
+    clases_ordenadas = clases.copy()
+    
+    if orden == "asc":
+        clases_ordenadas.sort(key=lambda clase: clase["fecha"])
+
+    elif orden == "desc":
+        clases_ordenadas.sort(key=lambda clase: clase["fecha"],reverse=True)
+
+    return render_template("asistencias.html",clases=clases_ordenadas,nombre_profesor=nombre)
 
 # 6. Ruta de la sección de Notas
 @app.route('/notas')
