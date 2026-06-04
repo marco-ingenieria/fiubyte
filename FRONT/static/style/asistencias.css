@@ -13,6 +13,7 @@
     width: 500px;
     margin: 0 auto 40px auto;
 
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -24,6 +25,8 @@
     border-radius: 16px;
 
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+
+    margin-top: 15px;
 }
 
 #formulario-clase input{
@@ -45,12 +48,13 @@
 #contenedor-clases{
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 8px;
 }
 
-#contenedor-clases > div{
+
+#contenedor-clases > div{  
     width: 280px;
-    padding: 20px;
+    padding: 16px;
     border-radius: 16px;
     background-color: white;
     box-shadow: 0px 4px 16px rgba(0,0,0,0.08);
@@ -63,7 +67,7 @@
 
 #contenedor-clases h3{
     margin-top: 0;
-    margin-bottom: 16px;
+    margin-bottom: 6px;
     font-size: 18px;
     font-weight: 800;
     color: #0f172a;
@@ -183,7 +187,7 @@
     font-size: 13px;
     font-weight: 600;
 }
-.btn-qr{
+button[id^="btn-qr"]{
     margin-top: 15px;
     width: 100%;
 
@@ -207,18 +211,17 @@
     transition: all 0.25s ease;
 }
 
-.btn-qr:hover{
+button[id^="btn-qr"]:hover{
     transform: translateY(-3px);
 
     box-shadow: 0 10px 22px rgba(79, 70, 229, 0.35);
 }
 
-.btn-qr:active{
+button[id^="btn-qr"]:active{
     transform: translateY(0px);
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
-----
 #contenedor-clases > div > div{
     display: flex;
     justify-content: space-between;
@@ -265,4 +268,20 @@
 #contenedor-clases form button[type="submit"]:last-of-type{
     background-color: #ef4444;
     color: white;
+}
+#error-msg{
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    display: block;
+
+    font-size: 11px;
+    font-weight: 600;
+    color: #dc2626 !important;
+
+}
+
+#contenedor-clases p{
+    margin: 3px 0;
+    line-height: 1.7;
 }

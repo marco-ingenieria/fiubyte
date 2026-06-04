@@ -38,38 +38,62 @@ clases = [] #la idea de dejarla afuera es para q acumule las clses agregadas, si
 
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
-
     nombre = request.args.get('nombre_profesor', '')
-
+    error = None
     if request.method == "POST":
 
-        fecha = request.form["fecha"]
-        fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date() #fecha en formato datetime para poder compararla con la fecha actual y determinar el estado de la clase
+        fecha = request.form.get("fecha")
+        tema = request.form.get("tema")
+        horario = request.form.get("horario")
 
-        if fecha_obj < date.today():
-            estado = "Finalizada"
-        elif fecha_obj == date.today():
-            estado = "Actual"
+        fecha_obj = None
+
+        if not fecha:
+            error = "Fecha inválida"
         else:
-            estado = "Próximamente"
+            try:
+                fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            except ValueError:
+                error = "Fecha inválida"
 
-        clases.append({
-            "fecha": fecha,
-            "docente1": request.form["docente1"],
-            "docente2": request.form["docente2"],
-            "docente3": request.form["docente3"],
-            "estado": estado
-        })
+        if error is None:
+                if not horario:
+                    error = "Horario inválido"
+                else:
+                    try:
+                        datetime.strptime(horario, "%H:%M")
+                    except ValueError:
+                        error = "Horario inválido"
+
+        if error is None:
+    
+            if fecha_obj < date.today():
+                estado = "Finalizada"
+            elif fecha_obj == date.today():
+                estado = "Actual"
+            else:
+                estado = "Próximamente"
+
+            clases.append({
+                "id": len(clases) + 1, #id autoincremental para cada clase
+                "fecha": fecha_obj.strftime("%Y-%m-%d"),
+                "tema": tema,
+                "horario": horario,
+                "docente1": request.form["docente1"],
+                "docente2": request.form["docente2"],
+                "docente3": request.form["docente3"],
+                "estado": estado
+            })
     orden=request.args.get("orden", "asc")
     clases_ordenadas = clases.copy()
     
     if orden == "asc":
-        clases_ordenadas.sort(key=lambda clase: clase["fecha"])
+        clases_ordenadas.sort(key=lambda clase: datetime.strptime(clase["fecha"], "%Y-%m-%d"))
 
     elif orden == "desc":
-        clases_ordenadas.sort(key=lambda clase: clase["fecha"],reverse=True)
+        clases_ordenadas.sort(key=lambda clase: datetime.strptime(clase["fecha"], "%Y-%m-%d"),reverse=True)
 
-    return render_template("asistencias.html",clases=clases_ordenadas,nombre_profesor=nombre)
+    return render_template("asistencias.html",clases=clases_ordenadas,nombre_profesor=nombre, error=error)
 
 # 6. Ruta de la sección de Notas
 @app.route('/notas')
