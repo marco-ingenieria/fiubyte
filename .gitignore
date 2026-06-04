@@ -2,3 +2,4 @@ BACK/.venv
 FRONT/.venv
 .env
 **/__pycache__/
+.vscode

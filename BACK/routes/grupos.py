@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from services.grupos import (listar_grupos, obtener_grupo)
+from services.grupos import (listar_grupos, obtener_grupo, crear_grupo)
 from utils import construir_error
 import json
 
@@ -30,5 +30,15 @@ def get_grupo(id):
     return obtener_grupo(id)
 
 
+@grupos_bp.route("/", methods=['POST'])
+def post_grupo():
+
+    data=request.get_json()
+    nombre = data.get('nombre')
+
+    if not nombre:
+        return (jsonify("No se ha especificado ningun nombre"), 400) 
+    
+    return crear_grupo(nombre)
 
 

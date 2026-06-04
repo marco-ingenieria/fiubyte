@@ -47,16 +47,19 @@ def obtener_grupo(id):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
+
         query = "SELECT * FROM GRUPOS WHERE ID=%s;"
         cursor.execute(query, [id])
         registro = cursor.fetchone()
 
-        return registro
+        if not registro:
+            return construir_error(404, "Grupo no encontrado")
+        
+        return (jsonify(registro), 200)
     
     except Exception:
-
         traceback.print_exc()
-        return  construir_error(500, "Error inesperado del servidor")
+        return construir_error(500, "Error inesperado del servidor")
     
     finally:
         if cursor:
@@ -66,3 +69,26 @@ def obtener_grupo(id):
 
 
 
+def crear_grupo(nombre_grupo):
+    connection = None
+    cursor = None 
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary = True)
+
+        query = "INSERT INTO GRUPOS (NOMBRE) VALUES(%s);"
+        cursor.execute(query, [nombre_grupo])
+        connection.commit()
+
+        return (jsonify("Creacion de grupo exitosa"), 200)
+    
+    except:
+        traceback.print_exc()
+        return construir_error(500, "Error inesperado del servidor")
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
