@@ -3,12 +3,14 @@ from routes.alumnos import alumnos_bp
 from routes.usuarios import usuarios_bp
 from routes.evaluaciones import evaluaciones_bp
 from routes.historial import historiales_bp
+from routes.clases import clases_bp
 app = Flask(__name__)
 
 app.register_blueprint(alumnos_bp, url_prefix='/alumnos')
 app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
 app.register_blueprint(evaluaciones_bp, url_prefix='/evaluaciones')
 app.register_blueprint(historiales_bp, url_prefix='/historiales')
+app.register_blueprint(clases_bp, url_prefix='/clases')
 
 @app.route("/")
 def index():

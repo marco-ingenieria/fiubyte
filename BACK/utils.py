@@ -1,4 +1,5 @@
 from flask import jsonify
+from datetime import datetime
 
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
@@ -29,3 +30,14 @@ def construir_paginacion(listado, base_url, limit, offset):
         "listado": listado,
         "links": links
     }), codigo_HTTP)
+
+def validar_fecha(fecha):
+    if not isinstance(fecha, str):
+        return False
+
+    try:
+        datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
+        return True
+    except ValueError:
+        return False
+    
