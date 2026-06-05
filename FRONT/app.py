@@ -32,6 +32,26 @@ def buscar_seccion():
 
     return render_template('menu_principal.html', nombre_profesor=nombre, error_busqueda=True)
 
+# 8. Ruta para mostrar el perfil del alumno
+
+@app.route("/alumno")
+def perfil_alumno():
+
+    alumno = {    #REEMPLZAR POR DATOS SQL REALES
+        "nombre": "Juan Pérez",
+        "asistencias": 87,
+        "promedio": 8.4,
+        "padron": 109876,
+        "grupos": ["Grupo 1", "Grupo 3"],
+        "trabajos": 5,
+        "notas": [9, 8, 7, 10]
+    }
+
+    return render_template(
+        "alumno.html",
+        alumno=alumno
+    )
+
 #7. Ruta para mostrar el QR de la clase actual
 
 @app.route("/qr")
@@ -137,6 +157,37 @@ def seccion_evaluaciones():
 def seccion_grupos():
     nombre = request.args.get('nombre_profesor', '')
     return render_template('grupos.html', nombre_profesor=nombre)
+
+# NUEVA RUTA: Hoja de detalle de un grupo específico (Accedida desde el perfil o listados)
+@app.route('/grupo-detalle')
+def detalle_grupo_especifico():
+    nombre_profesor = request.args.get('nombre_profesor', '')
+    
+    # Atajamos cuál grupo exacto se quiere ver (ej: "Grupo 1")
+    id_grupo = request.args.get('id', '')
+
+    # =========================================================================
+    # LÓGICA SQL FUTURA:
+    # # 1. Buscamos los datos de este grupo en la base de datos:
+    # grupo_datos = db.execute("SELECT * FROM grupos WHERE nombre = ?", id_grupo)
+    #
+    # # 2. Buscamos a todos los alumnos que pertenecen a este grupo para listarlos:
+    # integrantes = db.execute("SELECT nombre, padron FROM alumnos WHERE grupo = ?", id_grupo)
+    # =========================================================================
+
+    # Datos fijos temporales para que no tire error al renderizar mientras desarrollás
+    grupo_simulado = {
+        "nombre": id_grupo if id_grupo else "Grupo Sin Nombre",
+        "materia": "Diseño de Sistemas",
+        "integrantes": ["Juan Pérez", "Ana Gómez", "Lucas Díaz"]
+    }
+
+    return render_template(
+        'grupo_individual.html', # Esta es la nueva plantilla física para la hoja del grupo
+        nombre_profesor=nombre_profesor,
+        grupo=grupo_simulado
+    )
+
 
 # 3. Ruta de la sección de Historial
 @app.route('/historial')

@@ -1,0 +1,229 @@
+:root {
+    --color-primario: #0033a0;    
+    --color-secundario: #4f46e5;  
+    --color-exito: #10b981;      
+    --color-alerta: #f59e0b;     
+    --fondo-pagina: #f8fafc;      
+    --sombra-suave: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --sombra-hover: 0 20px 40px rgba(79, 70, 229, 0.15);
+}
+
+#contenedor-alumno {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: var(--fondo-pagina);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+}
+#cabecera-alumno {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+#avatar-alumno {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 20px auto;
+    border-radius: 50%;
+    
+    /* Centrado absoluto de la única letra */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Estilo de la inicial */
+    font-size: 48px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase; /* Fuerza que la letra sea mayúscula siempre */
+    line-height: 1; 
+    
+    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+    box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+#avatar-alumno:hover {
+    transform: scale(1.1) rotate(8deg);
+    box-shadow: 0 16px 32px rgba(79, 70, 229, 0.5);
+}
+
+
+#titulo-alumno {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+#padron-alumno {
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 600;
+    background: #e2e8f0;
+    padding: 6px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 0 0 12px 0;
+}
+#cabecera-alumno > small {
+    display: block;
+    font-size: 14px;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+#datos-alumno {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+#datos-alumno > div {
+    background: white;
+    padding: 30px;
+    border-radius: 24px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: var(--sombra-suave);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+#datos-alumno > div::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 5px;
+    background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+#datos-alumno > div:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--sombra-hover);
+    border-color: rgba(79, 70, 229, 0.3);
+}
+#datos-alumno > div:hover::before {
+    width: 100%;
+    left: 0;
+}
+#datos-alumno h3 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    font-weight: 700;
+}
+
+#datos-alumno p {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -1px;
+}
+#contenedor-alumno > h4 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin: 0 0 15px 0;
+    font-weight: 700;
+}
+#contenedor-grupos {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 35px;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--sombra-suave);
+}
+
+#contenedor-grupos a {
+    padding: 10px 20px;
+    border-radius: 14px;
+    background-color: rgba(79, 70, 229, 0.05);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-secundario);
+    border: 1px solid rgba(79, 70, 229, 0.1);
+    transition: all 0.2s ease;
+}
+
+#contenedor-grupos a:hover {
+    background-color: var(--color-secundario);
+    color: white;
+    transform: translateY(-2px);
+}
+#tabla-evaluaciones {
+    background: white;
+    padding: 20px;
+    border-radius: 24px;
+    box-shadow: var(--sombra-suave);
+    overflow-x: auto;
+}
+
+#tabla-evaluaciones table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+#tabla-evaluaciones th {
+    padding: 16px;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+#tabla-evaluaciones td {
+    padding: 18px 16px;
+    font-size: 15px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+#tabla-evaluaciones tr:last-child td {
+    border-bottom: none;
+}
+
+#tabla-evaluaciones tr:hover td {
+    background-color: #f8fafc;
+}
+
+#tabla-evaluaciones td strong {
+    font-size: 16px;
+    color: #0f172a;
+}
+#tabla-evaluaciones td span {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+#tabla-evaluaciones tr:nth-child(-n+4) td span {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--color-exito);
+}
+
+#tabla-evaluaciones tr:nth-last-child(2) td span {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-alerta);
+}
+#tabla-evaluaciones tr:last-child td span {
+    background-color: #f1f5f9;
+    color: #64748b;
+}

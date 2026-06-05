@@ -1,0 +1,85 @@
+{% extends "base_sistema.html" %}
+
+{% block content %}
+
+<div id="contenedor-alumno">
+
+    <!-- Bloque Perfil / Avatar -->
+    <div id="cabecera-alumno">
+        
+        <!-- CORRECCIÓN: Agregamos [0] para traer solo la primera letra del nombre -->
+        <div id="avatar-alumno">
+            {{ alumno.nombre[0] }}
+        </div>
+
+        <h1 id="titulo-alumno">
+            {{ alumno.nombre }}
+        </h1>
+
+        <p id="padron-alumno">
+            Padrón {{ alumno.padron }}
+        </p>
+        
+        <small>Curso: {{ alumno.curso if alumno.curso else "Diseño de Sistemas 2026" }}</small>
+    </div>
+
+    <!-- El resto del HTML (tarjetas y tabla) queda exactamente igual como te gustó antes -->
+    <div id="datos-alumno">
+        <div>
+            <h3>Asistencias</h3>
+            <p>{{ alumno.asistencias }}%</p>
+        </div>
+        <div>
+            <h3>Promedio General</h3>
+            <p>{{ alumno.promedio }}</p>
+        </div>
+        <div>
+            <h3>Trabajos Entregados</h3>
+            <p>{{ alumno.trabajos }}</p>
+        </div>
+    </div>
+
+    <h4>Grupos Asignados</h4>
+    <div id="contenedor-grupos">
+        {% for grupo in alumno.grupos %}
+            <a href="{{ url_for('detalle_grupo_especifico', id=grupo, nombre_profesor=request.args.get('nombre_profesor', '')) }}">
+                {{ grupo }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <h4>Detalle de Evaluaciones</h4>
+    <div id="tabla-evaluaciones">
+        <table>
+            <thead>
+                <tr>
+                    <th>Evaluación</th>
+                    <th>Estado</th>
+                    <th>Calificación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nota in alumno.notas %}
+                <tr>
+                    <td>Examen Parcial {{ loop.index }}</td>
+                    <td><span>Completado</span></td>
+                    <td><strong>{{ nota }}</strong></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td>Examen Final Integrador</td>
+                    <td><span>Pendiente</span></td>
+                    <td><strong>--</strong></td>
+                </tr>
+                <tr>
+                    <td>Recuperatorio General</td>
+                    <td><span>No requerido</span></td>
+                    <td><strong>--</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
