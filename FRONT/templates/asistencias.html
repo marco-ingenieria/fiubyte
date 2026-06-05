@@ -49,9 +49,10 @@
 
             <label>Ordenar:</label>
 
-            <select name="orden"> <!--dato clave-valor donde la clave es "orden" y el valor es "asc" o "desc"-->
-                <option value="asc">Más antiguas</option>
-                <option value="desc">Más recientes</option>
+            <select name="orden"> <!--dato clave-valor donde la clave es "orden" y el valor es "asc" o "desc" o "actual"-->
+                <option value="asc">Fechas ascendente</option>
+                <option value="desc">Fechas descendente</option>
+                <option value="actual">Actual primero</option>
             </select>
 
             <button type="submit">Aplicar</button>
@@ -138,9 +139,15 @@
                 </p>
 
                 {% if clase.estado == "Actual" %}
-                    <button id="btn-qr-{{clase.id}}">
-                        Generar QR
-                    </button>
+                    <form action="/qr" method="GET">
+
+                        <input type="hidden" name="id" value="{{ clase.id }}">
+
+                        <button id="btn-qr-{{clase.id}}" type="submit">
+                            Generar QR
+                        </button>
+
+                    </form>
                 {% endif %}
 
             </div>

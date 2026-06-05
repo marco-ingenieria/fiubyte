@@ -32,6 +32,19 @@ def buscar_seccion():
 
     return render_template('menu_principal.html', nombre_profesor=nombre, error_busqueda=True)
 
+#7. Ruta para mostrar el QR de la clase actual
+
+@app.route("/qr")
+def mostrar_qr():
+    id_clase = int(request.args.get("id"))
+    clase_encontrada = None
+
+    for clase in clases:
+        if clase["id"] == id_clase:
+            clase_encontrada = clase
+
+    return render_template("qr.html",clase=clase_encontrada)
+
 # 7. Ruta de la sección de Asistencias
 
 clases = [] #la idea de dejarla afuera es para q acumule las clses agregadas, si la dejo adentro se reinicia cada vez que se hace un POST
@@ -53,8 +66,11 @@ def seccion_asistencias():
         else:
             try:
                 fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+                if fecha_obj.year < 2000:
+                    error = "Fecha inválida"
             except ValueError:
                 error = "Fecha inválida"
+
 
         if error is None:
                 if not horario:
@@ -92,6 +108,15 @@ def seccion_asistencias():
 
     elif orden == "desc":
         clases_ordenadas.sort(key=lambda clase: datetime.strptime(clase["fecha"], "%Y-%m-%d"),reverse=True)
+    elif orden == "actual":
+        clases_actuales = []
+        resto_clases = []
+        for clase in clases_ordenadas:
+            if clase["estado"] == "Actual":
+                clases_actuales.append(clase)
+            else:
+                resto_clases.append(clase)
+        clases_ordenadas = clases_actuales + resto_clases
 
     return render_template("asistencias.html",clases=clases_ordenadas,nombre_profesor=nombre, error=error)
 
