@@ -7,7 +7,6 @@
     <!-- Bloque Perfil / Avatar -->
     <div id="cabecera-alumno">
         
-        <!-- CORRECCIÓN: Agregamos [0] para traer solo la primera letra del nombre -->
         <div id="avatar-alumno">
             {{ alumno.nombre[0] }}
         </div>
@@ -23,7 +22,6 @@
         <small>Curso: {{ alumno.curso if alumno.curso else "Diseño de Sistemas 2026" }}</small>
     </div>
 
-    <!-- El resto del HTML (tarjetas y tabla) queda exactamente igual como te gustó antes -->
     <div id="datos-alumno">
         <div>
             <h3>Asistencias</h3>
