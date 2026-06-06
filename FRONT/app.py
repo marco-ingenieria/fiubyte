@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template,request,url_for,redirect
 
 app = Flask(__name__)
 
@@ -11,6 +11,16 @@ def panel_principal():
 @app.route('/alumnos')
 def seccion_alumnos():
     return render_template('alumnos.html')
+@app.route('/grupos')
+def seccion_grupos():
+    nombre = request.args.get('nombre_profesor', '')
+    return render_template('grupos.html', nombre_profesor=nombre)
 
+@app.route('/grupo1')
+def seccion_grupo1():
+    return render_template('grupo1.html')
+@app.route('/listado')
+def seccion_listado():
+    return render_template('listado.html')
 if __name__ == '__main__':
     app.run(debug=True)

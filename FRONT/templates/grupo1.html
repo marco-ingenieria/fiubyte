@@ -1,0 +1,49 @@
+ {% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/grupo1.css') }}">
+<h1>Grupo 1 </h1>
+<!-- asignar parametro de id, para que modifique segun grupo-->
+<p>Integrantes del grupo</p>
+<div>
+    <select>
+    <option disabled selected>Todos</option>
+    <option>opcion 1</option>
+    <option>opcion 2</option>
+    <option>opcion 3</option>
+    </select>
+</div>
+<div></div>
+<section>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+    <a href="#">
+        <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+        <span>Hansel Brito</span>
+    </a>
+</section>
+{% endblock %}

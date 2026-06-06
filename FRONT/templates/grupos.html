@@ -1,0 +1,38 @@
+ {% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/grupos.css') }}">
+<div id="usuario-profesor">
+    <p>Profesor: {{ nombre_profesor }}</p>
+</div>
+<div id="menu-superior">
+    <strong>Panel Docente</strong>
+
+    <main>
+        <h1>Listado de Grupos</h1>
+        <p>Seleccione un grupo para ver los integrantes</p>
+
+        <div>
+            <button>Crear nuevo grupo</button>
+        </div>
+
+        <table>
+
+            <tbody>
+                <tr>
+                    <td>Grupo 1</td>
+                </tr>
+                <tr>
+                    <td>Grupo 2</td>
+                </tr>
+                <tr>
+                    <td>Grupo 3</td>
+                </tr>
+                <td>Grupo 4</td>
+                </tr>
+                <tr>
+                    <td>Grupo 5</td>
+                </tr>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    {% endblock %}
