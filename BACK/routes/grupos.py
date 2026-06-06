@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from services.grupos import (listar_grupos, obtener_grupo, crear_grupo)
+from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
+                             )
 from utils import construir_error
 import json
 
@@ -37,8 +38,47 @@ def post_grupo():
     nombre = data.get('nombre')
 
     if not nombre:
-        return (jsonify("No se ha especificado ningun nombre"), 400) 
+        return construir_error(400, "No se ha especificado ningun nombre") 
     
     return crear_grupo(nombre)
 
 
+####post_asignar_alumnos####
+def validar_json_asignar_alumnos(data):
+    
+    if not data:
+        return False, "El cuerpo de la request no puede estar vacío" 
+    
+    id_grupo = data.get("id_grupo")
+    padrones = data.get("padrones_alumnos")
+     
+    if not isinstance(padrones, list) or len(padrones) == 0:
+        return False, "padrones_alumnos debe ser una lista no vacía"
+    
+    if not isinstance(id_grupo, int) or id_grupo <= 0:
+        return False, "id_grupo debe ser un número entero positivo"
+    
+    padrones_invalidos = 0
+    for p in padrones:
+        padron = p.get("padron")
+        if not isinstance(padron, int) or padron <= 0: padrones_invalidos+=1
+            
+    if padrones_invalidos:
+        return False, f"Los padrones deben ser enteros positivos. Hay {padrones_invalidos} padrones invalidos"
+    return True, "Datos validos"
+
+
+@grupos_bp.route("/asignar-alumnos/", methods=['POST'])
+def post_asignar_alumnos():
+
+    data=request.get_json()
+    
+    request_es_valido, mensaje = validar_json_asignar_alumnos(data)
+
+    if request_es_valido:
+        return (jsonify("datos validos"), 200)
+    else:
+        return construir_error(400, mensaje)
+
+    
+    

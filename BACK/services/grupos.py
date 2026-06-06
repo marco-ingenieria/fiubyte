@@ -92,3 +92,9 @@ def crear_grupo(nombre_grupo):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+
+#def asignar_alumnos_a_grupo(padron_alumno):
+
+
+

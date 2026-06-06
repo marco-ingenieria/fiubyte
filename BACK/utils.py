@@ -15,6 +15,8 @@ def construir_error(code: int, description: str = '') -> dict:
         }]
     }), code)
 
+
+
 def construir_paginacion(listado, base_url, limit, offset):
     codigo_HTTP = 200 if len(listado) > 0 else 204
     total = len(listado)
