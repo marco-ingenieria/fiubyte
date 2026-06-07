@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
-                             )
+                             asignar_alumnos_a_grupo, actualizar_grupo,
+                             obtener_alumnos, eliminar_grupo)
 from utils import construir_error
 import json
 
@@ -23,11 +24,20 @@ def get_grupos():
 
     return listar_grupos(base_url, limit, offset)
 
+@grupos_bp.route("/alumnos/<int:id>", methods=['GET'])
+def get_alumnos(id):
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
+    return obtener_alumnos(id)
 
 
 @grupos_bp.route("/<int:id>", methods=['GET'])
 def get_grupo(id):
-
+    
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
     return obtener_grupo(id)
 
 
@@ -76,9 +86,31 @@ def post_asignar_alumnos():
     request_es_valido, mensaje = validar_json_asignar_alumnos(data)
 
     if request_es_valido:
-        return (jsonify("datos validos"), 200)
+        return asignar_alumnos_a_grupo(data.get("id_grupo"),
+                                       data.get("padrones_alumnos"))
     else:
         return construir_error(400, mensaje)
+    
+
+@grupos_bp.route("/<int:id>", methods=['PATCH'])
+def patch_grupo(id):
+
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+
+    data=request.get_json()
+    nombre_grupo = data.get("nombre_grupo")
+
+    if not isinstance(nombre_grupo, str):
+        return construir_error(400, "nombre_grupo debe ser un string")
+    
+    return actualizar_grupo(id, nombre_grupo)
 
     
+
+@grupos_bp.route("/<int:id>", methods=['DELETE'])
+def delete_grupo(id):
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
     
+    return eliminar_grupo(id)

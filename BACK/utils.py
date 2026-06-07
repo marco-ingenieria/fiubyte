@@ -1,5 +1,6 @@
 from flask import jsonify
 
+
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
         400: "Bad request",
@@ -31,3 +32,9 @@ def construir_paginacion(listado, base_url, limit, offset):
         "listado": listado,
         "links": links
     }), codigo_HTTP)
+
+
+
+def existe_en_bd(cursor, tabla, campo, valor):
+    cursor.execute(f"SELECT * FROM {tabla} WHERE {campo}=%s AND ELIMINADO=0", [valor])
+    return cursor.fetchone() is not None
