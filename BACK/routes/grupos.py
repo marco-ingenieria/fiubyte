@@ -1,0 +1,153 @@
+from flask import Blueprint, jsonify, request
+from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
+                             asignar_alumnos_a_grupo, actualizar_grupo,
+                             obtener_alumnos, eliminar_grupo, asignar_tp,
+                             eliminar_alumno)
+from utils import construir_error
+import json
+
+
+grupos_bp = Blueprint('grupos', __name__)
+
+
+@grupos_bp.route("/", methods=['GET'])
+def get_grupos():
+
+    base_url = request.base_url
+    limit = request.args.get('limit', type=int)
+    offset = request.args.get('offset', type=int)
+
+    if limit is None or limit < 0:
+        limit = 10
+
+    if offset is None or offset < 0:
+        offset = 0
+
+    return listar_grupos(base_url, limit, offset)
+
+@grupos_bp.route("/alumnos/<int:id>", methods=['GET'])
+def get_alumnos(id):
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
+    return obtener_alumnos(id)
+
+
+@grupos_bp.route("/<int:id>", methods=['GET'])
+def get_grupo(id):
+    
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
+    return obtener_grupo(id)
+
+
+@grupos_bp.route("/", methods=['POST'])
+def post_grupo():
+
+    data=request.get_json()
+    nombre = data.get('nombre')
+
+    if not nombre:
+        return construir_error(400, "No se ha especificado ningun nombre") 
+    
+    return crear_grupo(nombre)
+
+
+####post_asignar_alumnos####
+def validar_json_asignar_alumnos(data):
+    
+    if not data:
+        return False, "El cuerpo de la request no puede estar vacío" 
+    
+    id_grupo = data.get("id_grupo")
+    padrones = data.get("padrones_alumnos")
+     
+    if not isinstance(padrones, list) or len(padrones) == 0:
+        return False, "padrones_alumnos debe ser una lista no vacía"
+    
+    if not isinstance(id_grupo, int) or id_grupo <= 0:
+        return False, "id_grupo debe ser un número entero positivo"
+    
+    padrones_invalidos = 0
+    for p in padrones:
+        padron = p.get("padron")
+        if not isinstance(padron, int) or padron <= 0: padrones_invalidos+=1
+            
+    if padrones_invalidos:
+        return False, f"Los padrones deben ser enteros positivos. Hay {padrones_invalidos} padrones invalidos"
+    return True, "Datos validos"
+
+
+@grupos_bp.route("/asignar-alumnos/", methods=['POST'])
+def post_asignar_alumnos():
+
+    data=request.get_json()
+    
+    request_es_valido, mensaje = validar_json_asignar_alumnos(data)
+
+    if request_es_valido:
+        return asignar_alumnos_a_grupo(data.get("id_grupo"),
+                                       data.get("padrones_alumnos"))
+    else:
+        return construir_error(400, mensaje)
+    
+
+@grupos_bp.route("/<int:id>", methods=['PATCH'])
+def patch_grupo(id):
+
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+
+    data=request.get_json()
+    nombre_grupo = data.get("nombre_grupo")
+
+    if not isinstance(nombre_grupo, str):
+        return construir_error(400, "nombre_grupo debe ser un string")
+    
+    return actualizar_grupo(id, nombre_grupo)
+
+    
+
+@grupos_bp.route("/<int:id>", methods=['DELETE'])
+def delete_grupo(id):
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
+    return eliminar_grupo(id)
+
+
+
+@grupos_bp.route("/tp", methods=['POST'])
+def post_tp():
+
+    data=request.get_json()
+    id_grupo = data.get('id_grupo')
+    id_tp = data.get('id_tp')
+    
+    if not isinstance(id_grupo, int) or id_grupo <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo"
+    )
+    if not isinstance(id_tp, int) or id_tp <= 0:
+        return construir_error(400, "id_tp debe ser un número entero positivo")
+    
+
+    return asignar_tp(id_grupo, id_tp)
+
+
+
+@grupos_bp.route("/alumnos", methods=['DELETE'])
+def delete_alumno():
+
+    data=request.get_json()
+    id_grupo = data.get('id_grupo')
+    padron_alumno = data.get('padron_alumno')
+    
+    if not isinstance(id_grupo, int) or id_grupo <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo"
+    )
+    if not isinstance(padron_alumno, int) or padron_alumno <= 0:
+        return construir_error(400, "padron_alumno debe ser un número entero positivo")
+    
+
+    return eliminar_alumno(id_grupo, padron_alumno)
