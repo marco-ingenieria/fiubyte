@@ -16,7 +16,7 @@ def listar_usuarios(limit, offset):
         return construir_paginacion(usuarios, "/usuarios/", limit, offset)
 
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
@@ -39,7 +39,7 @@ def chequear_usuario(nombre, contrasenia):
         return (jsonify({"usuario": usuario}), 200)
         
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()

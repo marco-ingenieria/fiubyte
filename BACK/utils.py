@@ -1,4 +1,5 @@
 from flask import jsonify
+from datetime import datetime
 
 
 def construir_error(code: int, description: str = '') -> dict:
@@ -38,3 +39,14 @@ def construir_paginacion(listado, base_url, limit, offset):
 def existe_en_bd(cursor, tabla, campo, valor):
     cursor.execute(f"SELECT * FROM {tabla} WHERE {campo}=%s AND ELIMINADO=0", [valor])
     return cursor.fetchone() is not None
+  
+def validar_fecha(fecha):
+    if not isinstance(fecha, str):
+        return False
+
+    try:
+        datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
+        return True
+    except ValueError:
+        return False
+    
