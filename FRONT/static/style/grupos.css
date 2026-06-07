@@ -1,121 +1,100 @@
-:root {
-    --degradado-fondo: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-    --color-primario: #4338ca;
-    --color-primario-hover: #4338ca;
-    --texto-oscuro: #071302;
-    --texto-mutado: #64748b;
-    --blanco-vidrio: rgba(255, 255, 255, 0.45);
-    --borde-vidrio: rgba(255, 255, 255, 0.6);
-    --sombra-suave: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+#contenedor-boton {
+    margin-bottom: 20px;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--degradado-fondo);
-    background-attachment: fixed;
-    color: var(--texto-oscuro);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-
-/* 1. NAVEGACIÓN (Barra Flotante) */
-
-header {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--borde-vidrio);
-    padding: 15px 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1100px;
-    margin: 0 auto;
-    width: 100%;
-    padding: 0 20px;
-}
-
-nav strong {
-    font-size: 22px;
-    font-weight: 800;
-    background: linear-gradient(to right, #4f46e5, #06b6d4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-nav ul {
-    display: flex;
-    list-style: none;
-    gap: 25px;
-}
-
-nav a {
-    color: var(--texto-oscuro);
-    text-decoration: none;
+#boton-crear {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
     font-weight: 600;
-    font-size: 15px;
-    padding: 8px 16px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
 }
 
-nav a:hover {
-    background: rgba(79, 70, 229, 0.08);
-    color: var(--color-primario);
+#boton-crear:hover {
+    background: var(--color-primario-hover);
 }
 
-
-/* 2. CONTENEDOR CENTRAL */
-
-main {
-    flex: 1;
-    max-width: 700px;
+#tabla-grupos {
     width: 100%;
-    margin: 50 auto;
-    padding: 50px 20px;
-}
-
-main h1 {
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: #0f172a;
-    margin-bottom: 10px;
-}
-
-main p {
-    margin-bottom: 35px;
-    color: var(--texto-mutado);
-    font-size: 16px;
-    font-weight: 500;
-}
-
-th,
-td {
-    padding: 16px 20px;
-    text-align: center;
-    font-size: 15px;
-}
-
-#usuario-profesor {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid var(--borde-vidrio);
-    padding: 6px 14px;
-    border-radius: 50px;
+    background: white;
+    border-radius: 12px;
     box-shadow: var(--sombra-suave);
-    display: inline-flex;
+    border-collapse: collapse;
+}
+
+#tabla-grupos td {
+    padding: 16px 20px;
+    text-align: left;
+    /* Queda más ordenado alineado a la izquierda */
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--texto-oscuro);
+}
+
+#tabla-grupos tr:hover {
+    background: rgba(79, 70, 229, 0.03);
+    cursor: pointer;
+}
+
+#modal-crear::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+#modal-crear {
+    border: none;
+    border-radius: 20px;
+    padding: 40px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#modal-crear h3 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+#nuevo-numero-grupo {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 16px;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#modal-botones-contenedor {
+    display: flex;
+    gap: 15px;
+}
+
+#modal-crear button[onclick*="close"]:hover {
+    background-color: #cbd5e1;
+}
+
+#modal-crear {
+    /* 🌟 EL TRUCO PARA CENTRARLO EN EL MEDIO: */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: none;
+    border-radius: 20px;
+    padding: 35px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0;
 }

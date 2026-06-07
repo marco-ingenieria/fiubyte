@@ -1,6 +1,6 @@
-{% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+{% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+<p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar los alumnos y sus datos.</p>
 <h1>Listado de Alumnos y Notas</h1>
-<p>Administre las calificaciones y las condiciones académicas de los estudiantes.</p>
 
 <div>
     <button>Exportar Acta</button>
@@ -41,4 +41,3 @@
         </tr>
     </tbody>
 </table>
-{% endblock %}

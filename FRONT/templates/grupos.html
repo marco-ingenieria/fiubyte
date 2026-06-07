@@ -1,38 +1,37 @@
- {% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+ {% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/grupos.css') }}">
-<div id="usuario-profesor">
-    <p>Profesor: {{ nombre_profesor }}</p>
-</div>
-<div id="menu-superior">
-    <strong>Panel Docente</strong>
+<!--contenedor principal-->
+<main>
+    <h1>Listado de Grupos</h1>
+    <p>Seleccione un grupo para ver los integrantes</p>
 
-    <main>
-        <h1>Listado de Grupos</h1>
-        <p>Seleccione un grupo para ver los integrantes</p>
+    <div id="contenedor-boton">
+        <button id="boton-crear" type="button" onclick="document.getElementById('modal-crear').showModal()">Crear nuevo grupo</button>
+    </div>
+    <dialog id="modal-crear">
+        <h3>Crear Nuevo Grupo</h3>
+        <form id="form-crear" method="POST" action="{{url_for('seccion_grupos')}}">
+            <label for="nuevo-numero-grupo">Número del Nuevo Grupo:</label>
+            <input type="number" id="nuevo-numero-grupo" name="nuevo_numero_grupo">
+            <div id="modal-botones-contenedor">
+                <button type="submit" id="btn-modal-guardar">Guardar</button>
+                <button type="button" onclick="document.getElementById('modal-crear').close()">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
 
-        <div>
-            <button>Crear nuevo grupo</button>
-        </div>
+    <table id="tabla-grupos">
 
-        <table>
+        <tbody>
+            {%for num in grupos%}
+            <tr>
+                <td>
+                    <a href="{{ url_for('ver_grupo', numero_grupo=num, nombre_profesor=request.args.get('nombre_profesor', '')) }}"> grupo {{num}}</a>
+                </td>
+            </tr>
 
-            <tbody>
-                <tr>
-                    <td>Grupo 1</td>
-                </tr>
-                <tr>
-                    <td>Grupo 2</td>
-                </tr>
-                <tr>
-                    <td>Grupo 3</td>
-                </tr>
-                <td>Grupo 4</td>
-                </tr>
-                <tr>
-                    <td>Grupo 5</td>
-                </tr>
-                </tr>
-            </tbody>
-        </table>
-    </main>
-    {% endblock %}
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+{% endblock %}
