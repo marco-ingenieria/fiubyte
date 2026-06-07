@@ -113,7 +113,12 @@ def crear_grupo(nombre_grupo):
         cursor.execute(query, [nombre_grupo])
         connection.commit()
 
-        return (jsonify("Creacion de grupo exitosa"), 200)
+        return (jsonify({
+            "mensaje": "Creacion de grupo exitosa",
+            "grupo": {""
+                "ID": cursor.lastrowid,
+                "NOMBRE": nombre_grupo}
+        }), 200)
     
     except:
         traceback.print_exc()
@@ -192,14 +197,19 @@ def actualizar_grupo(id_grupo, nombre_grupo):
             return construir_error(404, "Grupo no encontrado")
         
         #update GRUPOS
-        query = "UPDATE GRUPOS SET NOMBRE=%s" \
+        query = "UPDATE GRUPOS SET NOMBRE=%s " \
         "WHERE ID=%s"
         cursor.execute(query, [nombre_grupo, id_grupo])
 
 
-        connection.commit()
-        return (jsonify(f"Nombre de grupo de id={id_grupo} actualizado con exito"), 200)    
-
+        connection.commit()   
+        return (jsonify({
+            "mensaje": f"Nombre de grupo actualizado con exito",
+            "grupo": {""
+                "ID": id_grupo,
+                "NOMBRE": nombre_grupo}
+        }), 200)
+    
     except:
         traceback.print_exc()
         return construir_error(500, "Error inesperado del servidor")
