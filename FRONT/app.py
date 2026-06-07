@@ -81,12 +81,25 @@ def seccion_usuarios():
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
-    body = request.get_json()
+    nombre = request.form.get('nombre')
+    contrasenia = request.form.get('contrasenia')
     try:
-        response = requests.post("http://backend:5000/usuarios/", json=body)
-        return response.json(), response.status_code
+        requests.post("http://backend:5000/usuarios/", json={
+            "nombre": nombre,
+            "contrasenia": contrasenia
+        })
     except Exception as e:
-        return {"error": "No se pudo conectar al servidor"}, 500
+        pass
+    return redirect(url_for('seccion_usuarios'))
+
+@app.route('/eliminar_usuario', methods=['POST'])
+def eliminar_usuario():
+    id = request.form.get('eliminar-usuario-id')
+    try:
+        requests.delete(f"http://backend:5000/usuarios/{id}")
+    except Exception as e:
+        pass
+    return redirect(url_for('seccion_usuarios'))
 
 
 # 0. Ruta del Panel Principal (Se activa al entrar a http://127.0.0.1:5000)

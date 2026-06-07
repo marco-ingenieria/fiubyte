@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
-from services.usuarios import listar_usuarios, chequear_usuario, crear_usuario
+from services.usuarios import listar_usuarios, chequear_usuario, crear_usuario, eliminar_usuario
 from utils import (construir_error)
 
 usuarios_bp = Blueprint('usuarios', __name__)
@@ -29,3 +29,7 @@ def post_usuario():
         return construir_error(400, "Faltan campos obligatorios")
 
     return crear_usuario(nombre, contrasenia)
+
+@usuarios_bp.route('/<int:id>', methods=['DELETE'])
+def delete_usuario(id):
+    return eliminar_usuario(id)

@@ -64,3 +64,27 @@ def crear_usuario(nombre, contrasenia):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+def eliminar_usuario(id):
+    cursor = None
+    connection = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        update_stmt = "UPDATE USUARIOS SET ELIMINADO = 1 WHERE ID_USUARIO = %s AND ELIMINADO = 0"
+        cursor.execute(update_stmt, [id])
+
+        filas_afectadas = cursor.rowcount
+        if filas_afectadas == 0:
+            return construir_error(404, "No se pudo eliminar el usuario")
+
+        connection.commit()
+        return (jsonify({}), 204)
+    except Exception as e:
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
