@@ -28,7 +28,6 @@ def listar_evaluaciones(limit, offset, base_url):
             connection.close()
 
 
-
 def buscar_evaluacion(id):
     connection = None
     cursor = None

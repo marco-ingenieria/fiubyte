@@ -46,4 +46,31 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cerramos la ventana limpia
         cerrarModal('eliminar');
     });
+
+    
+    const formCrear = document.getElementById('form-crear');
+    formCrear.addEventListener('submit', function(e) {
+
+        e.preventDefault();
+        
+        const nombre = formCrear.querySelector('input[type="text"]').value;
+        const contrasenia = formCrear.querySelector('input[type="password"]').value;
+        
+        fetch('/crear_usuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre: nombre, contrasenia: contrasenia })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Usuario creado correctamente');
+            cerrarModal('crear');
+            location.reload();
+        })
+        .catch(error => {
+            alert('Error al crear el usuario');
+        });
+    });
+
+
 });

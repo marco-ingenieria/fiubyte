@@ -50,57 +50,21 @@
         <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Historiales</th>
+            <!-- <th>Email</th>
+            <th>Rol</th> -->
+            <th>Historiales</th> 
         </tr>
     </thead>
     <tbody>
+        {% for usuario in usuarios %}
         <tr>
-            <td>1</td>
-            <td>Ana García</td>
-            <td>ana.garcia@universidad.edu</td>
-            <td>Docente</td>
-            <td>
-                <a href="#">Ver Historial</a>
-            </td>
+            <td>{{ usuario.ID_USUARIO }}</td>
+            <td>{{ usuario.NOMBRE }}</td>
+            <!-- <td>{{ usuario.Email }}</td> -->
+            <!-- <td>{{ usuario.Rol }}</td> -->
+            <td><a href="#">Ver Historial</a></td>
         </tr>
-        <tr>
-            <td>2</td>
-            <td>Diego Fernández</td>
-            <td>diego.fernandez@universidad.edu</td>
-            <td>Docente</td>
-            <td>
-                <a href="#">Ver Historial</a>
-            </td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Lucía Martínez</td>
-            <td>lucia.martinez@universidad.edu</td>
-            <td>Alumno</td>
-            <td>
-                <a href="#">Ver Historial</a>
-            </td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>Fernando Rojas</td>
-            <td>fernando.rojas@universidad.edu</td>
-            <td>Docente</td>
-            <td>
-                <a href="#">Ver Historial</a>
-            </td>
-        </tr>
-        <tr>
-            <td>5</td>
-            <td>María Silva</td>
-            <td>maria.silva@universidad.edu</td>
-            <td>Alumno</td>
-            <td>
-                <a href="#">Ver Historial</a>
-            </td>
-        </tr>
+        {% endfor %}
     </tbody>
 </table>
 <script src="{{ url_for('static', filename='javascript/usuarios.js') }}"></script>

@@ -72,7 +72,21 @@ def seccion_alumnos():
 @app.route('/usuarios')
 def seccion_usuarios():
     nombre = request.args.get('nombre_profesor', '')
-    return render_template('usuarios.html', nombre_profesor=nombre)
+    try:
+        response = requests.get("http://backend:5000/usuarios/", params={"limit": 30, "offset": 0})
+        usuarios = response.json().get("listado", [])
+    except Exception as e:
+        usuarios = []
+    return render_template('usuarios.html', nombre_profesor=nombre, usuarios=usuarios)
+
+@app.route('/crear_usuario', methods=['POST'])
+def crear_usuario():
+    body = request.get_json()
+    try:
+        response = requests.post("http://backend:5000/usuarios/", json=body)
+        return response.json(), response.status_code
+    except Exception as e:
+        return {"error": "No se pudo conectar al servidor"}, 500
 
 
 # 0. Ruta del Panel Principal (Se activa al entrar a http://127.0.0.1:5000)

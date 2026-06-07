@@ -45,3 +45,22 @@ def chequear_usuario(nombre, contrasenia):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+def crear_usuario(nombre, contrasenia):
+    cursor = None
+    connection = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        create_stmt = "INSERT INTO USUARIOS (NOMBRE, PASS) VALUES(%s, %s)"
+        cursor.execute(create_stmt, [nombre, contrasenia])
+        connection.commit()
+        id_usuario = cursor.lastrowid
+        return (jsonify({"id": id_usuario}), 201)
+    except Exception as e:
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
