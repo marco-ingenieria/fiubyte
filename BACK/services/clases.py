@@ -2,19 +2,21 @@ from flask import jsonify
 from db.init_db import get_connection
 from utils import (construir_paginacion, construir_error)
 import traceback
+import json
+from datetime import datetime
 
 
-def listar_alumnos(limit, offset, base_url):
+def listar_clases(limit, offset, base_url):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM ALUMNOS WHERE ELIMINADO = 0 ORDER BY PADRON LIMIT %s OFFSET %s"
+        select_stmt = "SELECT * FROM CLASES WHERE ELIMINADO = 0 ORDER BY FECHA, ID LIMIT %s OFFSET %s"
         cursor.execute(select_stmt, [limit, offset])
 
-        alumnos = cursor.fetchall()
-        listado = construir_paginacion(alumnos, base_url, limit, offset)
+        clases = cursor.fetchall()
+        listado = construir_paginacion(clases, base_url, limit, offset)
         
         return listado
     except Exception as e:
@@ -29,21 +31,21 @@ def listar_alumnos(limit, offset, base_url):
 
 
 
-def buscar_alumno(id):
+def buscar_clase(id):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM ALUMNOS WHERE PADRON = %s AND ELIMINADO = 0"
+        select_stmt = "SELECT * FROM CLASES WHERE ID = %s AND ELIMINADO = 0"
         cursor.execute(select_stmt, [id])
 
-        alumno = cursor.fetchone()
+        clase = cursor.fetchone()
 
-        if not alumno:
-            return construir_error(404, f"Alumno no encontrado")
+        if not clase:
+            return construir_error(404, f"Clase no encontrada")
         
-        return (jsonify({"alumno": alumno}), 200)
+        return (jsonify({"clase": clase}), 200)
     except Exception as e:
         traceback.print_exc()
 
@@ -56,27 +58,29 @@ def buscar_alumno(id):
 
 
 
-def crear_alumno(body):
+def crear_clase(body):
     connection = None
     cursor = None
 
-    padron      = body.get("padron")
-    nombre      = body.get("nombre")
-    apellido    = body.get("apellido")
-    email       = body.get("email")
-    abandono    = body.get("abandono")
+    profesores      = body.get('profesores')
+    fecha           = body.get('fecha')
+    materia         = body.get('id_materia')
 
+    #parse a JSON
+    profesores = json.dumps(profesores)
+    #parse a fecha
+    fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
 
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
-        cursor.execute(create_stmt, [padron, nombre, apellido, email])
+        create_stmt = "INSERT INTO CLASES (PROFESORES, FECHA, ID_MATERIA) VALUES (%s, %s, %s)"
+        cursor.execute(create_stmt, [profesores, fecha, materia])
 
-        filas_afectadas = cursor.rowcount
+        id = cursor.lastrowid
         
         connection.commit()
-        return (jsonify({"filas afectadas": filas_afectadas}), 201)
+        return (jsonify({"id": id}), 201)
     except Exception as e:
         traceback.print_exc()
 
@@ -89,47 +93,49 @@ def crear_alumno(body):
 
 
 
-def actualizar_alumno(body, id):
+def actualizar_clase(body, id):
     connection = None
     cursor = None
 
-    nombre      = body.get("nombre")
-    apellido    = body.get("apellido")
-    email       = body.get("email")
-    abandono    = body.get("abandono")
+    profesores      = body.get('profesores')
+    fecha           = body.get('fecha')
+
+    #parse a JSON
+    if profesores:
+        profesores = json.dumps(profesores)
+
+    #parse a fecha
+    if fecha:
+        fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
 
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        select_stmt = "SELECT * FROM ALUMNOS WHERE PADRON = %s AND ELIMINADO = 0"
+        select_stmt = "SELECT * FROM CLASES WHERE ID = %s AND ELIMINADO = 0"
         cursor.execute(select_stmt, [id])
-        alumno = cursor.fetchone()
+        clase = cursor.fetchone()
         
-        if not alumno:
-            return construir_error(404, f"Alumno no encontrado")
+        if not clase:
+            return construir_error(404, f"Clase no encontrada")
         
         #rellenar datos que no vengan en el body
-        nombre      = nombre    or alumno["NOMBRE"]
-        apellido    = apellido  or alumno["APELLIDO"]
-        email       = email     or alumno["MAIL"]
-        abandono    = abandono  or alumno["ABANDONO"]
+        profesores      = profesores    or clase["PROFESORES"]
+        fecha           = fecha         or clase["FECHA"]
 
         update_stmt = """
-        UPDATE ALUMNOS SET
-        NOMBRE = %s,
-        APELLIDO = %s,
-        MAIL = %s,
-        ABANDONO = %s
-        WHERE PADRON = %s
+        UPDATE CLASES SET
+        PROFESORES = %s,
+        FECHA = %s
+        WHERE ID = %s
         """
-        cursor.execute(update_stmt, [nombre, apellido, email, abandono, id])
+        cursor.execute(update_stmt, [profesores, fecha, id])
         filas_afectadas = cursor.rowcount
 
         cursor.execute(select_stmt, [id])
-        alumno_actualizado = cursor.fetchone()
+        clase_actualizada = cursor.fetchone()
         connection.commit()
-        return (jsonify({"filas afectadas": filas_afectadas, "alumno_actualizado": alumno_actualizado}), 200)
+        return (jsonify({"filas afectadas": filas_afectadas, "clase_actualizada": clase_actualizada}), 200)
 
     except Exception as e:
         traceback.print_exc()
@@ -143,19 +149,19 @@ def actualizar_alumno(body, id):
 
 
 
-def eliminar_alumno(id):
+def eliminar_clase(id):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        update_stmt = "UPDATE ALUMNOS SET ELIMINADO = 1 WHERE PADRON = %s AND ELIMINADO = 0"
+        update_stmt = "UPDATE CLASES SET ELIMINADO = 1 WHERE ID = %s AND ELIMINADO = 0"
         cursor.execute(update_stmt, [id])
 
         filas_afectadas = cursor.rowcount
         if filas_afectadas == 0:
-            return construir_error(404, "No se encontró el alumno")
+            return construir_error(404, "No se encontró la clase")
 
         connection.commit()
         return (jsonify({}), 204)
@@ -171,19 +177,19 @@ def eliminar_alumno(id):
 
 
 
-def eliminar_alumno_permanente(id):
+def eliminar_clase_permanente(id):
     connection = None
     cursor = None
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        update_stmt = "DELETE FROM ALUMNOS WHERE PADRON = %s"
+        update_stmt = "DELETE FROM CLASES WHERE ID = %s"
         cursor.execute(update_stmt, [id])
 
         filas_afectadas = cursor.rowcount
         if filas_afectadas == 0:
-            return construir_error(404, "No se encontró el alumno")
+            return construir_error(404, "No se encontró la clase")
 
         connection.commit()
         return (jsonify({}), 204)

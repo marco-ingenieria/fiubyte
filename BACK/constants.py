@@ -1,0 +1,1 @@
+TIPOS_EVAL = {"Parcial", "Oral", "Final", "TP", "Recuperatorio"}

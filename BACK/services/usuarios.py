@@ -9,14 +9,14 @@ def listar_usuarios(limit, offset):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM USUARIOS LIMIT %s OFFSET %s"
+        select_stmt = "SELECT * FROM USUARIOS WHERE ELIMINADO = 0 LIMIT %s OFFSET %s"
         cursor.execute(select_stmt, [limit, offset])
 
         usuarios = cursor.fetchall()
         return construir_paginacion(usuarios, "/usuarios/", limit, offset)
 
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
@@ -29,7 +29,7 @@ def chequear_usuario(nombre, contrasenia):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT ID_USUARIO, NOMBRE FROM USUARIOS WHERE NOMBRE = %s AND PASS = %s"
+        select_stmt = "SELECT ID_USUARIO, NOMBRE FROM USUARIOS WHERE NOMBRE = %s AND PASS = %s AND ELIMINADO = 0"
         cursor.execute(select_stmt, [nombre, contrasenia])
 
         usuario = cursor.fetchone()
@@ -39,7 +39,7 @@ def chequear_usuario(nombre, contrasenia):
         return (jsonify({"usuario": usuario}), 200)
         
     except Exception as e:
-        return construir_error(f"Error inesperado: {e}", 500)
+        return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
             cursor.close()
