@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
                              asignar_alumnos_a_grupo, actualizar_grupo,
-                             obtener_alumnos, eliminar_grupo)
+                             obtener_alumnos, eliminar_grupo, asignar_tp,
+                             eliminar_alumno)
 from utils import construir_error
 import json
 
@@ -114,3 +115,39 @@ def delete_grupo(id):
         return construir_error(400, "id_grupo debe ser un número entero positivo")
     
     return eliminar_grupo(id)
+
+
+
+@grupos_bp.route("/tp", methods=['POST'])
+def post_tp():
+
+    data=request.get_json()
+    id_grupo = data.get('id_grupo')
+    id_tp = data.get('id_tp')
+    
+    if not isinstance(id_grupo, int) or id_grupo <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo"
+    )
+    if not isinstance(id_tp, int) or id_tp <= 0:
+        return construir_error(400, "id_tp debe ser un número entero positivo")
+    
+
+    return asignar_tp(id_grupo, id_tp)
+
+
+
+@grupos_bp.route("/alumnos", methods=['DELETE'])
+def delete_alumno():
+
+    data=request.get_json()
+    id_grupo = data.get('id_grupo')
+    padron_alumno = data.get('padron_alumno')
+    
+    if not isinstance(id_grupo, int) or id_grupo <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo"
+    )
+    if not isinstance(padron_alumno, int) or padron_alumno <= 0:
+        return construir_error(400, "padron_alumno debe ser un número entero positivo")
+    
+
+    return eliminar_alumno(id_grupo, padron_alumno)
