@@ -1,8 +1,94 @@
 {%- extends 'base_sistema.html' -%}
 
-{%- block title -%}Notas - Panel Docente{%- endblock -%}
+{%- block title -%}Planilla de Calificaciones - Panel Docente{%- endblock -%}
+
+{%- block head -%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/notas.css') }}">
+{%- endblock -%}
 
 {%- block content -%}
-    <h1>Notas</h1>
-    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar las notas y resultados de la plataforma.</p>
+    <div>
+        <h1>Planilla de Calificaciones</h1>
+        <p>Gestión integral de notas y estados académicos del curso.</p>
+    </div>
+
+    <form>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">Padrón</th>
+                        <th rowspan="2">Alumno</th>
+                        <th colspan="2">Trabajos Prácticos</th>
+                        <th colspan="2">Exámenes</th>
+                        <th rowspan="2">Final</th>
+                        <th rowspan="2">Nota Final</th>
+                        <th rowspan="2">Estado</th>
+                    </tr>
+                    <tr>
+                        <th>TP1</th>
+                        <th>TP2</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set alumnos_curso = [
+                        {'padron': '105432', 'nombre': 'Juan Rodriguez', 'estado': 'APROBADO', 'abandonó': false},
+                        {'padron': '106112', 'nombre': 'Guillermo Francella', 'estado': 'APROBADO', 'abandonó': false},
+                        {'padron': '104873', 'nombre': 'Ricardo Darín', 'estado': 'LIBRE', 'abandonó': true},
+                        {'padron': '105991', 'nombre': 'Evelyn Gómez', 'estado': 'DESAPROBADO', 'abandonó': false},
+                        {'padron': '102345', 'nombre': 'Luis Brandoni', 'estado': 'APROBADO', 'abandonó': false}
+                    ] %}
+
+                    {% for alumno in alumnos_curso %}
+                        <tr {% if alumno.abandonó %}data-status="bloqueado"{% endif %}>
+                            
+                            <td>
+                                {{ alumno.padron }}
+                            </td>
+
+                            <td>
+                                <strong>{{ alumno.nombre }}</strong>
+                                {% if alumno.abandonó %}
+                                    <span>Abandono</span>
+                                {% endif %}
+                            </td>
+
+                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
+                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
+                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
+                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
+                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
+
+                            <td>
+                                <input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}>
+                            </td>
+
+                            <td>
+                                {% set estado_actual = 'libre' if alumno.abandonó else alumno.estado | lower %}
+                                <select {{ 'disabled' if alumno.abandonó }} 
+                                        data-color="{{ estado_actual }}"
+                                        onchange="this.setAttribute('data-color', this.value.toLowerCase())">
+                                    <option value="APROBADO" {% if estado_actual == 'aprobado' %}selected{% endif %}>APROBADO</option>
+                                    <option value="LIBRE" {% if estado_actual == 'libre' %}selected{% endif %}>LIBRE</option>
+                                    <option value="DESAPROBADO" {% if estado_actual == 'desaprobado' %}selected{% endif %}>DESAPROBADO</option>
+                                </select>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <button type="button" onclick="window.location.href='{{ url_for('seccion_evaluaciones') }}'">
+                <span>←</span> Volver
+            </button>
+            
+            <button type="submit">
+                <span>💾</span> Guardar Planilla
+            </button>
+        </div>
+    </form>
 {%- endblock -%}
