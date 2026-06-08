@@ -6,7 +6,6 @@ from utils import (construir_error, validar_fecha)
 clases_bp = Blueprint('clases', __name__)
 
 
-
 @clases_bp.route('/', methods=['GET'])
 def get_clases():
     base_url = request.base_url
@@ -39,11 +38,12 @@ def post_clase():
 
     profesores      = body.get('profesores')
     fecha           = body.get('fecha')
-    materia         = body.get('id_materia')
+    
+    #materia         = body.get('id_materia')
 
     if len(body) == 0:
         return construir_error(400, "Datos vacíos")
-    if not profesores or not fecha or not materia:
+    if not profesores or not fecha:
         return construir_error(400, "Faltan campos obligatorios")
     if not isinstance(profesores, list):
         return construir_error(400, "Profesores debe ser una lista")
