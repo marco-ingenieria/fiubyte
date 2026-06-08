@@ -1,6 +1,7 @@
 from flask import jsonify
 from datetime import datetime
 
+
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
         400: "Bad request",
@@ -15,6 +16,8 @@ def construir_error(code: int, description: str = '') -> dict:
             'description': description
         }]
     }), code)
+
+
 
 def construir_paginacion(listado, base_url, limit, offset):
     codigo_HTTP = 200 if len(listado) > 0 else 204
@@ -31,6 +34,12 @@ def construir_paginacion(listado, base_url, limit, offset):
         "links": links
     }), codigo_HTTP)
 
+
+
+def existe_en_bd(cursor, tabla, campo, valor):
+    cursor.execute(f"SELECT * FROM {tabla} WHERE {campo}=%s AND ELIMINADO=0", [valor])
+    return cursor.fetchone() is not None
+  
 def validar_fecha(fecha):
     if not isinstance(fecha, str):
         return False
