@@ -1,8 +1,161 @@
-{%- extends 'base_sistema.html' -%}
+{% extends "base_sistema.html" %}
 
-{%- block title -%}Asistencias - Panel Docente{%- endblock -%}
+{% block content %}
 
-{%- block content -%}
-    <h1>Asistencias</h1>
-    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar las asistencias y registros de la plataforma.</p>
-{%- endblock -%}
+<div id="contenedor-asistencia">
+
+    <h1 id="titulo-asistencia">Asistencia</h1>
+
+    <details id="nueva-clase" {%if error %}open{% endif %}> <!--contenedor desplegable en el mismo navegador-->
+
+        <summary>➕ Añadir clase</summary> <!--título del desplegable-->
+        <form id="formulario-clase" method="POST">
+
+            {% if error %}
+                <p id="error-msg">{{ error }}</p>
+            {% endif %}
+
+            <label>Fecha de clase</label>
+            <input type="date" name="fecha">
+
+            <label>Temas</label>
+            <input type="text" name="tema">
+
+            <label>Horario</label>
+            <input type="time" name="horario">
+
+            <label>Docente 1</label>
+            <input type="text" name="docente1">
+
+            <label>Docente 2</label>
+            <input type="text" name="docente2">
+
+            <label>Docente 3</label>
+            <input type="text" name="docente3">
+
+            <button type="submit">
+                Guardar clase
+            </button>
+
+        </form>
+
+    </details>
+
+    <div id="barra-filtros">
+
+        <form method="GET">
+
+            <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+
+            <label>Ordenar:</label>
+
+            <select name="orden"> <!--dato clave-valor donde la clave es "orden" y el valor es "asc" o "desc" o "actual"-->
+                <option value="asc">Fechas ascendente</option>
+                <option value="desc">Fechas descendente</option>
+                <option value="actual">Actual primero</option>
+            </select>
+
+            <button type="submit">Aplicar</button>
+
+        </form>
+
+    </div>
+
+    <div id="contenedor-clases">
+
+        {% for clase in clases %}
+
+            {% if clase.estado == "Finalizada" %}
+                <div data-estado="finalizada">
+
+            {% elif clase.estado == "Actual" %}
+                <div data-estado="actual">
+
+            {% else %}
+                <div data-estado="proxima">
+            {% endif %}    
+
+                <div>
+                    <h3>Clase</h3>
+                    <details>
+                        <summary>✏</summary>
+
+                        <form method="POST" action="/editar_clase/{{ clase.id }}"><!--RUTA BACKEND-->
+                            <label>Fecha</label>
+                            <input type="date" name="fecha" value="{{ clase.fecha }}">
+                            
+                            <label>Tema</label>
+                            <input type="text" name="tema" value="{{ clase.tema }}">
+
+                            <label>Horario</label>
+                            <input type="time" name="horario" value="{{ clase.horario }}">
+
+                          <label>Docente 1</label>
+                            <input type="text" name="docente1" value="{{ clase.docente1 }}">
+
+                            <label>Docente 2</label>
+                            <input type="text" name="docente2" value="{{ clase.docente2 }}">
+
+                            <label>Docente 3</label>
+                            <input type="text" name="docente3" value="{{ clase.docente3 }}">
+
+                            <button type="submit">Guardar cambios</button>
+                        </form>
+
+                        <form method="POST" action="/eliminar_clase/{{ clase.id }}"><!--RUTA BACKEND-->
+                            <button type="submit">Eliminar clase</button>
+                        </form>
+
+                    </details>
+
+                </div>
+
+                <p id="fecha-clase">
+                    {{ clase.fecha[8:10] }}/{{ clase.fecha[5:7] }}/{{ clase.fecha[0:4] }}
+                </p>
+
+                {% if clase.tema %}
+                    <p>TEMA: {{ clase.tema }}</p>
+                {% endif %}
+
+                {% if clase.horario %}
+                    <p>HORA: {{ clase.horario }}</p>
+                {% endif %}
+
+                {% if clase.docente1 %}
+                    <p>DOCENTE: {{ clase.docente1 }}</p>
+                {% endif %}
+
+                {% if clase.docente2 %}
+                    <p>DOCENTE: {{ clase.docente2 }}</p>
+                {% endif %}
+
+                {% if clase.docente3 %}
+                    <p>DOCENTE: {{ clase.docente3 }}</p>
+                {% endif %}
+
+                <p data-estado="{{ clase.estado|lower }}">
+                    ● {{ clase.estado }}
+                </p>
+
+                {% if clase.estado == "Actual" %}
+                    <form action="/qr" method="GET">
+
+                        <input type="hidden" name="id" value="{{ clase.id }}">
+
+                        <button id="btn-qr-{{clase.id}}" type="submit">
+                            Generar QR
+                        </button>
+
+                    </form>
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
