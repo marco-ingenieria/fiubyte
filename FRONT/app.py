@@ -1,6 +1,7 @@
 from flask import Flask, render_template,request,url_for,redirect
 import requests
 from datetime import date, datetime
+import json
 
 app = Flask(__name__)
 
@@ -74,72 +75,101 @@ clases = [] #la idea de dejarla afuera es para q acumule las clses agregadas, si
 def seccion_asistencias():
     nombre = request.args.get('nombre_profesor', '')
     error = None
-    if request.method == "POST":
 
+    if request.method == "POST":
         fecha = request.form.get("fecha")
         tema = request.form.get("tema")
         horario = request.form.get("horario")
+        docente1 = request.form.get("docente1", "")
+        docente2 = request.form.get("docente2", "")
+        docente3 = request.form.get("docente3", "")
+        profesores = [d for d in [docente1, docente2, docente3] if d]
 
-        fecha_obj = None
+        try:
+            requests.post("http://backend:5000/clases/", json={
+                "profesores": profesores,
+                "fecha": fecha,
+                "horario": horario,
+                "tema": tema
+            })
+        except Exception as e:
+            error = "No se pudo conectar al servidor"
 
-        if not fecha:
-            error = "Fecha inválida"
-        else:
-            try:
-                fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
-                if fecha_obj.year < 2000:
-                    error = "Fecha inválida"
-            except ValueError:
-                error = "Fecha inválida"
+    try:
+        response = requests.get("http://backend:5000/clases/", params={"limit": 100, "offset": 0})
+        clases_raw = response.json().get("listado", [])
+        for c in clases_raw:
+            print(f"FECHA raw: {c.get('FECHA')}, tipo: {type(c.get('FECHA'))}", flush=True)
+    except Exception as e:
+        clases_raw = []
 
-
-        if error is None:
-                if not horario:
-                    error = "Horario inválido"
-                else:
-                    try:
-                        datetime.strptime(horario, "%H:%M")
-                    except ValueError:
-                        error = "Horario inválido"
-
-        if error is None:
-    
+    clases = []
+    for c in clases_raw:
+        try:
+            fecha_obj = datetime.strptime(c.get("FECHA", ""), "%a, %d %b %Y %H:%M:%S %Z").date()
+            fecha_str = fecha_obj.strftime("%Y-%m-%d")
             if fecha_obj < date.today():
                 estado = "Finalizada"
             elif fecha_obj == date.today():
                 estado = "Actual"
             else:
                 estado = "Próximamente"
+        except:
+            estado = "Desconocido"
+            fecha_str = ""
 
-            clases.append({
-                "id": len(clases) + 1, #id autoincremental para cada clase
-                "fecha": fecha_obj.strftime("%Y-%m-%d"),
-                "tema": tema,
-                "horario": horario,
-                "docente1": request.form["docente1"],
-                "docente2": request.form["docente2"],
-                "docente3": request.form["docente3"],
-                "estado": estado
-            })
-    orden=request.args.get("orden", "asc")
-    clases_ordenadas = clases.copy()
-    
+        try:
+            profesores_lista = json.loads(c.get("PROFESORES", "[]"))
+        except:
+            profesores_lista = []
+
+        clases.append({
+            "id": c.get("ID"),
+            "fecha": fecha_str,
+            "tema": c.get("TEMA", ""),
+            "horario": str(c.get("HORARIO", "")),
+            "docente1": profesores_lista[0] if len(profesores_lista) > 0 else "",
+            "docente2": profesores_lista[1] if len(profesores_lista) > 1 else "",
+            "docente3": profesores_lista[2] if len(profesores_lista) > 2 else "",
+            "estado": estado
+        })
+
+    orden = request.args.get("orden", "asc")
     if orden == "asc":
-        clases_ordenadas.sort(key=lambda clase: datetime.strptime(clase["fecha"], "%Y-%m-%d"))
-
+        clases.sort(key=lambda c: c["fecha"])
     elif orden == "desc":
-        clases_ordenadas.sort(key=lambda clase: datetime.strptime(clase["fecha"], "%Y-%m-%d"),reverse=True)
+        clases.sort(key=lambda c: c["fecha"], reverse=True)
     elif orden == "actual":
-        clases_actuales = []
-        resto_clases = []
-        for clase in clases_ordenadas:
-            if clase["estado"] == "Actual":
-                clases_actuales.append(clase)
-            else:
-                resto_clases.append(clase)
-        clases_ordenadas = clases_actuales + resto_clases
+        clases_actuales = [c for c in clases if c["estado"] == "Actual"]
+        resto = [c for c in clases if c["estado"] != "Actual"]
+        clases = clases_actuales + resto
 
-    return render_template("asistencias.html",clases=clases_ordenadas,nombre_profesor=nombre, error=error)
+    return render_template("asistencias.html", clases=clases, nombre_profesor=nombre, error=error)
+
+@app.route('/editar_clase/<int:id>', methods=['POST'])
+def editar_clase(id):
+    docente1 = request.form.get('docente1', '')
+    docente2 = request.form.get('docente2', '')
+    docente3 = request.form.get('docente3', '')
+    profesores = [d for d in [docente1, docente2, docente3] if d]
+    try:
+        requests.patch(f"http://backend:5000/clases/{id}", json={
+            "profesores": profesores,
+            "fecha": request.form.get('fecha'),
+            "horario": request.form.get('horario'),
+            "tema": request.form.get('tema')
+        })
+    except Exception as e:
+        pass
+    return redirect(url_for('seccion_asistencias'))
+
+@app.route('/eliminar_clase/<int:id>', methods=['POST'])
+def eliminar_clase(id):
+    try:
+        requests.delete(f"http://backend:5000/clases/{id}")
+    except Exception as e:
+        pass
+    return redirect(url_for('seccion_asistencias'))
 
 # 6. Ruta de la sección de Notas
 @app.route('/notas')

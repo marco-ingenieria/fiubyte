@@ -43,10 +43,11 @@ def existe_en_bd(cursor, tabla, campo, valor):
 def validar_fecha(fecha):
     if not isinstance(fecha, str):
         return False
-
-    try:
-        datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
-        return True
-    except ValueError:
-        return False
+    for formato in ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]:
+        try:
+            datetime.strptime(fecha, formato)
+            return True
+        except ValueError:
+            continue
+    return False
     
