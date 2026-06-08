@@ -12,6 +12,7 @@
     background-color: #e9eef5;
     box-shadow:0 2px 6px rgba(0,0,0,0.10);
     font-size: 15px;
+    transition: all 0.3s ease;
 }
 #buscador-secciones{
     text-align: center;
@@ -19,4 +20,133 @@
 }
 #entrada-busqueda:focus{
     outline:none;
+    transform: scale(1.03);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+/* =========================
+   TARJETAS PANEL
+========================= */
+#contenedor-tarjetas {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+    gap: 30px;
+}
+
+/* Cada tarjeta */
+#contenedor-tarjetas > div {
+    background: var(--blanco-vidrio);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    border: 1px solid var(--borde-vidrio);
+
+    border-radius: 16px;
+
+    padding: 35px 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+
+    box-shadow: var(--sombra-suave);
+
+    transition:
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.3s ease;
+
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover */
+#contenedor-tarjetas > div:hover {
+    transform: translateY(-8px) scale(1.02);
+
+    box-shadow: 0 20px 40px 0 rgba(31, 38, 135, 0.12);
+
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Título */
+#contenedor-tarjetas h2 {
+    color: #0f172a;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    margin-bottom: 12px;
+}
+
+/* Texto */
+#contenedor-tarjetas p {
+    font-size: 14px;
+
+    color: var(--texto-mutado);
+
+    line-height: 1.6;
+
+    margin-bottom: 25px;
+}
+
+/* Botón */
+#contenedor-tarjetas a {
+    margin-top: auto;
+
+    display: inline-block;
+
+    padding: 11px 28px;
+
+    background: var(--color-primario);
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 30px;
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+
+    transition: all 0.3s ease;
+}
+
+/* Hover botón */
+#contenedor-tarjetas a:hover {
+    background: var(--color-primario-hover);
+
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+
+    transform: translateY(-1px);
+}
+
+#contenedor-tarjetas > div::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 4px;
+
+    background: linear-gradient(
+        90deg,
+        #4f46e5,
+        #06b6d4
+    );
+
+    transition: left 0.4s ease;
+}
+
+#contenedor-tarjetas > div:hover::before{
+    left: 0;
 }

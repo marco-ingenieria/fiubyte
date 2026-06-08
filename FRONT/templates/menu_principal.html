@@ -10,6 +10,11 @@
 
 <form id="buscador-secciones" action="{{ url_for('buscar_seccion') }}" method="GET">
 
+    <input
+        type="hidden"
+        name="nombre_profesor"
+        value="{{ nombre_profesor }}">
+        
     <input 
         id="entrada-busqueda"
         name="busqueda"

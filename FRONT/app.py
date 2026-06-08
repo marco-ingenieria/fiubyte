@@ -8,31 +8,32 @@ app = Flask(__name__)
 @app.route('/buscar')
 def buscar_seccion():
 
-    texto = request.args.get('busqueda', '').lower()
     nombre = request.args.get('nombre_profesor', '')
 
-    if 'usuario' in texto: #coloco en singular porque puede ser "usuarios" o "usuario"
-        return render_template('usuarios.html',nombre_profesor=nombre)
+    texto = request.args.get('busqueda', '').lower().strip()
 
-    if 'alumno' in texto:
-        return render_template('alumnos.html', nombre_profesor=nombre)
+    if texto.startswith('usuario'):
+        return redirect(url_for('seccion_usuarios',nombre_profesor=nombre))
 
-    if 'historial' in texto:
-        return render_template('historial.html',nombre_profesor=nombre)
+    if texto.startswith('alumno'):
+        return redirect(url_for('seccion_alumnos', nombre_profesor=nombre))
 
-    if 'grupo' in texto:
-        return render_template('grupos.html',nombre_profesor=nombre)
+    if texto.startswith('historial'):
+        return redirect(url_for('seccion_historial',nombre_profesor=nombre))
 
-    if 'evaluacion' in texto:
-        return render_template('registro_evaluaciones.html',nombre_profesor=nombre)
+    if texto.startswith('grupo'):
+        return redirect(url_for('seccion_grupos', nombre_profesor=nombre))
 
-    if 'nota' in texto:
-        return render_template('notas.html',nombre_profesor=nombre)
+    if texto.startswith('evaluacion'):
+        return redirect(url_for('seccion_evaluaciones',nombre_profesor=nombre))
 
-    if 'asistencia' in texto:
-        return render_template('asistencias.html',nombre_profesor=nombre)
+    if texto.startswith('nota'):
+        return redirect(url_for('seccion_notas',nombre_profesor=nombre))
 
-    return render_template('menu_principal.html', nombre_profesor=nombre, error_busqueda=True)
+    if texto.startswith('asistencia'):
+        return redirect(url_for('seccion_asistencias',nombre_profesor=nombre))
+
+    return redirect(url_for('menu_principal', nombre_profesor=nombre, error_busqueda=True))
 
 # 8. Ruta para mostrar el perfil del alumno
 
@@ -98,8 +99,6 @@ def seccion_asistencias():
     try:
         response = requests.get("http://backend:5000/clases/", params={"limit": 100, "offset": 0})
         clases_raw = response.json().get("listado", [])
-        for c in clases_raw:
-            print(f"FECHA raw: {c.get('FECHA')}, tipo: {type(c.get('FECHA'))}", flush=True)
     except Exception as e:
         clases_raw = []
 
@@ -245,6 +244,7 @@ def seccion_usuarios():
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
+    nombre_profesor = request.args.get('nombre_profesor', '')
     nombre = request.form.get('nombre')
     contrasenia = request.form.get('contrasenia')
     try:
@@ -254,22 +254,29 @@ def crear_usuario():
         })
     except Exception as e:
         pass
-    return redirect(url_for('seccion_usuarios'))
+    return redirect(url_for('seccion_usuarios',nombre_profesor=nombre_profesor))
 
 @app.route('/eliminar_usuario', methods=['POST'])
 def eliminar_usuario():
+    nombre_profesor = request.args.get('nombre_profesor', '')
     id = request.form.get('eliminar-usuario-id')
     try:
         requests.delete(f"http://backend:5000/usuarios/{id}")
     except Exception as e:
         pass
-    return redirect(url_for('seccion_usuarios'))
+    return redirect(url_for('seccion_usuarios',nombre_profesor=nombre_profesor))
 
 
 # 0. Ruta del Panel Principal (Se activa al entrar a http://127.0.0.1:5000)
 @app.route('/')
 def inicio():
     return render_template('inicio.html')
+
+@app.route('/menu')
+def menu_principal():
+    nombre = request.args.get('nombre_profesor', '')
+    error_busqueda = request.args.get('error_busqueda')
+    return render_template('menu_principal.html',nombre_profesor=nombre, error_busqueda=error_busqueda)
 
 #Modifique un toque para pasar contrasenia aparte de nombre al back
 @app.route("/login", methods=["GET", "POST"])

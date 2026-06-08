@@ -13,7 +13,7 @@
 </div>
 <dialog id="modal-crear">
     <h3>Crear Nuevo Usuario</h3>
-    <form id="form-crear" method="POST" action="/crear_usuario">
+    <form id="form-crear" method="POST" action="/crear_usuario?nombre_profesor={{ nombre_profesor }}">
         <label>Nombre de Usuario:</label>
         <input type="text" name="nombre" placeholder="usuario" required>
         <label>Contraseña:</label>
@@ -29,7 +29,7 @@
     <h3>Eliminar Usuario</h3>
     <p>Introduce el ID del usuario que deseas dar de baja y confirma la acción.</p>
     
-    <form id="form-eliminar" method="POST" action="/eliminar_usuario">
+    <form id="form-eliminar" method="POST" action="/eliminar_usuario?nombre_profesor={{ nombre_profesor }}">
         <label>ID:</label>
         <input type="text" name="eliminar-usuario-id" placeholder="Ej: 1042" required>
         <label>Confirmación:</label>
@@ -53,9 +53,15 @@
     </thead>
     <tbody>
         {% for usuario in usuarios %}
-        <tr>
+        <!-- Cambiado: Compara el campo NOMBRE de la API contra la variable nombre_profesor -->
+        <tr {% if usuario.NOMBRE == nombre_profesor %}id="usuario-actual"{% endif %}>
             <td>{{ usuario.ID_USUARIO }}</td>
-            <td>{{ usuario.NOMBRE }}</td>
+            <td>
+                {{ usuario.NOMBRE }}
+                {% if usuario.NOMBRE == nombre_profesor %}
+                    <span>(Tú)</span>
+                {% endif %}
+            </td>
             <!-- <td>{{ usuario.Email }}</td> -->
             <!-- <td>{{ usuario.Rol }}</td> -->
             <td><a href="#">Ver Historial</a></td>

@@ -12,13 +12,14 @@
 <body>
    
     <div id="menu-superior">
+    <a href="{{ url_for('menu_principal', nombre_profesor=nombre_profesor) }}">
         <strong>Panel Docente</strong>
-        <div id="usuario-profesor">
-            <p>Profesor: {{ nombre_profesor }}</p>
-        </div>
+    </a>
 
-
+    <div id="usuario-profesor">
+        <p>Profesor: {{ nombre_profesor }}</p>
     </div>
+</div>
     <!-- Caja contenedora general de las páginas -->
     <div id="contenedor-principal">
         {% block content %}{% endblock %}
