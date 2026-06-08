@@ -1,234 +1,186 @@
-:root {
-    --blanco: #ffffff;
-    --negro: #1a1a1a;
-    --gris-claro: #f4f6f9;
-    --gris-plata: #bdc3c7;
-    --azul-fiuba: #00539ba8;      
-    --azul-oscuro: #002d57;     
-    --azul-foco: #fffffff5;
-    --fuente-fiuba: 'Helvetica Neue', Arial, sans-serif;
-    --filtro-glass: blur(16px);
-}
-
+/* ------ Estilos Generales y Reset ------ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body {
-    font-family: var(--fuente-fiuba);
-    background-color: var(--azul-oscuro);
+main {
+    position: relative;
+    width: 100vw;
     height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
+    background-color: #0f172a;
+}
+
+/* ------ Carrusel de Fotos en Pantalla Completa ------ */
+#background-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#background-carousel img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.4); 
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
+}
+
+#background-carousel img:first-of-type {
+    opacity: 1;
+}
+
+/* ------ Forma Rectangular con Brillo ------ */
+form {
     position: relative;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-/* CAPA DE IMÁGENES ANIMADAS */
-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: -2;
-    animation: cambiarFondo 24s infinite ease-in-out;
-}
-
-/* CAPA DE GRADIENTE INTEGRANTE FIUBA */
-body::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(0, 83, 155, 0.21), rgba(0, 45, 87, 0.9));
-    z-index: -1;
-}
-
-/* EFECTO GLASSMORPHISM AVANZADO CON SOMBRA BLANCA */
-.wrapper {
-    background-color: rgba(255, 255, 255, 0.06); 
-    backdrop-filter: var(--filtro-glass);
-    -webkit-backdrop-filter: var(--filtro-glass);
-    padding: 3.5rem 4rem;
-    border-radius: 1.2rem; 
-    width: min(90%, 38rem);
-    color: var(--blanco);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    /* Se combinan la sombra oscura profunda y el resplandor blanco perimetral */
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35),
-                0 0 15px rgba(255, 255, 255, 0.898);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.wrapper:hover {
-    border-color: rgba(255, 255, 255, 0.25);
-    /* El resplandor blanco se intensifica y expande al hacer hover */
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45),
-                0 0 25px rgba(255, 255, 255, 0.25);
-}
-
-.wrapper h1 {
-    font-size: 2.2rem;
+    z-index: 2;
+    width: 90%;
+    max-width: 440px;
+    padding: 40px;
     text-align: center;
-    margin-bottom: 0.5rem;
+    color: white;
+    
+    /* Fondo azul marino traslúcido */
+    background: rgba(10, 23, 47, 0.65); 
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    
+    /* Borde Rectangular */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+
+    /* Sombra de neón brillante */
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.2),
+        0 15px 35px rgba(0, 0, 0, 0.6),
+        0 0 25px rgba(0, 114, 245, 0.35), 
+        0 0 60px rgba(0, 114, 245, 0.15);
+}
+
+form h1 {
+    font-size: 26px;
     font-weight: 700;
+    margin-bottom: 12px;
     letter-spacing: 0.5px;
-    color: var(--blanco);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.login-instruction {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.812);
-    text-align: center;
-    margin-bottom: 3rem;
+form p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 25px;
     line-height: 1.5;
-    font-weight: 300;
 }
 
-/* ENTRADAS DE TEXTO ESTILIZADAS */
-.input-box {
+/* ------ Enunciado de Alerta de Error ------ */
+#error-message {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 25px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+#error-message svg {
+    width: 18px;
+    height: 18px;
+    fill: #ef4444;
+    position: static; /* Evita heredar el absolute de los inputs */
+    transform: none;
+}
+
+/* ------ Inputs y Elementos Internos ------ */
+form > div {
     position: relative;
-    width: 100%;
-    margin-bottom: 2.5rem;
+    margin-bottom: 25px;
 }
 
-.input-box input {
+form input[type="text"],
+form input[type="password"] {
     width: 100%;
-    padding: 1rem 3.5rem 0.8rem 0.5rem;
+    padding: 12px 40px 12px 10px;
     background: transparent;
     border: none;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.25);
     outline: none;
-    font-size: 1.15rem;
-    color: var(--blanco);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 16px;
+    color: white;
+    transition: border-color 0.3s ease;
 }
 
-.input-box input:focus {
-    border-bottom-color: var(--azul-foco); 
-    box-shadow: 0 1px 0 var(--azul-foco);
+form input:focus {
+    border-bottom-color: #0072f5; 
 }
 
-.input-box input::placeholder {
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
+form input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
 }
 
-.input-box i {
+/* Estilos de los iconos SVG internos de los inputs */
+form div svg {
     position: absolute;
-    right: 0.8rem;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.3rem;
-    color: rgba(255, 255, 255, 0.5);
-    transition: color 0.3s ease, transform 0.3s ease;
+    width: 20px;
+    height: 20px;
+    fill: rgba(255, 255, 255, 0.5);
+    transition: fill 0.3s ease;
+    z-index: 3; /* Quedan por encima del input */
+}
+
+/* Desactivamos eventos en el path para que el click no se trabe */
+form div svg path {
     pointer-events: none;
 }
 
-.input-box input:focus ~ i {
-    color: var(--azul-foco); 
-    transform: translateY(-50%) scale(1.05);
-}
-
-/* CHECKBOX & LINKS */
-.remember-forgot {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin-bottom: 3rem;
-    font-size: 0.95rem;
-    color: var(--gris-plata);
-}
-
-.remember-forgot label {
+/* Cambia el cursor a la mano solo en el ojo */
+form div svg[id="toggle-password"] {
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    user-select: none;
-    transition: color 0.2s ease;
 }
 
-.remember-forgot label:hover {
-    color: var(--blanco);
+/* Cambia el color del SVG cuando el input recibe foco */
+form input:focus + svg {
+    fill: #0072f5;
 }
 
-.remember-forgot input[type="checkbox"] {
-    accent-color: var(--azul-fiuba); 
-    width: 1.15rem;
-    height: 1.15rem;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-/* BOTÓN DE ACCESO ERGONÓMICO */
-.btn {
-    display: block;
+/* ------ Botón Rectangular Azul ------ */
+form button[type="submit"] {
     width: 100%;
-    font-family: var(--fuente-fiuba);
-    color: var(--blanco);
-    background: var(--azul-fiuba); 
-    text-align: center;
+    padding: 14px;
+    background: #0055b3;
+    color: white;
+    border: none;
+    border-radius: 6px;
     font-weight: 600;
-    font-size: 1.1rem;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.5rem; 
+    font-size: 16px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 82, 155, 0.3);
-    transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
-    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(0, 85, 179, 0.3);
+    transition: all 0.3s ease;
+    margin-top: 10px;
 }
 
-.btn:hover {
-    background-color: var(--azul-oscuro); 
-    box-shadow: 0 6px 20px rgba(0, 45, 87, 0.5);
-    transform: translateY(-1.5px);
-}
-
-.btn:active {
-    transform: translateY(0.5px);
-}
-
-/* CICLO DE TRANSICIÓN SUAVE (CROSSFADE EQUILIBRADO) */
-@keyframes cambiarFondo {
-    0%, 18% {
-        background-image: url('../img/Facultad.png');
-    }
-    25%, 43% {
-        background-image: url('../img/Facultad1.png');
-    }
-    50%, 68% {
-        background-image: url('../img/Facultad2.png');
-    }
-    75%, 93% {
-        background-image: url('../img/Facultad3.png');
-    }
-    100% {
-        background-image: url('../img/Facultad.png');
-    }
-}
-
-/* RESPONSIVE PARA DISPOSITIVOS MÓVILES */
-@media (max-width: 480px) {
-    .wrapper {
-        padding: 2.5rem 2rem;
-    }
-    .wrapper h1 {
-        font-size: 1.8rem;
-    }
+form button[type="submit"]:hover {
+    background: #0072f5;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(0, 114, 245, 0.4);
 }
