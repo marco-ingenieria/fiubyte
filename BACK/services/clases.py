@@ -16,6 +16,9 @@ def listar_clases(limit, offset, base_url):
         cursor.execute(select_stmt, [limit, offset])
 
         clases = cursor.fetchall()
+        for clase in clases:
+            if clase.get('HORARIO') is not None:
+                clase['HORARIO'] = str(clase['HORARIO'])
         listado = construir_paginacion(clases, base_url, limit, offset)
         
         return listado
@@ -41,9 +44,11 @@ def buscar_clase(id):
         cursor.execute(select_stmt, [id])
 
         clase = cursor.fetchone()
-
         if not clase:
             return construir_error(404, f"Clase no encontrada")
+        
+        if clase and clase.get('HORARIO') is not None:
+            clase['HORARIO'] = str(clase['HORARIO'])        
         
         return (jsonify({"clase": clase}), 200)
     except Exception as e:
@@ -62,20 +67,23 @@ def crear_clase(body):
     connection = None
     cursor = None
 
+    #en otro momento podriamos hacer que solo te deje elegir usuarios
     profesores      = body.get('profesores')
     fecha           = body.get('fecha')
-    materia         = body.get('id_materia')
+    horario         = body.get('horario')
+    tema            = body.get('tema')
+    #materia         = body.get('id_materia')
 
     #parse a JSON
     profesores = json.dumps(profesores)
     #parse a fecha
-    fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
-
+    fecha = datetime.strptime(fecha, "%Y-%m-%d")
+    
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO CLASES (PROFESORES, FECHA, ID_MATERIA) VALUES (%s, %s, %s)"
-        cursor.execute(create_stmt, [profesores, fecha, materia])
+        create_stmt = "INSERT INTO CLASES (PROFESORES, FECHA, HORARIO, TEMA) VALUES (%s, %s, %s, %s)"
+        cursor.execute(create_stmt, [profesores, fecha, horario, tema])
 
         id = cursor.lastrowid
         
@@ -92,13 +100,14 @@ def crear_clase(body):
             connection.close()
 
 
-
 def actualizar_clase(body, id):
     connection = None
     cursor = None
 
     profesores      = body.get('profesores')
     fecha           = body.get('fecha')
+    tema            = body.get('tema')
+    horario         = body.get('horario')
 
     #parse a JSON
     if profesores:
@@ -106,8 +115,8 @@ def actualizar_clase(body, id):
 
     #parse a fecha
     if fecha:
-        fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
-
+        fecha = datetime.strptime(fecha, "%Y-%m-%d")
+    
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
@@ -122,14 +131,18 @@ def actualizar_clase(body, id):
         #rellenar datos que no vengan en el body
         profesores      = profesores    or clase["PROFESORES"]
         fecha           = fecha         or clase["FECHA"]
+        tema            = tema          or clase["TEMA"]
+        horario           = horario         or clase["HORARIO"]
 
         update_stmt = """
         UPDATE CLASES SET
         PROFESORES = %s,
-        FECHA = %s
+        FECHA = %s,
+        TEMA = %s,
+        HORARIO = %s
         WHERE ID = %s
         """
-        cursor.execute(update_stmt, [profesores, fecha, id])
+        cursor.execute(update_stmt, [profesores, fecha, tema, horario, id])
         filas_afectadas = cursor.rowcount
 
         cursor.execute(select_stmt, [id])
