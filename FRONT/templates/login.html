@@ -4,38 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/login.css') }}">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="{{ url_for('static', filename='javascript/usuarios.js') }}" defer></script>
     <title>Iniciar Sesión</title>
 </head>
 <body>
 
-<div class="wrapper">
+<main>
+    <div id="background-carousel">
+        <img src="{{ url_for('static', filename='img/Facultad.png') }}" alt="Facultad de Ingeniería 1">
+        <img src="{{ url_for('static', filename='img/Facultad1.png') }}" alt="Facultad de Ingeniería 2">
+        <img src="{{ url_for('static', filename='img/Facultad2.png') }}" alt="Facultad de Ingeniería 3">
+        <img src="{{ url_for('static', filename='img/Facultad3.png') }}" alt="Facultad de Ingeniería 4">
+    </div>
+
     <form method="POST" action="">
         <h1>FIUBA - Iniciar Sesión</h1>
         
-        <p class="login-instruction">
+        <p>
             Ingresá con tu usuario completo (usuario@fi.uba.ar) y contraseña.
         </p>
 
-        <div class="input-box">
+        <p id="error-message" style="display: none;">
+            <svg viewBox="0 0 24 24"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.465 10 9.953 10c5.52 0 10.047-4.5 10.047-10S17.473 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Usuario o contraseña incorrectos. Por favor, intente de nuevo.
+        </p>
+
+        <div>
             <input type="text" id="nombre_profesor" name="nombre_profesor" placeholder="Usuario" required autocomplete="username">
-            <i class='bx bxs-user'></i>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.579 2 2 6.579 2 12s4.579 10 10 10 10-4.579 10-10S17.421 2 12 2zm0 5c1.727 0 3 1.272 3 3s-1.273 3-3 3c-1.726 0-3-1.272-3-3s1.274-3 3-3zm0 12.2c-2.754 0-5.183-1.424-6.61-3.58.038-2.187 4.407-3.38 6.61-3.38s6.572 1.193 6.61 3.38c-1.427 2.156-3.856 3.58-6.61 3.58z"/></svg>
         </div>
 
-        <div class="input-box">
+        <div>
             <input type="password" id="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
-            <i class='bx bxs-lock-alt'></i>
+            <svg viewBox="0 0 24 24" id="toggle-password" style="pointer-events: auto; cursor: pointer;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
         </div>
 
-        <div class="remember-forgot">
-            <label>
-                <input type="checkbox" name="remember"> Recordarme en este equipo
-            </label>
-        </div>
-
-        <button type="submit" class="btn">Ingresar</button>
+        <button type="submit">Ingresar</button>
     </form>
-</div>
+</main>
 
 </body>
 </html>
