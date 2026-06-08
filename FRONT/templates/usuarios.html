@@ -1,8 +1,4 @@
-{% extends 'base_sistema.html' %}
-
-{% block title %}Usuarios - Panel Docente{% endblock %}
-
-{% block content %}
+{% extends 'base_sistema.html' %} {% block title %}Usuarios - Panel Docente{% endblock %} {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/usuarios.css') }}">
 <h1 style="text-align: center;">Listado de Usuarios</h1>
 <p style="text-align: center;">Administre los usuarios del sistema, incluyendo docentes y alumnos.</p>
@@ -16,10 +12,10 @@
     <form id="form-crear">
         <label>Nombre de Usuario:</label>
         <input type="text" placeholder="usuario" required>
-        
+
         <label>Contraseña:</label>
         <input type="password" placeholder="0123456789" required>
-        
+
         <div>
             <button type="submit">Guardar</button>
             <button type="button" onclick="cerrarModal('crear')">Cancelar</button>
@@ -30,14 +26,14 @@
 <dialog id="modal-eliminar">
     <h3>Eliminar Usuario</h3>
     <p>Introduce el ID del usuario que deseas dar de baja y confirma la acción.</p>
-    
+
     <form id="form-eliminar">
         <label for="eliminar-usuario-id">ID:</label>
         <input type="text" id="eliminar-usuario-id" placeholder="Ej: 1042" required>
-        
+
         <label for="confirmar-palabra">Confirmación:</label>
         <input type="text" id="confirmar-palabra" placeholder="Escribe ELIMINAR" required>
-        
+
         <div>
             <button type="submit" id="btn-eliminar-submit" disabled>Eliminar permanentemente</button>
             <button type="button" onclick="cerrarModal('eliminar')">Cancelar</button>
