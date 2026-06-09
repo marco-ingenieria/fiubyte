@@ -1,94 +1,120 @@
 {%- extends 'base_sistema.html' -%}
 
-{%- block title -%}Planilla de Calificaciones - Panel Docente{%- endblock -%}
-
-{%- block head -%}
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/notas.css') }}">
-{%- endblock -%}
+{%- block title -%}Notas - Panel Docente{%- endblock -%}
 
 {%- block content -%}
-    <div>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/notas.css') }}">
+
+  <nav id="nav-interno">
+    <div id="nav-links">
+      <a href="{{ url_for('seccion_evaluaciones') }}">← Evaluaciones</a>
+    </div>
+  </nav>
+
+  <div id="main-content">
+
+    <div id="page-header">
+      <div id="page-header-left">
         <h1>Planilla de Calificaciones</h1>
-        <p>Gestión integral de notas y estados académicos del curso.</p>
+        <p>Gestión de notas y estados académicos · Ciclo 2026</p>
+      </div>
     </div>
 
-    <form>
-        <div>
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2">Padrón</th>
-                        <th rowspan="2">Alumno</th>
-                        <th colspan="2">Trabajos Prácticos</th>
-                        <th colspan="2">Exámenes</th>
-                        <th rowspan="2">Final</th>
-                        <th rowspan="2">Nota Final</th>
-                        <th rowspan="2">Estado</th>
-                    </tr>
-                    <tr>
-                        <th>TP1</th>
-                        <th>TP2</th>
-                        <th>P1</th>
-                        <th>P2</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set alumnos_curso = [
-                        {'padron': '105432', 'nombre': 'Juan Rodriguez', 'estado': 'APROBADO', 'abandonó': false},
-                        {'padron': '106112', 'nombre': 'Guillermo Francella', 'estado': 'APROBADO', 'abandonó': false},
-                        {'padron': '104873', 'nombre': 'Ricardo Darín', 'estado': 'LIBRE', 'abandonó': true},
-                        {'padron': '105991', 'nombre': 'Evelyn Gómez', 'estado': 'DESAPROBADO', 'abandonó': false},
-                        {'padron': '102345', 'nombre': 'Luis Brandoni', 'estado': 'APROBADO', 'abandonó': false}
-                    ] %}
+    <div id="toolbar">
+      <div id="toolbar-left">
+        <button onclick="openDL('tp')">
+          <span>📄</span> Descargar TPs
+        </button>
+        <button onclick="openDL('examenes')">
+          <span>📝</span> Descargar Exámenes
+        </button>
+        <button onclick="downloadPlanilla('completa')">
+          <span>📊</span> Planilla Completa
+        </button>
+      </div>
+      <div id="toolbar-right">
+        <button id="btn-guardar" onclick="guardarCambios()">
+          💾 Guardar Cambios
+        </button>
+      </div>
+    </div>
 
-                    {% for alumno in alumnos_curso %}
-                        <tr {% if alumno.abandonó %}data-status="bloqueado"{% endif %}>
-                            
-                            <td>
-                                {{ alumno.padron }}
-                            </td>
+    <div id="stats-row">
+      <div id="stat-card-aprobados">
+        <div>Aprobados</div>
+        <div id="stat-ap">—</div>
+      </div>
+      <div id="stat-card-desaprobados">
+        <div>Desaprobados</div>
+        <div id="stat-des">—</div>
+      </div>
+      <div id="stat-card-promedio">
+        <div>Promedio Final</div>
+        <div id="stat-prom">—</div>
+      </div>
+    </div>
 
-                            <td>
-                                <strong>{{ alumno.nombre }}</strong>
-                                {% if alumno.abandonó %}
-                                    <span>Abandono</span>
-                                {% endif %}
-                            </td>
+    <div id="table-wrap">
+      <table>
+        <thead>
 
-                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
-                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
-                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
-                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
-                            <td><input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}></td>
-
-                            <td>
-                                <input type="number" min="1" max="10" placeholder="-" {{ 'disabled' if alumno.abandonó }}>
-                            </td>
-
-                            <td>
-                                {% set estado_actual = 'libre' if alumno.abandonó else alumno.estado | lower %}
-                                <select {{ 'disabled' if alumno.abandonó }} 
-                                        data-color="{{ estado_actual }}"
-                                        onchange="this.setAttribute('data-color', this.value.toLowerCase())">
-                                    <option value="APROBADO" {% if estado_actual == 'aprobado' %}selected{% endif %}>APROBADO</option>
-                                    <option value="LIBRE" {% if estado_actual == 'libre' %}selected{% endif %}>LIBRE</option>
-                                    <option value="DESAPROBADO" {% if estado_actual == 'desaprobado' %}selected{% endif %}>DESAPROBADO</option>
-                                </select>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div>
-            <button type="button" onclick="window.location.href='{{ url_for('seccion_evaluaciones') }}'">
-                <span>←</span> Volver
-            </button>
+          <tr>
+            <th rowspan="2"><div>Padrón</div></th>
+            <th rowspan="2"><div>Alumno</div></th>
+            <th colspan="2"><div>Trabajos Prácticos</div></th>
+            <th colspan="2"><div>Exámenes / Parciales</div></th>
+            <th rowspan="2"><div>Final</div></th>
+            <th rowspan="2"><div>Nota Final</div></th>
+            <th rowspan="2"><div>Estado</div></th>
+          </tr>
             
-            <button type="submit">
-                <span>💾</span> Guardar Planilla
-            </button>
+          <tr>
+            <th>TP 1</th>
+            <th>TP 2</th>
+            <th>1er Parcial</th>
+            <th>2do Parcial</th>
+          </tr>
+        </thead>
+          
+        <tbody id="tabla-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="toast"></div>
+
+
+  <div id="dl-overlay" onclick="closeDLOutside(event)">
+    <div id="dl-modal">
+      <div id="dl-modal-header">
+        <h2 id="dl-title">Descargar</h2>
+        <button id="dl-close" onclick="closeDL()">✕</button>
+      </div>
+      <div id="dl-modal-body">
+        <p id="dl-desc">Elegí el formato de descarga:</p>
+        
+        <div data-download-option="primary" onclick="downloadCSV('tp1')">
+          <div>📋</div>
+          <div>
+            <h3>TP 1 – Lista de alumnos y notas</h3>
+            <p>CSV con padrón, nombre y calificación del TP 1</p>
+          </div>
         </div>
-    </form>
+        
+        <div data-download-option="secondary" onclick="downloadCSV('tp2')">
+          <div>📋</div>
+          <div>
+            <h3>TP 2 – Lista de alumnos y notas</h3>
+            <p>CSV con padrón, nombre y calificación del TP 2</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='javascript/notas.js') }}"></script>
 {%- endblock -%}
