@@ -237,7 +237,7 @@ def seccion_alumnos():
         alumnos = []
 
     nombre = request.args.get('nombre_profesor', '')
-    return render_template('alumnos.html', nombre_profesor=nombre)
+    return render_template('alumnos.html', nombre_profesor=nombre, alumnos=alumnos)
 
 # 1. Ruta de la sección de Usuarios
 @app.route('/usuarios')

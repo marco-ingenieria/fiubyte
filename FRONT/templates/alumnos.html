@@ -8,23 +8,23 @@
 <table>
     <thead>
         <tr>
-            <th>ID</th>
-            <th>DNI</th>
             <th>Nombre</th>
             <th>Email</th>
             <th>Padron</th>
-            <th>Grupo</th>
+            <th>Estado</th>
         </tr>
     </thead>
     <tbody>
-        {% for alumno in lista_alumnos %}
+        {% for alumno in alumnos %}
         <tr>
-            <td>{{ alumno.id }}</td>
-            <td>{{ alumno.dni }}</td>
-            <td>{{ alumno.nombre }}</td>
-            <td>{{ alumno.email }}</td>
-            <td>{{ alumno.padron }}</td>
-            <td>{{ alumno.grupo}}</td>
+            <td>{{ alumno.NOMBRE }} {{ alumno.APELLIDO }}</td>
+            <td>{{ alumno.MAIL }}</td>
+            <td>{{ alumno.PADRON }}</td>
+            {% if alumno.ABANDONO %}
+                <td>Abandonó<td>
+            {% else %}
+                <td>Cursando</td>                
+            {% endif %}
         </tr>
         {% endfor %}
 </table>
