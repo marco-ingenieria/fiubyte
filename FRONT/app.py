@@ -186,7 +186,39 @@ def seccion_evaluaciones():
 @app.route('/grupos')
 def seccion_grupos():
     nombre = request.args.get('nombre_profesor', '')
-    return render_template('grupos.html', nombre_profesor=nombre)
+
+    return render_template('grupos.html', nombre_profesor=nombre,grupos=lista_grupos)
+
+# NUEVA RUTA: Hoja de detalle de un grupo específico (Accedida desde el perfil o listados)
+@app.route('/grupo-detalle')
+def detalle_grupo_especifico():
+    nombre_profesor = request.args.get('nombre_profesor', '')
+    
+    # Atajamos cuál grupo exacto se quiere ver (ej: "Grupo 1")
+    id_grupo = request.args.get('id', '')
+
+    # =========================================================================
+    # LÓGICA SQL FUTURA:
+    # # 1. Buscamos los datos de este grupo en la base de datos:
+    # grupo_datos = db.execute("SELECT * FROM grupos WHERE nombre = ?", id_grupo)
+    #
+    # # 2. Buscamos a todos los alumnos que pertenecen a este grupo para listarlos:
+    # integrantes = db.execute("SELECT nombre, padron FROM alumnos WHERE grupo = ?", id_grupo)
+    # =========================================================================
+
+    # Datos fijos temporales para que no tire error al renderizar mientras desarrollás
+    grupo_simulado = {
+        "nombre": id_grupo if id_grupo else "Grupo Sin Nombre",
+        "materia": "Diseño de Sistemas",
+        "integrantes": ["Juan Pérez", "Ana Gómez", "Lucas Díaz"]
+    }
+
+    return render_template(
+        'grupo_individual.html', # Esta es la nueva plantilla física para la hoja del grupo
+        nombre_profesor=nombre_profesor,
+        grupo=grupo_simulado
+    )
+
 
 # NUEVA RUTA: Hoja de detalle de un grupo específico (Accedida desde el perfil o listados)
 @app.route('/grupo-detalle')
@@ -296,3 +328,19 @@ def login():
         except Exception as e:
             return render_template("login.html", error="No se pudo conectar al servidor")
     return render_template("login.html")
+
+@app.route('/grupo/<int:numero_grupo>')
+def ver_grupo(numero_grupo):
+    nombre = request.args.get('nombre_profesor', '')
+    if numero_grupo == 1:
+        lista_alumnos = ["Hansel Brito", "Ana López", "Carlos Pérez", "María Gómez"]
+    elif numero_grupo == 2:
+        lista_alumnos = ["Juan Rodríguez", "Sofía Martínez", "Lucas Díaz"]
+    else:
+        lista_alumnos = ["Estudiante X", "Estudiante Y", "Estudiante Z", "Estudiante W"]
+    return render_template('detalle_grupo.html',numero=numero_grupo, integrantes=lista_alumnos,nombre_profesor=nombre)
+@app.route('/listado')
+def seccion_listado():
+    return render_template('listado.html')
+if __name__ == '__main__':
+    app.run(debug=True)

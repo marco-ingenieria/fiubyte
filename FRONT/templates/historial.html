@@ -1,8 +1,27 @@
-{%- extends 'base_sistema.html' -%}
+{% extends 'base_sistema.html' %} {% block title %}Historial - Panel Docente{% endblock %} {% block content %}
+<main>
+    <h1>Historial del alumno</h1>
+    <p>Bienvenido {{ nombre_profesor }} Aquí puedes ver el registro del alumno</p>
+    <h1>Alumno {{alumno}}</h1>
+    <table id="tabla-historial">
+        <thead>
+            <tr>
+                <th>Evalucion</th>
+                <th>Instancia</th>
+                <th>Calificacion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in historial_alumno %}
+            <tr>
+                <td>{{ item.Evalucion }}</td>
+                <td>{{ item.Instancia }}</td>
+                <td>{{ item.Calificacion}}</td>
+            </tr>
+            {%endfor%}
+        </tbody>
 
-{%- block title -%}Historial - Panel Docente{%- endblock -%}
+    </table>
+</main>
 
-{%- block content -%}
-    <h1>Historial</h1>
-    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes ver el historial de actividades en la plataforma.</p>
-{%- endblock -%}
+{% endblock %}

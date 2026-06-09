@@ -1,8 +1,32 @@
-{%- extends 'base_sistema.html' -%}
-
-{%- block title -%}Alumnos - Panel Docente{%- endblock -%}
-
-{%- block content -%}
-    <h1>Alumnos</h1>
-    <p>Bienvenido, {{ nombre_profesor }}. Aquí puedes gestionar los alumnos y sus datos.</p>
-{% endblock %}
+{% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+<p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ves los datos de los alumnos.</p>
+<h1>Listado de Alumnos </h1>
+<div id="grupo-botones">
+    <button type="button" onclick="abrirModal('exportar-pdf')">Exportar listado pdf</button>
+    <button type="button" onclick="abrirModal('exportar-csv')">Exportar listado csv</button>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>DNI</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Padron</th>
+            <th>Grupo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alumno in lista_alumnos %}
+        <tr>
+            <td>{{ alumno.id }}</td>
+            <td>{{ alumno.dni }}</td>
+            <td>{{ alumno.nombre }}</td>
+            <td>{{ alumno.email }}</td>
+            <td>{{ alumno.padron }}</td>
+            <td>{{ alumno.grupo}}</td>
+        </tr>
+        {% endfor %}
+</table>
+</tbody>
+{%endblock%}

@@ -1,0 +1,20 @@
+ {% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/listado.css') }}">
+<h1>Grupo 1 </h1>
+<!-- asignar parametro de id, para que modifique segun grupo-->
+<p>Integrantes del grupo</p>
+<div>
+    <select>
+    <option disabled selected>Ordenar por:</option>
+    <option>Notas mas altas</option>
+    <option>Notas mas bajas</option>
+    <option>Apellido A-Z</option>
+     <option>Apellido Z-A</option>
+    </select>
+</div>
+<div id="barra_busqueda">
+    <input placeholder="Buscar alumno por nombre,legajo o dni">
+    <button type="submit">Buscar</button>
+</div>
+
+{% endblock %}

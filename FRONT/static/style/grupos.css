@@ -1,0 +1,100 @@
+#contenedor-boton {
+    margin-bottom: 20px;
+}
+
+#boton-crear {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#boton-crear:hover {
+    background: var(--color-primario-hover);
+}
+
+#tabla-grupos {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    border-collapse: collapse;
+}
+
+#tabla-grupos td {
+    padding: 16px 20px;
+    text-align: left;
+    /* Queda más ordenado alineado a la izquierda */
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--texto-oscuro);
+}
+
+#tabla-grupos tr:hover {
+    background: rgba(79, 70, 229, 0.03);
+    cursor: pointer;
+}
+
+#modal-crear::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+#modal-crear {
+    border: none;
+    border-radius: 20px;
+    padding: 40px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#modal-crear h3 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+#nuevo-numero-grupo {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 16px;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#modal-botones-contenedor {
+    display: flex;
+    gap: 15px;
+}
+
+#modal-crear button[onclick*="close"]:hover {
+    background-color: #cbd5e1;
+}
+
+#modal-crear {
+    /* 🌟 EL TRUCO PARA CENTRARLO EN EL MEDIO: */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: none;
+    border-radius: 20px;
+    padding: 35px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0;
+}

@@ -1,0 +1,21 @@
+ {% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/detalle_grupo.css') }}">
+<main>
+    <div id="contenedor-volver">
+        <a href="{{ url_for('seccion_grupos', nombre_profesor=nombre_profesor) }}" id="boton-volver">Volver atras</a>
+    </div>
+    <h1>Grupo {{numero}}</h1>
+    <!-- asignar parametro de id, para que modifique segun grupo-->
+    <p>Integrantes del grupo</p>
+
+    <div></div>
+    <section>
+        {% for alumno in integrantes %}
+        <a href="{{url_for('seccion_historial', nombre_profesor=nombre_profesor)}}">
+            <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
+            <span>{{alumno}}</span>
+        </a>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}

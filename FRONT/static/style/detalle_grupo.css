@@ -1,0 +1,216 @@
+/* 3. SECCIÓN DE CUADRÍCULA (panel.html) */
+
+section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+article {
+    background: var(--blanco-vidrio);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--borde-vidrio);
+    border-radius: 16px;
+    padding: 35px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: var(--sombra-suave);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+}
+
+article:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px 0 rgba(31, 38, 135, 0.12);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+article h3 {
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+article p {
+    font-size: 14px;
+    color: var(--texto-mutated);
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+article a {
+    margin-top: auto;
+    display: inline-block;
+    padding: 11px 28px;
+    background: var(--color-primario);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    transition: all 0.3s ease;
+}
+
+article a:hover {
+    background: var(--color-primario-hover);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    transform: translateY(-1px);
+}
+
+
+/* 4. BOTONES Y TABLA (alumnos.html) */
+
+main div button {
+    padding: 11px 22px;
+    background: white;
+    border: 1px solid var(--borde-vidrio);
+    border-radius: 30px;
+    color: var(--texto-oscuro);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+}
+
+main div button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--blanco-vidrio);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+    border: 1px solid var(--borde-vidrio);
+}
+
+th,
+td {
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 15px;
+}
+
+th {
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--texto-oscuro);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    color: #334155;
+    font-weight: 500;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--color-primario);
+}
+
+
+/* 5. PIE DE PÁGINA */
+
+footer {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    color: var(--texto-mutado);
+    text-align: center;
+    padding: 25px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 60px;
+    border-top: 1px solid var(--borde-vidrio);
+}
+
+main section {
+    display: flex;
+    flex-wrap: wrap;
+    /* Para que bajen si no hay espacio */
+    gap: 30px;
+    /* Espacio entre cada alumno */
+    justify-content: center;
+}
+
+
+/* El "botón" (cada enlace <a>) */
+
+main section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0%;
+}
+
+main section a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    width: 160px;
+}
+
+
+/* La imagen del alumno */
+
+main section a img {
+    width: 100%;
+    border-radius: 25px;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+
+
+/* El nombre del alumno */
+
+main section a span {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+main div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+main div span {
+    font-weight: 600;
+    color: #475569;
+}
+
+main select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    cursor: pointer;
+    font-weight: bolder;
+}
