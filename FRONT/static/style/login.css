@@ -1,4 +1,6 @@
-/* ------ Estilos Generales y Reset ------ */
+/* ==========================================================================
+   Estilos Generales y Reset
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -17,7 +19,7 @@ main {
     background-color: #0f172a;
 }
 
-/* ------ Carrusel de Fotos en Pantalla Completa ------ */
+/* Carrusel de Fotos */
 #background-carousel {
     position: absolute;
     top: 0;
@@ -43,7 +45,7 @@ main {
     opacity: 1;
 }
 
-/* ------ Forma Rectangular con Brillo ------ */
+/* Formulario */
 form {
     position: relative;
     z-index: 2;
@@ -53,16 +55,13 @@ form {
     text-align: center;
     color: white;
     
-    /* Fondo azul marino traslúcido */
     background: rgba(10, 23, 47, 0.65); 
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     
-    /* Borde Rectangular */
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
 
-    /* Sombra de neón brillante */
     box-shadow: 
         inset 0 1px 2px rgba(255, 255, 255, 0.2),
         0 15px 35px rgba(0, 0, 0, 0.6),
@@ -84,7 +83,7 @@ form p {
     line-height: 1.5;
 }
 
-/* ------ Enunciado de Alerta de Error ------ */
+/* Enunciado de Error */
 #error-message {
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid rgba(239, 68, 68, 0.4);
@@ -97,18 +96,15 @@ form p {
     display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
 }
 
 #error-message svg {
     width: 18px;
     height: 18px;
     fill: #ef4444;
-    position: static; /* Evita heredar el absolute de los inputs */
-    transform: none;
 }
 
-/* ------ Inputs y Elementos Internos ------ */
+/* Inputs y Cajas contenedoras */
 form > div {
     position: relative;
     margin-bottom: 25px;
@@ -135,7 +131,7 @@ form input::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* Estilos de los iconos SVG internos de los inputs */
+/* ÍCONOS SVG CORREGIDOS */
 form div svg {
     position: absolute;
     right: 10px;
@@ -145,25 +141,23 @@ form div svg {
     height: 20px;
     fill: rgba(255, 255, 255, 0.5);
     transition: fill 0.3s ease;
-    z-index: 3; /* Quedan por encima del input */
+    z-index: 5; /* Forzamos a que esté arriba del input siempre */
 }
 
-/* Desactivamos eventos en el path para que el click no se trabe */
+/* Esto soluciona que el click no se quede trabado en las líneas del ojo */
 form div svg path {
     pointer-events: none;
 }
 
-/* Cambia el cursor a la mano solo en el ojo */
 form div svg[id="toggle-password"] {
     cursor: pointer;
 }
 
-/* Cambia el color del SVG cuando el input recibe foco */
 form input:focus + svg {
     fill: #0072f5;
 }
 
-/* ------ Botón Rectangular Azul ------ */
+/* Botón de Envío */
 form button[type="submit"] {
     width: 100%;
     padding: 14px;
@@ -184,3 +178,4 @@ form button[type="submit"]:hover {
     transform: translateY(-1px);
     box-shadow: 0 8px 22px rgba(0, 114, 245, 0.4);
 }
+
