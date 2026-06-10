@@ -138,3 +138,5 @@ CREATE TABLE HISTORIAL (
 );
 
 INSERT INTO USUARIOS (NOMBRE, PASS) VALUES ('BrunoLanzillota', 'linustorvaldsroot');
+
+INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (115599, 'Agustin', 'Maseda', 'amaseda@fi.uba.ar', 0);

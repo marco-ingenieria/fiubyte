@@ -15,18 +15,21 @@
         </tr>
     </thead>
     <tbody>
-        {% for alumno in alumnos %}
-        <tr>
-            <td>{{ alumno.NOMBRE }} {{ alumno.APELLIDO }}</td>
-            <td>{{ alumno.MAIL }}</td>
-            <td>{{ alumno.PADRON }}</td>
-            {% if alumno.ABANDONO %}
-                <td>Abandonó<td>
-            {% else %}
-                <td>Cursando</td>                
-            {% endif %}
-        </tr>
-        {% endfor %}
+    {% for alumno in alumnos %}
+    <tr onclick="window.location.href='{{ url_for('perfil_alumno', padron=alumno.PADRON, nombre_profesor=request.args.get('nombre_profesor','')) }}'">
+
+        <td>{{ alumno.NOMBRE }} {{ alumno.APELLIDO }}</td>
+        <td>{{ alumno.MAIL }}</td>
+        <td>{{ alumno.PADRON }}</td>
+
+        {% if alumno.ABANDONO %}
+            <td>Abandonó</td>
+        {% else %}
+            <td>Cursando</td>
+        {% endif %}
+
+    </tr>
+    {% endfor %}
+    </tbody>
 </table>
-</tbody>
 {%endblock%}

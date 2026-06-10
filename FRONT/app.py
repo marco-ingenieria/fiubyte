@@ -37,23 +37,47 @@ def buscar_seccion():
 
 # 8. Ruta para mostrar el perfil del alumno
 
-@app.route("/alumno")
-def perfil_alumno():
+@app.route("/alumno/<int:padron>")
+def perfil_alumno(padron):
+    nombre = request.args.get('nombre_profesor', '')
 
-    alumno = {    #REEMPLZAR POR DATOS SQL REALES
-        "nombre": "Juan Pérez",
-        "asistencias": 87,
-        "promedio": 8.4,
-        "padron": 109876,
-        "grupos": ["Grupo 1", "Grupo 3"],
-        "trabajos": 5,
-        "notas": [9, 8, 7, 10]
-    }
+    try:
+        response = requests.get(f"http://backend:5000/alumnos/{padron}")
 
-    return render_template(
-        "alumno.html",
-        alumno=alumno
-    )
+        print("STATUS:", response.status_code)
+        print("RAW RESPONSE:", response.text)
+        print("JSON:", response.json())
+        
+        data = response.json()
+
+        print("DEBUG DATA:", data)
+
+        alumno = {
+            "NOMBRE": data.get("NOMBRE"),
+            "APELLIDO": data.get("APELLIDO"),
+            "MAIL": data.get("MAIL"),
+            "PADRON": data.get("PADRON", padron),
+            "ASISTENCIAS": data.get("ASISTENCIAS", 0),
+            "PROMEDIO": data.get("PROMEDIO", 0),
+            "TRABAJOS": data.get("TRABAJOS", 0),
+            "GRUPOS": data.get("GRUPOS", []),
+            "NOTAS": data.get("NOTAS", [])
+        }
+        
+    except Exception:
+        alumno = {
+            "NOMBRE": "",
+            "APELLIDO": "",
+            "MAIL": "",
+            "PADRON": padron,
+            "asistencias": 0,
+            "promedio": 0,
+            "trabajos": 0,
+            "grupos": [],
+            "notas": []
+        }
+
+    return render_template("alumno.html", alumno=alumno, nombre_profesor=nombre)
 
 #7. Ruta para mostrar el QR de la clase actual
 
