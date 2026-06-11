@@ -14,7 +14,10 @@ def listar_alumnos(limit, offset, base_url):
         cursor.execute(select_stmt, [limit, offset])
 
         alumnos = cursor.fetchall()
-        listado = construir_paginacion(alumnos, base_url, limit, offset)
+
+        cursor.execute("SELECT COUNT(*) as total FROM ALUMNOS WHERE ELIMINADO=0")
+        total = cursor.fetchone()["total"]
+        listado = construir_paginacion(alumnos, base_url, limit, offset, total)
         
         return listado
     except Exception as e:
