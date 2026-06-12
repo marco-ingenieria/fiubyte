@@ -1,21 +1,28 @@
  {% extends 'base.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/detalle_grupo.css') }}">
 <main>
-    <div id="contenedor-volver">
-        <a href="{{ url_for('seccion_grupos', nombre_profesor=nombre_profesor) }}" id="boton-volver">Volver atras</a>
-    </div>
-    <h1>Grupo {{numero}}</h1>
+    <h1>Grupo {{ID}}</h1>
     <!-- asignar parametro de id, para que modifique segun grupo-->
     <p>Integrantes del grupo</p>
 
-    <div></div>
     <section>
         {% for alumno in integrantes %}
-        <a href="{{url_for('seccion_historial', nombre_profesor=nombre_profesor)}}">
+        <a href="{{ url_for('menu_principal', nombre_profesor=nombre_profesor) }}">
             <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
-            <span>{{alumno}}</span>
+            <span>{{alumno['NOMBRE']}} (Padrón: {{ alumno['PADRON'] }})</span>
         </a>
         {% endfor %}
     </section>
+    <dialog id="modal-eliminar">
+        <h3> Eliminar Integrante</h3>
+        <form id="form-crear" method="POST" action="{{ url_for('ver_grupo',id=ID,  nombre_profesor=request.args.get('nombre_profesor', '')) }}">
+            <label for="eliminar">Introduzca el padron del integrante:</label>
+            <input type="number" id="nombre" name="eliminar">
+            <div id="modal-botones-contenedor">
+                <button type="submit" id="btn-modal-guardar">Eliminar</button>
+                <button type="button" onclick="document.getElementById('modal-eliminar').close()">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
 </main>
 {% endblock %}

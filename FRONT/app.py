@@ -182,12 +182,45 @@ def seccion_evaluaciones():
     nombre = request.args.get('nombre_profesor', '')
     return render_template('registro_evaluaciones.html', nombre_profesor=nombre)
 
-# 4. Ruta de la sección de Grupos
-@app.route('/grupos')
+@app.route('/grupos', methods=["POST", "GET"])
 def seccion_grupos():
-    nombre = request.args.get('nombre_profesor', '')
+    nombre_profesor = request.args.get('nombre_profesor', '')
+    padron_asignar = request.form.get('padron_asignar')
+    grupo_id = request.form.get('grupo_id')
+ 
+    if request.method == "POST":
+        crear = request.form.get('crear')
+        eliminar = request.form.get('eliminar')
 
-    return render_template('grupos.html', nombre_profesor=nombre,grupos=lista_grupos)
+        if eliminar:
+            try:
+                requests.delete(f"http://backend:5000/grupos/{eliminar}")
+            except Exception as e:
+                print("Error al eliminar grupo")
+        elif crear:
+            try:
+                requests.post("http://backend:5000/grupos/", json={
+                    "nombre": crear
+                })
+            except Exception as e:
+                print("Error al crear grupo")
+        elif padron_asignar and grupo_id:
+            try:
+                requests.post(f"http://backend:5000/grupos/asignar-alumnos", json={
+            "id_grupo": int(grupo_id),
+            "padrones_alumnos": [{"padron": int(padron_asignar)}]
+                })
+            except Exception as e:
+                print("Error al asignar alumno ")
+
+    grupos = []
+    try:
+        response = requests.get("http://backend:5000/grupos/", params={"limit": 30, "offset": 0})
+        grupos = response.json().get("listado", [])
+    except Exception as e:
+        print("Hubo un error")
+
+    return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos)
 
 # NUEVA RUTA: Hoja de detalle de un grupo específico (Accedida desde el perfil o listados)
 @app.route('/grupo-detalle')
@@ -219,24 +252,34 @@ def detalle_grupo_especifico():
         grupo=grupo_simulado
     )
 
-
-# 3. Ruta de la sección de Historial
-@app.route('/historial')
-def seccion_historial():
-    nombre = request.args.get('nombre_profesor', '')
-    return render_template('historial.html', nombre_profesor=nombre)
-
 # 2. Ruta de la sección de Alumnos y Notas (Se activa al ir a /alumnos)
-@app.route('/alumnos')
+@app.route('/alumnos', methods=["POST","GET"])
 def seccion_alumnos():
     nombre = request.args.get('nombre_profesor', '')
+    crear_alumno = request.form.get('crear_alumno')
+    eliminar_alumno = request.form.get('eliminar_alumno')
+    if crear_alumno:
+        try:
+            requests.post("http://backend:5000/alumnos/", json={
+                "nombre": request.form.get('crear_alumno'),
+                "apellido": request.form.get('apellido'),
+                "email": request.form.get('email'),
+                "padron": request.form.get('padron')
+            })
+        except Exception as e:
+            print("Error al crear alumno")
+
+    if eliminar_alumno:
+        try:
+            requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
+        except Exception as e:
+            print("Error al eliminar alumno")
     try:
-        response = requests.get("http://backend:5000/alumnos/", params={"limit": 30, "offset": 0})
+        response = requests.get("http://backend:5000/alumnos/")
         alumnos = response.json().get("listado", [])
     except Exception as e:
         alumnos = []
 
-    nombre = request.args.get('nombre_profesor', '')
     return render_template('alumnos.html', nombre_profesor=nombre, alumnos=alumnos)
 
 # 1. Ruta de la sección de Usuarios
@@ -305,16 +348,24 @@ def login():
             return render_template("login.html", error="No se pudo conectar al servidor")
     return render_template("login.html")
 
-@app.route('/grupo/<int:numero_grupo>')
-def ver_grupo(numero_grupo):
+@app.route('/grupo/<int:id>', methods=["GET", "POST"])
+def ver_grupo(id):
     nombre = request.args.get('nombre_profesor', '')
-    if numero_grupo == 1:
-        lista_alumnos = ["Hansel Brito", "Ana López", "Carlos Pérez", "María Gómez"]
-    elif numero_grupo == 2:
-        lista_alumnos = ["Juan Rodríguez", "Sofía Martínez", "Lucas Díaz"]
-    else:
-        lista_alumnos = ["Estudiante X", "Estudiante Y", "Estudiante Z", "Estudiante W"]
-    return render_template('detalle_grupo.html',numero=numero_grupo, integrantes=lista_alumnos,nombre_profesor=nombre)
+    lista_alumnos = [] 
+    if request.method == "POST":   
+        eliminar_alumno= request.form.get('eliminar')
+        if eliminar_alumno:
+            try:
+                requests.delete(f"http://backend:5000/grupos/{id}/alumnos/{eliminar_alumno}")
+            except Exception as e:
+                print("Error al eliminar alumno del grupo")
+
+    try:
+        response = requests.get(f"http://backend:5000/grupos/alumnos/{id}")
+        lista_alumnos = response.json()
+    except Exception as e:
+        print('Hubo un error al obtener los alumnos del grupo')
+    return render_template('detalle_grupo.html',nombre=nombre, integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
 @app.route('/listado')
 def seccion_listado():
     return render_template('listado.html')

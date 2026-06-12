@@ -36,13 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // formEliminar.addEventListener('submit', function(e) {
     //     e.preventDefault(); // Evitamos que la página intente recargarse
-        
+
     //     // Capturamos lo que el usuario escribió en la cajita de ID
     //     const idAGrabar = document.getElementById('eliminar-usuario-id').value;
-        
+
     //     // Alerta de prueba para verificar que funciona
     //     alert("Acción simulada: Enviando orden para eliminar al usuario ID: " + idAGrabar);
-        
+
     //     // Cerramos la ventana limpia
     //     cerrarModal('eliminar');
     // });

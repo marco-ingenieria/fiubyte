@@ -1,8 +1,33 @@
 #contenedor-boton {
     margin-bottom: 20px;
+    justify-content: center;
+    display: flex;
+}
+
+#contenedor-boton {
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--texto-oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 #boton-crear {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#boton-eliminar {
     padding: 10px 20px;
     border-radius: 8px;
     background: var(--color-primario);
@@ -17,6 +42,10 @@
     background: var(--color-primario-hover);
 }
 
+#boton-eliminar:hover {
+    background: var(--color-primario-hover);
+}
+
 #tabla-grupos {
     width: 100%;
     background: white;
@@ -28,7 +57,6 @@
 #tabla-grupos td {
     padding: 16px 20px;
     text-align: left;
-    /* Queda más ordenado alineado a la izquierda */
     font-size: 15px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     color: var(--texto-oscuro);
@@ -54,6 +82,23 @@
     text-align: center;
 }
 
+#modal-eliminar {
+    border: none;
+    border-radius: 20px;
+    padding: 40px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#boton-alumno {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
 #modal-crear h3 {
     margin-top: 0;
     color: #1e293b;
@@ -61,7 +106,7 @@
     margin-bottom: 20px;
 }
 
-#nuevo-numero-grupo {
+#nombre {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
@@ -76,6 +121,7 @@
 #modal-botones-contenedor {
     display: flex;
     gap: 15px;
+    justify-content: center;
 }
 
 #modal-crear button[onclick*="close"]:hover {
@@ -83,7 +129,22 @@
 }
 
 #modal-crear {
-    /* 🌟 EL TRUCO PARA CENTRARLO EN EL MEDIO: */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: none;
+    border-radius: 20px;
+    padding: 35px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+#modal-eliminar {
     position: fixed;
     top: 50%;
     left: 50%;

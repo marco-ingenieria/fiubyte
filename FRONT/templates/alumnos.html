@@ -1,10 +1,45 @@
 {% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
 <p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ves los datos de los alumnos.</p>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/grupos.css') }}">
 <h1>Listado de Alumnos </h1>
 <div id="grupo-botones">
-    <button type="button" onclick="abrirModal('exportar-pdf')">Exportar listado pdf</button>
-    <button type="button" onclick="abrirModal('exportar-csv')">Exportar listado csv</button>
+    <button type="button" onclick="document.getElementById('exportar-pdf').showModal()">Exportar pdf</button>
+    <button type="button" onclick="document.getElementById('importar-csv').showModal()">Importar csv</button>
+    <button type="button" onclick="document.getElementById('modal-crear').showModal()">Crear alumno</button>
+    <button type="button" onclick="document.getElementById('modal-eliminar').showModal()">Eliminar alumno</button>
 </div>
+<!--crear alumno-->
+<dialog id="modal-crear">
+    <h3>Crear nuevo alumno</h3>
+    <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
+        <label for="nombre">Nombre del Nuevo Alumno:</label>
+        <input type="text" id="nombre" name="crear_alumno">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" name="apellido">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email">
+        <label for="padron">Padron</label>
+        <input type="number" id="padron" name="padron">
+        <div id="modal-botones-contenedor">
+            <button type="submit" id="btn-modal-guardar">Guardar</button>
+            <button type="button" id="btn-modal-cancelar" onclick="document.getElementById('modal-crear').close()">Cancelar</button>
+        </div>
+    </form>
+</dialog>
+<!--eliminar alumno-->
+<dialog id="modal-eliminar">
+    <h3>Eliminar alumno</h3>
+    <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
+        <label for="eliminar">Padron </label>
+        <input type="number" id="nombre" name="eliminar_alumno">
+        <div id="modal-botones-contenedor">
+            <button type="submit" id="btn-modal-guardar">Guardar</button>
+            <button type="button" id="btn-modal-cancelar" onclick="document.getElementById('modal-eliminar').close()">Cancelar</button>
+        </div>
+    </form>
+</dialog>
+
+
 <table>
     <thead>
         <tr>
@@ -21,12 +56,13 @@
             <td>{{ alumno.MAIL }}</td>
             <td>{{ alumno.PADRON }}</td>
             {% if alumno.ABANDONO %}
-                <td>Abandonó<td>
+            <td>Abandonó</td>
             {% else %}
-                <td>Cursando</td>                
+            <td>Cursando</td>
             {% endif %}
         </tr>
         {% endfor %}
+    </tbody>
 </table>
-</tbody>
+
 {%endblock%}
