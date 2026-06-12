@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
-from services.alumnos import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente)
+from services.alumnos import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente, crear_alumnos_csv)
 from utils import (construir_error)
 
 alumnos_bp = Blueprint('alumnos', __name__)
@@ -35,9 +35,13 @@ def get_alumno(id):
 
 @alumnos_bp.route('/csv', methods=['POST'])
 def post_alumnos_csv():
-    pass
-
-
+    listado_alumnos = request.files.get('alumnos')
+    if not listado_alumnos:
+        return construir_error(400, "Falta archivo")
+    if not listado_alumnos.filename.endswith(".csv"):
+        return construir_error(400, "El listado debe ser un archivo .csv")
+    
+    return crear_alumnos_csv(listado_alumnos)
 
 @alumnos_bp.route('/', methods=['POST'])
 def post_alumno():
