@@ -4,42 +4,42 @@
 
 <div id="contenedor-alumno">
 
-    <!-- Bloque Perfil / Avatar -->
     <div id="cabecera-alumno">
         
         <div id="avatar-alumno">
-            {{ alumno.nombre[0] }}
+            {{ alumno.NOMBRE[0] if alumno.NOMBRE else "?" }}
         </div>
 
         <h1 id="titulo-alumno">
-            {{ alumno.nombre }}
+            {{ alumno.NOMBRE }} {{ alumno.APELLIDO }}
         </h1>
 
         <p id="padron-alumno">
-            Padrón {{ alumno.padron }}
+            Padrón {{ alumno.PADRON }}
         </p>
         
-        <small>Curso: {{ alumno.curso if alumno.curso else "Diseño de Sistemas 2026" }}</small>
+        <small>Email: {{ alumno.MAIL }}</small>
+        
     </div>
 
     <div id="datos-alumno">
         <div>
             <h3>Asistencias</h3>
-            <p>{{ alumno.asistencias }}%</p>
+            <p>{{ alumno.ASISTENCIAS or 0 }}%</p>
         </div>
         <div>
             <h3>Promedio General</h3>
-            <p>{{ alumno.promedio }}</p>
+            <p>{{ alumno.PROMEDIO or 0 }}</p>
         </div>
         <div>
             <h3>Trabajos Entregados</h3>
-            <p>{{ alumno.trabajos }}</p>
+            <p>{{ alumno.TRABAJOS or 0 }}</p>
         </div>
     </div>
 
     <h4>Grupos Asignados</h4>
     <div id="contenedor-grupos">
-        {% for grupo in alumno.grupos %}
+        {% for grupo in alumno.GRUPOS or [0] %}
             <a href="{{ url_for('detalle_grupo_especifico', id=grupo, nombre_profesor=request.args.get('nombre_profesor', '')) }}">
                 {{ grupo }}
             </a>
@@ -57,7 +57,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for nota in alumno.notas %}
+                {% for nota in alumno.NOTAS or [0] %}
                 <tr>
                     <td>Examen Parcial {{ loop.index }}</td>
                     <td><span>Completado</span></td>

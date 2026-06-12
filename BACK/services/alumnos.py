@@ -43,7 +43,7 @@ def buscar_alumno(id):
         if not alumno:
             return construir_error(404, f"Alumno no encontrado")
         
-        return (jsonify({"alumno": alumno}), 200)
+        return alumno
     except Exception as e:
         traceback.print_exc()
 

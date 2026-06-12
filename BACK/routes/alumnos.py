@@ -29,7 +29,7 @@ def get_alumnos():
 def get_alumno(id):
     alumno = buscar_alumno(id)
 
-    return alumno
+    return jsonify(alumno)
 
 
 

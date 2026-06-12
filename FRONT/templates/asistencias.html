@@ -2,11 +2,17 @@
 
 {% block content %}
 
+<div id="asistencia-data"
+     data-edit-error-id="{{ edit_error_id|default('') }}"
+     data-edit-error-fecha="{{ edit_error_fecha|default('') }}"
+     data-edit-error-horario="{{ edit_error_horario|default('') }}">
+</div>
+
 <div id="contenedor-asistencia">
 
     <h1 id="titulo-asistencia">Asistencia</h1>
 
-    <details id="nueva-clase" {%if error %}open{% endif %}> <!--contenedor desplegable en el mismo navegador-->
+    <details id="nueva-clase" {%if error or error_fecha or error_horario %}open{% endif %}>
 
         <summary>➕ Añadir clase</summary> <!--título del desplegable-->
         <form id="formulario-clase" method="POST">
@@ -15,14 +21,22 @@
                 <p id="error-msg">{{ error }}</p>
             {% endif %}
 
-            <label>Fecha de clase</label>
+            {% if error_fecha %}
+                <p id="error-msg">{{ error_fecha }}</p>
+            {% endif %}
+
+            {% if error_horario %}
+                <p id="error-msg">{{ error_horario }}</p>
+            {% endif %}
+
+            <label>Fecha de clase</label required>
             <input type="date" name="fecha">
 
             <label>Temas</label>
             <input type="text" name="tema">
 
             <label>Horario</label>
-            <input type="time" name="horario">
+            <input type="time" name="horario" required>
 
             <label>Docente 1</label>
             <input type="text" name="docente1">
@@ -49,10 +63,10 @@
 
             <label>Ordenar:</label>
 
-            <select name="orden"> <!--dato clave-valor donde la clave es "orden" y el valor es "asc" o "desc" o "actual"-->
+            <select name="orden"> 
                 <option value="asc">Fechas ascendente</option>
                 <option value="desc">Fechas descendente</option>
-                <option value="actual">Actual primero</option>
+                <option value="HOY">Hoy primero</option>
             </select>
 
             <button type="submit">Aplicar</button>
@@ -65,97 +79,133 @@
 
         {% for clase in clases %}
 
-            {% if clase.estado == "Finalizada" %}
-                <div data-estado="finalizada">
+        <div data-estado="{{ clase.estado|lower }}">
 
-            {% elif clase.estado == "Actual" %}
-                <div data-estado="actual">
+            <div>
+                <h3>Clase</h3>
 
-            {% else %}
-                <div data-estado="proxima">
-            {% endif %}    
+                <div data-acciones>
 
-                <div>
-                    <h3>Clase</h3>
-                    <details>
-                        <summary>✏</summary>
+                    <button type="button" title="Editar clase"
+                        onclick='openEditClase(
+                            {{ clase.id | tojson }},
+                            {{ clase.fecha | tojson }},
+                            {{ clase.tema | tojson }},
+                            {{ clase.horario | tojson }},
+                            {{ clase.docente1 | tojson }},
+                            {{ clase.docente2 | tojson }},
+                            {{ clase.docente3 | tojson }}
+                        )'>
+                        ✏️
+                    </button>
 
-                        <form method="POST" action="/editar_clase/{{ clase.id }}"><!--RUTA BACKEND-->
-                            <label>Fecha</label>
-                            <input type="date" name="fecha" value="{{ clase.fecha }}">
-                            
-                            <label>Tema</label>
-                            <input type="text" name="tema" value="{{ clase.tema }}">
-
-                            <label>Horario</label>
-                            <input type="time" name="horario" value="{{ clase.horario }}">
-
-                          <label>Docente 1</label>
-                            <input type="text" name="docente1" value="{{ clase.docente1 }}">
-
-                            <label>Docente 2</label>
-                            <input type="text" name="docente2" value="{{ clase.docente2 }}">
-
-                            <label>Docente 3</label>
-                            <input type="text" name="docente3" value="{{ clase.docente3 }}">
-
-                            <button type="submit">Guardar cambios</button>
-                        </form>
-
-                        <form method="POST" action="/eliminar_clase/{{ clase.id }}"><!--RUTA BACKEND-->
-                            <button type="submit">Eliminar clase</button>
-                        </form>
-
-                    </details>
+                    <button type="button" title="Eliminar clase" onclick="openDelete('{{ clase.id }}')">
+                        🗑️
+                    </button>
 
                 </div>
-
-                <p id="fecha-clase">
-                    {{ clase.fecha[8:10] }}/{{ clase.fecha[5:7] }}/{{ clase.fecha[0:4] }}
-                </p>
-
-                {% if clase.tema %}
-                    <p>TEMA: {{ clase.tema }}</p>
-                {% endif %}
-
-                {% if clase.horario %}
-                    <p>HORA: {{ clase.horario }}</p>
-                {% endif %}
-
-                {% if clase.docente1 %}
-                    <p>DOCENTE: {{ clase.docente1 }}</p>
-                {% endif %}
-
-                {% if clase.docente2 %}
-                    <p>DOCENTE: {{ clase.docente2 }}</p>
-                {% endif %}
-
-                {% if clase.docente3 %}
-                    <p>DOCENTE: {{ clase.docente3 }}</p>
-                {% endif %}
-
-                <p data-estado="{{ clase.estado|lower }}">
-                    ● {{ clase.estado }}
-                </p>
-
-                {% if clase.estado == "Actual" %}
-                    <form action="/qr" method="GET">
-
-                        <input type="hidden" name="id" value="{{ clase.id }}">
-
-                        <button id="btn-qr-{{clase.id}}" type="submit">
-                            Generar QR
-                        </button>
-
-                    </form>
-                {% endif %}
-
             </div>
+
+            <!-- INFO -->
+            <p>
+                {{ clase.fecha[8:10] }}/{{ clase.fecha[5:7] }}/{{ clase.fecha[0:4] }}
+            </p>
+
+            {% if clase.tema %}
+                <p>TEMA: {{ clase.tema }}</p>
+            {% endif %}
+
+            {% if clase.horario %}
+                <p>HORA: {{ clase.horario }}</p>
+            {% endif %}
+
+            {% if clase.docente1 %}
+                <p>DOCENTE: {{ clase.docente1 }}</p>
+            {% endif %}
+
+            {% if clase.docente2 %}
+                <p>DOCENTE: {{ clase.docente2 }}</p>
+            {% endif %}
+
+            {% if clase.docente3 %}
+                <p>DOCENTE: {{ clase.docente3 }}</p>
+            {% endif %}
+
+            <p data-estado="{{ clase.estado|lower }}">
+                ● {{ clase.estado }}
+            </p>
+
+            {% if clase.estado == "HOY" %}
+                <form action="/qr" method="GET">
+                    <input type="hidden" name="id" value="{{ clase.id }}">
+                    <button type="submit" id="btn-qr-{{clase.id}}">Generar QR</button>
+                </form>
+            {% endif %}
+
+        </div>
 
         {% endfor %}
 
     </div>
 
 </div>
+
+<div id="modal-overlay" onclick="closeModalOutside(event)">
+    <div id="modal">
+
+        <h2>Editar clase</h2>
+        {% if edit_error_fecha %}
+            <p id="error-msg">{{ edit_error_fecha }}</p>
+        {% endif %}
+
+        {% if edit_error_horario %}
+            <p id="error-msg">{{ edit_error_horario }}</p>
+        {% endif %}
+
+        <form id="form-editar" method="POST">
+
+            <input type="hidden" id="edit-id" name="id">
+
+            <label>Fecha</label>
+            <input type="date" id="edit-fecha" name="fecha">
+
+            <label>Tema</label>
+            <input type="text" id="edit-tema" name="tema">
+
+            <label>Horario</label>
+            <input type="time" id="edit-horario" name="horario" required>
+
+            <label>Docente 1</label>
+            <input type="text" id="edit-doc1" name="docente1">
+
+            <label>Docente 2</label>
+            <input type="text" id="edit-doc2" name="docente2">
+
+            <label>Docente 3</label>
+            <input type="text" id="edit-doc3" name="docente3">
+
+            <button type="submit">Guardar</button>
+            <button type="button" onclick="closeModal()">Cancelar</button>
+
+        </form>
+
+    </div>
+</div>
+
+<div id="delete-overlay">
+    <div id="delete-box">
+
+        <h3>¿Eliminar clase?</h3>
+
+        <form id="form-delete" method="POST">
+            <button type="submit">Sí, eliminar</button>
+            <button type="button" onclick="closeDelete()">Cancelar</button>
+        </form>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='javascript/asistencia.js') }}"></script>
 
 {% endblock %}

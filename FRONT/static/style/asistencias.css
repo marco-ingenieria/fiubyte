@@ -270,7 +270,10 @@ button[id^="btn-qr"]:active{
     color: white;
 }
 #error-msg{
-    position: absolute;
+    margin-top: 10px;
+    padding: 10px;
+    background: #fee2e2;
+    border-radius: 8px;
     top: 8px;
     right: 12px;
     display: block;
@@ -284,4 +287,133 @@ button[id^="btn-qr"]:active{
 #contenedor-clases p{
     margin: 3px 0;
     line-height: 1.7;
+}
+
+#modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+/* Caja del modal */
+#modal {
+    background: #fff;
+    width: 420px;
+    max-width: 90%;
+    padding: 20px 25px;
+
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+    /* sin animaciones, pero más limpio */
+}
+
+/* Título */
+#modal h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Inputs */
+#modal input {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    outline: none;
+}
+
+#modal input:focus {
+    border-color: #4a90e2;
+}
+
+/* Botones */
+#modal button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+#modal button[type="submit"] {
+    background: #4CAF50;
+    color: white;
+}
+
+#modal button[type="button"] {
+    background: #ccc;
+}
+#delete-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+#delete-box {
+    background: #fff;
+    width: 320px;
+    padding: 20px;
+
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px
+}
+
+#delete-box button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+#delete-box button[type="submit"] {
+    background: #e74c3c;
+    color: white;
+}
+
+#delete-box button[type="button"] {
+    background: #bbb;
+}
+#delete-box h3 {
+    margin: 0;
+}
+#delete-box form {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+}
+
+#delete-box button {
+    flex: 1;
 }
