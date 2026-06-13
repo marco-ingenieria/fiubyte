@@ -38,6 +38,10 @@ def buscar_seccion():
 
 # 8. Ruta para mostrar el perfil del alumno
 
+@app.route("/historial")
+def seccion_historial():
+    pass
+
 @app.route("/alumno/<int:padron>")
 def perfil_alumno(padron):
     nombre = request.args.get('nombre_profesor', '')
