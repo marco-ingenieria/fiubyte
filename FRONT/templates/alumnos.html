@@ -1,9 +1,22 @@
 {% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
-<p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ves los datos de los alumnos.</p>
+<p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ver los datos de los alumnos.</p>
 <h1>Listado de Alumnos </h1>
 <div id="grupo-botones">
-    <button type="button" onclick="abrirModal('exportar-pdf')">Exportar listado pdf</button>
-    <button type="button" onclick="abrirModal('exportar-csv')">Exportar listado csv</button>
+    <button type="button" onclick="abrirModal('modal-pdf')">Exportar listado pdf</button>
+    <button type="button" onclick="abrirModal('modal-csv')">Exportar listado csv</button>
+    <dialog id="modal-csv">
+        <h3>Cargar archivo de alumnos</h3>
+        <p>Selecciona el archivo .csv con los alumnos. Verifica que el formato de cada fila sea "padrón, nombre, apellido, email"</p>
+        
+        <form id="form-csv" method="POST" enctype=multipart/form-data action="/cargar_csv_alumnos?nombre_profesor={{ nombre_profesor }}">
+            <label for="alumnos">Archivo seleccionado:</label>
+            <input type="file" id="campo-csv" name="alumnos" required>
+            <div>
+                <button type="submit" id="btn-csv-submit">Subir</button>
+                <button type="button" onclick="cerrarModal('modal-csv', 'form-csv')">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
 </div>
 <table>
     <thead>
@@ -32,4 +45,5 @@
     {% endfor %}
     </tbody>
 </table>
+<script src="{{ url_for('static', filename='javascript/alumnos.js') }}"></script>
 {%endblock%}
