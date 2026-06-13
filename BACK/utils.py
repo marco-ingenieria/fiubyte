@@ -19,9 +19,8 @@ def construir_error(code: int, description: str = '') -> dict:
 
 
 
-def construir_paginacion(listado, base_url, limit, offset):
+def construir_paginacion(listado, base_url, limit, offset, total):
     codigo_HTTP = 200 if len(listado) > 0 else 204
-    total = len(listado)
     ultimo_offset = ((total - 1) // limit) * limit if total > 0 else 0
     links = {
         "_first": f"{base_url}?limit={limit}&offset=0",
