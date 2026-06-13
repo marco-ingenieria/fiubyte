@@ -174,6 +174,7 @@ def eliminar_alumno(id):
 
 
 
+
 def eliminar_alumno_permanente(id):
     connection = None
     cursor = None
@@ -202,3 +203,43 @@ def eliminar_alumno_permanente(id):
 
 
 
+def crear_alumnos_csv(csv):
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        datos_alumnos = []
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
+        
+        for fila_bytes in csv:
+            try:
+                fila = fila_bytes.decode("utf-8")
+
+                padron_raw, nombre_raw, apellido_raw, email_raw = tuple(fila.split(","))
+                padron = int(padron_raw)
+                nombre = nombre_raw.strip()
+                apellido = apellido_raw.strip()
+                email = email_raw.strip()
+                datos_alumnos.append([padron, nombre, apellido, email])
+            except ValueError:
+                continue
+            
+        if len(datos_alumnos) == 0:
+            return construir_error(400, "Filas vacías en el archivo .csv")
+        
+        cursor.executemany(create_stmt, datos_alumnos)
+
+        filas_afectadas = cursor.rowcount
+        
+        connection.commit()
+        return (jsonify({"filas afectadas": filas_afectadas}), 201)
+    except Exception as e:
+        traceback.print_exc()
+
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
