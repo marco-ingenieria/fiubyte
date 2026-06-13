@@ -5,9 +5,6 @@ import traceback
 
 
 
-
-
-
 def listar_materias(base_url, limit, offset):
     connection = None
     cursor = None
@@ -23,7 +20,7 @@ def listar_materias(base_url, limit, offset):
         
         
         query = "SELECT " \
-        "NOMBRE_MATERIA, CUATRIMESTRE, ANIO " \
+        "NOMBRE_MATERIA, CUATRIMESTRE, ANIO, ID " \
         "FROM MATERIAS WHERE ELIMINADO = 0 ORDER BY FECHA_CREACION DESC LIMIT %s OFFSET %s;"
         params =[limit, offset]
         cursor.execute(query, params)
@@ -45,6 +42,37 @@ def listar_materias(base_url, limit, offset):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+
+def obtener_materia(id):
+    connection = None
+    cursor = None
+    
+    try: 
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        query = "SELECT * " \
+        "FROM MATERIAS WHERE ELIMINADO = 0 AND ID=%s ORDER BY FECHA_CREACION DESC;"
+        cursor.execute(query, [id])
+        registro = cursor.fetchone()       
+        
+        if registro is None:
+            return construir_error(404, f"La materia con id={id} no existe")
+        
+        return (jsonify(registro), 200)
+    
+    except Exception:
+        traceback.print_exc()
+        return  construir_error(500, "Error inesperado del servidor")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+
 
 
 #crear_materia
@@ -103,3 +131,103 @@ def crear_materia(nombre_materia, cuatrimestre, anio):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()   
+
+
+
+def actualizar_materia(id, data):
+    connection = None
+    cursor = None
+    
+    try: 
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary = True)
+
+        nombre_materia      = data.get("nombre_materia")
+        cuatrimestre        = data.get("cuatrimestre")
+        anio                = data.get("anio")
+
+        query = "SELECT * " \
+        "FROM MATERIAS WHERE ELIMINADO = 0 AND ID=%s ORDER BY FECHA_CREACION DESC;"
+        cursor.execute(query, [id])
+        registro = cursor.fetchone()       
+        
+        if registro is None:
+            return construir_error(404, f"La materia con id={id} no existe")
+        
+    
+        if not (cuatrimestre is None) and (not isinstance(cuatrimestre, int) or (cuatrimestre != 1 and cuatrimestre!=2)):
+            return construir_error(400, "'cuatrimestre' debe ser el numero de valor 1 o de valor 2")
+    
+        if not (anio is None)and ( not isinstance(anio, int) or not (anio >= 2000 and anio <= 2100)):
+            return construir_error(400, "'anio' debe ser el anio entre el rango [2000, 2100]")
+        
+        #agregar validaciones sobre los parametros??
+        nombre_materia  = nombre_materia if nombre_materia is not None else registro["NOMBRE_MATERIA"]
+        cuatrimestre    = cuatrimestre if cuatrimestre is not None else registro["CUATRIMESTRE"]
+        anio            = anio if anio is not None else registro["ANIO"]
+
+        query = "UPDATE MATERIAS SET " \
+        "NOMBRE_MATERIA = %s, CUATRIMESTRE=%s, ANIO = %s " \
+        "WHERE ID = %s"
+
+        cursor.execute(query, [nombre_materia, cuatrimestre, anio, id ])
+        connection.commit()
+
+        return (jsonify({
+                "filas_actualizadas": cursor.rowcount,
+                "mensaje": "materia actualizada correctamente",
+                "materia_actualizada": {
+                "ID": id,
+                "NOMBRE_MATERIA": nombre_materia,
+                "CUATRIMESTRE": cuatrimestre,
+                "ANIO": anio}}), 200)
+
+    except Exception:
+        traceback.print_exc()
+        return  construir_error(500, "Error inesperado del servidor")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+
+
+def eliminar_materia(id_materia):
+    connection = None
+    cursor = None 
+    
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary = True)
+
+        #existe materia
+        query = "SELECT * " \
+        "FROM MATERIAS WHERE ELIMINADO = 0 AND ID=%s ORDER BY FECHA_CREACION DESC;"
+        cursor.execute(query, [id_materia])
+        registros = cursor.fetchall()       
+        
+        if registros is None:
+            return construir_error(404, f"La materia con id={id_materia} no existe")
+        
+        
+        query = "UPDATE MATERIAS SET ELIMINADO=1 WHERE ID = %s"
+        cursor.execute(query, [id_materia])
+        connection.commit()
+
+        return (jsonify({
+            "mensaje": "materia eliminada con éxito",
+            "materias eliminadas" : registros
+        }), 200)    
+
+    except:
+        traceback.print_exc()
+        return construir_error(500, "Error inesperado del servidor")
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()

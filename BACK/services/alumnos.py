@@ -199,3 +199,6 @@ def eliminar_alumno_permanente(id):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+
+

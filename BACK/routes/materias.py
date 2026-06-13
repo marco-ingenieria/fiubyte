@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from services.materias import (listar_materias, crear_materia)
+from services.materias import (listar_materias, crear_materia, obtener_materia,
+                               actualizar_materia, eliminar_materia)
 from utils import construir_error
 import json
 
@@ -24,6 +25,13 @@ def get_materias():
     return listar_materias(base_url, limit, offset)
 
 
+@materias_bp.route("/<int:id>", methods=['GET'])
+def get_materia(id):
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
+    return obtener_materia(id)
+
 
 @materias_bp.route("/", methods=['POST'])
 def post_materia():
@@ -41,7 +49,32 @@ def post_materia():
    
     if not isinstance(anio, int) or not (anio >= 2000 and anio <= 2100):
         return construir_error(400, "'anio' debe ser el anio entre el rango [2000, 2100]")
-    
-
 
     return crear_materia(nombre, cuatrimestre, anio)
+
+
+
+
+@materias_bp.route("/<int:id>", methods=['PATCH'])
+def patch_materia(id):
+
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+
+    body=request.get_json()
+
+    if len(body) == 0:
+        return construir_error(400, "Datos vacíos")
+    
+    return actualizar_materia(id, body)
+
+
+
+
+
+@materias_bp.route("/<int:id>", methods=['DELETE'])
+def delete_materia(id):
+    if id <= 0:
+        return construir_error(400, "id_grupo debe ser un número entero positivo")
+    
+    return eliminar_materia(id)

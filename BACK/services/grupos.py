@@ -101,6 +101,8 @@ def obtener_alumnos(id_grupo):
             connection.close()
 
 
+
+
 def crear_grupo(nombre_grupo):
     connection = None
     cursor = None 
@@ -239,9 +241,6 @@ def eliminar_grupo(id_grupo):
         "WHERE ID=%s"
         cursor.execute(query, [id_grupo])
 
-        query = "UPDATE GRUPO_ALUMNO SET ELIMINADO=1 " \
-        "WHERE ID_GRUPO=%s"
-        cursor.execute(query, [id_grupo])
 
         connection.commit()
         return (jsonify(f"El grupo de id={id_grupo} ha sido borrado con exito"), 200)    
