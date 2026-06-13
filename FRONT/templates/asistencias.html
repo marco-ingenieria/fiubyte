@@ -4,36 +4,28 @@
 
 <div id="asistencia-data"
      data-edit-error-id="{{ edit_error_id|default('') }}"
-     data-edit-error-fecha="{{ edit_error_fecha|default('') }}"
-     data-edit-error-horario="{{ edit_error_horario|default('') }}">
+     data-edit-error-fecha="{{ error|default('') }}"
+     data-edit-error-horario="">
 </div>
 
 <div id="contenedor-asistencia">
 
     <h1 id="titulo-asistencia">Asistencia</h1>
 
-    <details id="nueva-clase" {%if error or error_fecha or error_horario %}open{% endif %}>
-
-        <summary>➕ Añadir clase</summary> <!--título del desplegable-->
+    <details id="nueva-clase" {% if error and not edit_error_id %}open{% endif %}>
+        <summary>➕ Añadir clase</summary>
         <form id="formulario-clase" method="POST">
 
-            {% if error %}
-                <p id="error-msg">{{ error }}</p>
+            <!-- El cartel de arriba solo aparece si el error NO es del modal -->
+            {% if error and not edit_error_id %}
+                <p id="error-msg">⚠️ {{ error }}</p>
             {% endif %}
 
-            {% if error_fecha %}
-                <p id="error-msg">{{ error_fecha }}</p>
-            {% endif %}
-
-            {% if error_horario %}
-                <p id="error-msg">{{ error_horario }}</p>
-            {% endif %}
-
-            <label>Fecha de clase</label required>
-            <input type="date" name="fecha">
+            <label>Fecha de clase</label>
+            <input type="date" name="fecha" min="2025-01-01" max="9999-01-01" required>
 
             <label>Temas</label>
-            <input type="text" name="tema">
+            <input type="text" name="tema" placeholder="Tema obligatorio..." required>
 
             <label>Horario</label>
             <input type="time" name="horario" required>
@@ -47,12 +39,8 @@
             <label>Docente 3</label>
             <input type="text" name="docente3">
 
-            <button type="submit">
-                Guardar clase
-            </button>
-
+            <button type="submit">Guardar clase</button>
         </form>
-
     </details>
 
     <div id="barra-filtros">
@@ -99,7 +87,7 @@
                         ✏️
                     </button>
 
-                    <button type="button" title="Eliminar clase" onclick="openDelete('{{ clase.id }}')">
+                    <button type="button" title="Eliminar clase" onclick="openDelete('{{ clase.id }}', '{{ nombre_profesor }}')">
                         🗑️
                     </button>
 
@@ -150,27 +138,22 @@
 
 </div>
 
-<div id="modal-overlay" onclick="closeModalOutside(event)">
+<div id="modal-overlay" onclick="closeModalOutside(event)" style="display: none;">
     <div id="modal">
 
         <h2>Editar clase</h2>
-        {% if edit_error_fecha %}
-            <p id="error-msg">{{ edit_error_fecha }}</p>
-        {% endif %}
-
-        {% if edit_error_horario %}
-            <p id="error-msg">{{ edit_error_horario }}</p>
-        {% endif %}
+        <p id="error-msg-edit" style="display:none;" >⚠️ Campos obligatorios incompletos o inválidos</p>
 
         <form id="form-editar" method="POST">
+            <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
 
             <input type="hidden" id="edit-id" name="id">
 
             <label>Fecha</label>
-            <input type="date" id="edit-fecha" name="fecha">
+            <input type="date" id="edit-fecha" name="fecha" min="2025-01-01" max="9999-01-01" required>
 
             <label>Tema</label>
-            <input type="text" id="edit-tema" name="tema">
+            <input type="text" id="edit-tema" name="tema" required>
 
             <label>Horario</label>
             <input type="time" id="edit-horario" name="horario" required>

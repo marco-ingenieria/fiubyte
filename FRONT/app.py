@@ -1,7 +1,8 @@
 from flask import Flask, render_template,request,url_for,redirect
 import requests
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import json
+
 
 app = Flask(__name__)
 
@@ -99,22 +100,22 @@ def mostrar_qr():
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
     clases = []
+    # Reemplaza tu hoy_str actual por este:
+    hora_local = datetime.utcnow() - timedelta(hours=3)
+    hoy_str = hora_local.strftime("%Y-%m-%d")
     nombre = request.args.get('nombre_profesor', '')
 
-    edit_error_fecha=request.args.get("edit_error_fecha")
-    edit_error_horario=request.args.get("edit_error_horario")
-    edit_error_id=request.args.get("edit_error_id")
+    error_url = request.args.get("error_msg")
+    edit_error_id = request.args.get("edit_error_id")
 
     if edit_error_id in ["None", "", "null"]:
         edit_error_id = None
 
-    create_error = None
-    create_error_fecha = None
-    create_error_horario = None
+    global_error = error_url if error_url else None
 
     if request.method == "POST":
         fecha = request.form.get("fecha")
-        tema = request.form.get("tema")
+        tema = request.form.get("tema", "").strip()
         horario = request.form.get("horario")
 
         docente1 = request.form.get("docente1", "")
@@ -122,22 +123,10 @@ def seccion_asistencias():
         docente3 = request.form.get("docente3", "")
         profesores = [d for d in [docente1, docente2, docente3] if d]
 
-        if not fecha:
-            create_error_fecha = "La fecha es obligatoria"
-
-        if not horario:
-            create_error_horario = "El horario es obligatorio"
-
-        if create_error_fecha or create_error_horario:
-            return render_template(
-                "asistencias.html",
-                clases=clases,
-                nombre_profesor=nombre,
-                error_fecha=create_error_fecha,
-                error_horario=create_error_horario,
-                edit_error_id=None
-            )
-        if fecha and horario:
+        if not fecha or not tema or not horario:
+            global_error="El tema es obligatorio"
+        
+        else:
             try:
                 response = requests.post("http://backend:5000/clases/", json={
                     "profesores": profesores,
@@ -145,10 +134,12 @@ def seccion_asistencias():
                     "horario": horario,
                     "tema": tema
                 })
-            except:
-                create_error = "Error al crear la clase"
-        else:
-            create_error = "Faltan campos obligatorios"
+                if response.status_code == 201:
+                    return redirect(url_for('seccion_asistencias', nombre_profesor=nombre))
+                else:
+                    global_error = "Campos obligatorios incompletos o inválidos"
+            except Exception:
+                global_error = "Error de conexión con el servidor"
 
     try:
         response = requests.get("http://backend:5000/clases/", params={"limit": 100, "offset": 0})
@@ -156,15 +147,14 @@ def seccion_asistencias():
     except Exception as e:
         clases_raw = []
 
-    clases = []
     for c in clases_raw:
         try:
             fecha_obj = datetime.strptime(c.get("FECHA", ""), "%a, %d %b %Y %H:%M:%S %Z").date()
             fecha_str = fecha_obj.strftime("%Y-%m-%d")
-            if fecha_obj < date.today():
-                estado = "Finalizada"
-            elif fecha_obj == date.today():
+            if fecha_str == hoy_str:
                 estado = "HOY"
+            elif fecha_str < hoy_str:
+                estado = "Finalizada"
             else:
                 estado = "Próximamente"
         except:
@@ -197,57 +187,53 @@ def seccion_asistencias():
         resto = [c for c in clases if c["estado"] != "HOY"]
         clases = clases_actuales + resto
 
+    if not error_url or error_url in ["None","","null"]:
+        edit_error_id = ""
+        global_error = ""
+    else:
+        global_error=error_url
+        if edit_error_id in ["None","","null"]:
+            edit_error_id=""
+
     return render_template(
         "asistencias.html",
         clases=clases,
         nombre_profesor=nombre,
-
-        # errores de CREATE
-        error=create_error,
-        error_fecha=create_error_fecha,
-        error_horario=create_error_horario,
-
-        # errores de EDIT
-        edit_error_fecha=edit_error_fecha,
-        edit_error_horario=edit_error_horario,
+        error=global_error,
         edit_error_id=edit_error_id
     )
 
 @app.route('/editar_clase/<int:id>', methods=['POST'])
 def editar_clase(id):
-
+    nombre = request.args.get('nombre_profesor') or request.form.get('nombre_profesor', '')
     docente1 = request.form.get('docente1', '')
     docente2 = request.form.get('docente2', '')
     docente3 = request.form.get('docente3', '')
     profesores = [d for d in [docente1, docente2, docente3] if d]
     fecha = request.form.get('fecha')
     horario = request.form.get('horario')
+    tema = request.form.get('tema', '').strip()
 
-    edit_error_fecha = None
-    edit_error_horario = None
-
-    if not fecha:
-        edit_error_fecha = "La fecha es obligatoria"
-
-    if not horario:
-        edit_error_horario = "El horario es obligatorio"
-
-    if edit_error_fecha or edit_error_horario:
-        return redirect(url_for('seccion_asistencias',
-                                edit_error_fecha=edit_error_fecha or "",
-                                edit_error_horario=edit_error_horario or "",edit_error_id=id))
+    if not fecha or not tema or not horario:
+        return redirect(url_for('seccion_asistencias', 
+                                nombre_profesor=nombre,
+                                error_msg="Campos obligatorios incompletos o inválidos",
+                                edit_error_id=id))
 
     try:
-        requests.patch(f"http://backend:5000/clases/{id}", json={
+        response = requests.patch(f"http://backend:5000/clases/{id}", json={
             "profesores": profesores,
             "fecha": fecha,
             "horario": horario,
-            "tema": request.form.get('tema')
+            "tema": tema
         })
+        if response.status_code != 200:
+            return redirect(url_for('seccion_asistencias', 
+                                    nombre_profesor=nombre))
     except Exception:
         pass
 
-    return redirect(url_for('seccion_asistencias'))
+    return redirect(url_for('seccion_asistencias', nombre_profesor=nombre))
 
 @app.route('/eliminar_clase/<int:id>', methods=['POST'])
 def eliminar_clase(id):
@@ -255,7 +241,7 @@ def eliminar_clase(id):
         requests.delete(f"http://backend:5000/clases/{id}")
     except Exception as e:
         pass
-    return redirect(url_for('seccion_asistencias'))
+    return redirect(url_for('seccion_asistencias', nombre_profesor=request.args.get('nombre_profesor', '')))
 
 # 6. Ruta de la sección de Notas
 @app.route('/notas')

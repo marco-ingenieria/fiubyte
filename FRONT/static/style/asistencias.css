@@ -417,3 +417,18 @@ button[id^="btn-qr"]:active{
 #delete-box button {
     flex: 1;
 }
+
+.ocultar-modal-firme {
+    display: none !important;
+}
+
+#error-msg-edit {
+    display: none; 
+    color: #ff4d4d;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#error-msg-edit.mostrar-error {
+    display: block;
+}
