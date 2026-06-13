@@ -359,6 +359,19 @@ def seccion_alumnos():
 
     return render_template('alumnos.html', nombre_profesor=nombre, alumnos=alumnos)
 
+
+@app.route('/cargar_csv_alumnos', methods=['POST'])
+def crear_alumnos_csv():
+    nombre_profesor = request.args.get('nombre_profesor', '')
+    csv = request.files.get('alumnos')
+    try:
+        r = requests.post("http://backend:5000/alumnos/csv", files={"alumnos": (csv.filename, csv.stream, csv.content_type)})
+    except Exception as e:
+        print(e)
+        pass
+    return redirect(url_for('seccion_alumnos',nombre_profesor=nombre_profesor))
+
+
 # 1. Ruta de la sección de Usuarios
 @app.route('/usuarios')
 def seccion_usuarios():

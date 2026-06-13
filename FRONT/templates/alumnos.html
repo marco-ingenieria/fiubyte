@@ -1,10 +1,23 @@
 {% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
-<p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ves los datos de los alumnos.</p>
+<p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ver los datos de los alumnos.</p>
 <link rel="stylesheet" href="{{ url_for('static', filename='style/grupos.css') }}">
 <h1>Listado de Alumnos </h1>
 <div id="grupo-botones">
-    <button type="button" onclick="document.getElementById('exportar-pdf').showModal()">Exportar pdf</button>
-    <button type="button" onclick="document.getElementById('importar-csv').showModal()">Importar csv</button>
+    <button type="button" onclick="abrirModal('modal-pdf')">Exportar pdf</button>
+    <button type="button" onclick="abrirModal('modal-csv')">Importar csv</button>
+    <dialog id="modal-csv">
+        <h3>Cargar archivo de alumnos</h3>
+        <p>Selecciona el archivo .csv con los alumnos. Verifica que el formato de cada fila sea "padrón, nombre, apellido, email"</p>
+        
+        <form id="form-csv" method="POST" enctype=multipart/form-data action="/cargar_csv_alumnos?nombre_profesor={{ nombre_profesor }}">
+            <label for="alumnos">Archivo seleccionado:</label>
+            <input type="file" id="campo-csv" name="alumnos" required>
+            <div>
+                <button type="submit" id="btn-csv-submit">Subir</button>
+                <button type="button" onclick="cerrarModal('modal-csv', 'form-csv')">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
     <button type="button" onclick="document.getElementById('modal-crear').showModal()">Crear alumno</button>
     <button type="button" onclick="document.getElementById('modal-eliminar').showModal()">Eliminar alumno</button>
 </div>
@@ -67,4 +80,5 @@
         {% endfor %}
     </tbody>
 </table>
+<script src="{{ url_for('static', filename='javascript/alumnos.js') }}"></script>
 {%endblock%}
