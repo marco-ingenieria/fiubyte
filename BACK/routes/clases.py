@@ -34,18 +34,21 @@ def get_clase(id):
 
 @clases_bp.route('/', methods=['POST'])
 def post_clase():
-    body = request.get_json()
-
-    profesores      = body.get('profesores')
-    fecha           = body.get('fecha')
+    body = request.get_json(silent=True)
+    if not body:
+        return construir_error(400, "JSON inválido o vacío")
+    profesores = body.get('profesores')
+    fecha = body.get('fecha')
+    horario=body.get("horario")
+    tema=body.get("tema")
     
     #materia         = body.get('id_materia')
-
-    if len(body) == 0:
-        return construir_error(400, "Datos vacíos")
-    if not profesores or not fecha:
+        
+    if not fecha or not horario or not tema or not tema.strip():
         return construir_error(400, "Faltan campos obligatorios")
-    if not isinstance(profesores, list):
+    if not profesores:
+        profesores=[]
+    elif not isinstance(profesores, list):
         return construir_error(400, "Profesores debe ser una lista")
     if not validar_fecha(fecha):
         return construir_error(400, "Fecha inválida")
@@ -69,8 +72,8 @@ def patch_clase(id):
     if fecha and not validar_fecha(fecha):
         return construir_error(400, "Fecha inválida")
     
-    clase = actualizar_clase(body, id)
-    return clase
+    # Retorna directamente el resultado del servicio
+    return actualizar_clase(body, id)
 
 
 

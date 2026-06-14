@@ -101,6 +101,8 @@ def obtener_alumnos(id_grupo):
             connection.close()
 
 
+
+
 def crear_grupo(nombre_grupo):
     connection = None
     cursor = None 
@@ -239,9 +241,6 @@ def eliminar_grupo(id_grupo):
         "WHERE ID=%s"
         cursor.execute(query, [id_grupo])
 
-        query = "UPDATE GRUPO_ALUMNO SET ELIMINADO=1 " \
-        "WHERE ID_GRUPO=%s"
-        cursor.execute(query, [id_grupo])
 
         connection.commit()
         return (jsonify(f"El grupo de id={id_grupo} ha sido borrado con exito"), 200)    
@@ -336,3 +335,30 @@ def eliminar_alumno(id_grupo, padron_alumno):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+def obtener_grupos_de_un_alumno(padron_alumno):
+    connection = None
+    cursor = None 
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Hacemos el JOIN para traer el ID y el NOMBRE del grupo donde está el alumno
+        query = """
+            SELECT G.ID, G.NOMBRE 
+            FROM GRUPO_ALUMNO GA 
+            INNER JOIN GRUPOS G ON G.ID = GA.ID_GRUPO 
+            WHERE GA.PADRON_ALUMNO = %s AND GA.ELIMINADO = 0 AND G.ELIMINADO = 0
+        """
+        cursor.execute(query, [padron_alumno])
+        registros = cursor.fetchall() # Devuelve una lista de grupos, ej: [{"ID": 1, "NOMBRE": "Grupo A"}]
+
+        return (jsonify(registros), 200)
+    
+    except Exception:
+        traceback.print_exc()
+        return construir_error(500, "Error inesperado del servidor")
+    finally:
+        if cursor: cursor.close()
+        if connection and connection.is_connected(): connection.close()
+

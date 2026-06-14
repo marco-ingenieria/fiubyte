@@ -109,14 +109,12 @@ def actualizar_clase(body, id):
     tema            = body.get('tema')
     horario         = body.get('horario')
 
-    #parse a JSON
-    if profesores:
-        profesores = json.dumps(profesores)
+    # Convertimos a JSON string únicamente si la lista contiene profesores reales
+    if profesores is not None and isinstance(profesores, list) and len(profesores) > 0:
+        profesores_json = json.dumps(profesores)
+    else:
+        profesores_json = None
 
-    #parse a fecha
-    if fecha:
-        fecha = datetime.strptime(fecha, "%Y-%m-%d")
-    
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
@@ -128,11 +126,16 @@ def actualizar_clase(body, id):
         if not clase:
             return construir_error(404, f"Clase no encontrada")
         
-        #rellenar datos que no vengan en el body
-        profesores      = profesores    or clase["PROFESORES"]
-        fecha           = fecha         or clase["FECHA"]
-        tema            = tema          or clase["TEMA"]
-        horario           = horario         or clase["HORARIO"]
+        # --- COMBINACIÓN TOTALMENTE REPARADA ---
+        final_profesores = profesores_json if profesores_json is not None else clase["PROFESORES"]
+        final_tema       = tema if (tema is not None and tema != "") else clase["TEMA"]
+        final_horario    = horario if (horario is not None and horario != "") else clase["HORARIO"]
+
+        # Evitamos mandar horas/segundos a una columna tipo DATE de SQL
+        if fecha and fecha != "":
+            final_fecha = datetime.strptime(fecha, "%Y-%m-%d").date()
+        else:
+            final_fecha = clase["FECHA"]
 
         update_stmt = """
         UPDATE CLASES SET
@@ -142,18 +145,19 @@ def actualizar_clase(body, id):
         HORARIO = %s
         WHERE ID = %s
         """
-        cursor.execute(update_stmt, [profesores, fecha, tema, horario, id])
+        cursor.execute(update_stmt, [final_profesores, final_fecha, final_tema, final_horario, id])
         filas_afectadas = cursor.rowcount
 
         cursor.execute(select_stmt, [id])
         clase_actualizada = cursor.fetchone()
         connection.commit()
+        
+        # Retorno exitoso en tu formato nativo
         return (jsonify({"filas afectadas": filas_afectadas, "clase_actualizada": clase_actualizada}), 200)
 
     except Exception as e:
         traceback.print_exc()
-
-        return construir_error(500, f"Error inesperado: {e}")
+        return construir_error(500, f"Error inesperado de base de datos: {e}")
     finally:
         if cursor:
             cursor.close()

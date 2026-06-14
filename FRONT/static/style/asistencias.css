@@ -80,12 +80,12 @@
     font-weight: 700 !important;
 }
 
-#contenedor-clases p[data-estado="actual"]{
+#contenedor-clases p[data-estado="hoy"]{
     color: #0f766e !important;
     font-weight: 700 !important;
 }
 
-#contenedor-clases p[data-estado="proxima"]{
+#contenedor-clases p[data-estado="proximamente"]{
     color: #4b5563 !important;
     font-weight: 700 !important;
 }
@@ -95,12 +95,12 @@
     border: 1px solid rgba(214, 40, 40, 0.15);
 }
 
-#contenedor-clases div[data-estado="actual"]{
+#contenedor-clases div[data-estado="hoy"]{
     background-color: rgba(42, 157, 143, 0.08);
     border: 1px solid rgba(42, 157, 143, 0.15);
 }
 
-#contenedor-clases div[data-estado="proxima"]{
+#contenedor-clases div[data-estado="proximamente"]{
     background-color: rgba(108, 117, 125, 0.08);
     border: 1px solid rgba(108, 117, 125, 0.15);
 }
@@ -416,4 +416,19 @@ button[id^="btn-qr"]:active{
 
 #delete-box button {
     flex: 1;
+}
+
+.ocultar-modal-firme {
+    display: none !important;
+}
+
+#error-msg-edit {
+    display: none; 
+    color: #ff4d4d;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#error-msg-edit.mostrar-error {
+    display: block;
 }

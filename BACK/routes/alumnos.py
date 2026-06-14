@@ -1,11 +1,9 @@
 from flask import Blueprint, jsonify, request
 import json
-from services.alumnos import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente)
+from services.alumnos import (listar_alumnos, listar_alumno_curso, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente, crear_alumnos_csv)
 from utils import (construir_error)
 
 alumnos_bp = Blueprint('alumnos', __name__)
-
-
 
 @alumnos_bp.route('/', methods=['GET'])
 def get_alumnos():
@@ -23,21 +21,21 @@ def get_alumnos():
 
     return alumnos
 
-
-
 @alumnos_bp.route('/<int:id>', methods=['GET'])
 def get_alumno(id):
     alumno = buscar_alumno(id)
 
     return jsonify(alumno)
 
-
-
 @alumnos_bp.route('/csv', methods=['POST'])
 def post_alumnos_csv():
-    pass
-
-
+    listado_alumnos = request.files.get('alumnos')
+    if not listado_alumnos:
+        return construir_error(400, "Falta archivo")
+    if not listado_alumnos.filename.endswith(".csv"):
+        return construir_error(400, "El listado debe ser un archivo .csv")
+    
+    return crear_alumnos_csv(listado_alumnos)
 
 @alumnos_bp.route('/', methods=['POST'])
 def post_alumno():
@@ -47,17 +45,16 @@ def post_alumno():
     nombre      = body.get('nombre')
     apellido    = body.get('apellido')
     email       = body.get('email')
+    id_curso       = body.get('id_curso')
     #abandono es 0 por default, no entra en POST
 
     if len(body) == 0:
         return construir_error(400, "Datos vacíos")
-    if not padron or not nombre or not apellido or not email:
+    if not padron or not nombre or not apellido or not email or not id_curso:
         return construir_error(400, "Faltan campos obligatorios")
     
     alumno = crear_alumno(body)
     return alumno
-
-
 
 @alumnos_bp.route('/<int:id>', methods=['PATCH'])
 def patch_alumno(id):
@@ -69,14 +66,21 @@ def patch_alumno(id):
     alumno = actualizar_alumno(body, id)
     return alumno
 
-
-
 @alumnos_bp.route('/<int:id>', methods=['DELETE'])
 def delete_alumno_virtual(id):
     return eliminar_alumno(id)
 
-
-
 @alumnos_bp.route('/perma/<int:id>', methods=['DELETE'])
 def delete_alumno(id):
     return eliminar_alumno_permanente(id)
+
+@alumnos_bp.route('/curso/<int:id_curso>', methods=['GET'])
+def get_alumnos_curso(id_curso):
+    base_url = request.base_url
+    limit = request.args.get('limit', type=int)
+    offset = request.args.get('offset', type=int)
+    if limit is None or limit < 0:
+        limit = 10
+    if offset is None or offset < 0:
+        offset = 0
+    return listar_alumno_curso(limit, offset, base_url, id_curso)

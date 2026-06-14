@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
                              asignar_alumnos_a_grupo, actualizar_grupo,
                              obtener_alumnos, eliminar_grupo, asignar_tp,
-                             eliminar_alumno)
+                             eliminar_alumno,obtener_grupos_de_un_alumno)
 from utils import construir_error
 import json
 
@@ -151,3 +151,12 @@ def delete_alumno():
     
 
     return eliminar_alumno(id_grupo, padron_alumno)
+
+# Agregá 'obtener_grupos_de_un_alumno' en el 'from services.grupos import ...' arriba de todo
+
+@grupos_bp.route("/del-alumno/<int:padron>", methods=['GET'])
+def get_grupos_del_alumno(padron):
+    if padron <= 0:
+        return construir_error(400, "El padrón debe ser un número entero positivo")
+    
+    return obtener_grupos_de_un_alumno(padron)

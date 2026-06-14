@@ -3,7 +3,6 @@ from db.init_db import get_connection
 from utils import (construir_paginacion, construir_error)
 import traceback
 
-
 def listar_alumnos(limit, offset, base_url):
     connection = None
     cursor = None
@@ -14,7 +13,10 @@ def listar_alumnos(limit, offset, base_url):
         cursor.execute(select_stmt, [limit, offset])
 
         alumnos = cursor.fetchall()
-        listado = construir_paginacion(alumnos, base_url, limit, offset)
+
+        cursor.execute("SELECT COUNT(*) as total FROM ALUMNOS WHERE ELIMINADO=0")
+        total = cursor.fetchone()["total"]
+        listado = construir_paginacion(alumnos, base_url, limit, offset, total)
         
         return listado
     except Exception as e:
@@ -27,7 +29,28 @@ def listar_alumnos(limit, offset, base_url):
         if connection and connection.is_connected():
             connection.close()
 
+def listar_alumno_curso(limit, offset, base_url, id_curso):
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        select_stmt = "SELECT * FROM ALUMNOS WHERE ELIMINADO = 0 AND ID_CURSO = %s ORDER BY PADRON LIMIT %s OFFSET %s"
+        cursor.execute(select_stmt, [id_curso, limit, offset])
+        alumnos = cursor.fetchall()
 
+        cursor.execute("SELECT COUNT(*) as total FROM ALUMNOS WHERE ELIMINADO = 0 AND ID_CURSO = %s", [id_curso])
+        total = cursor.fetchone()["total"]
+
+        return construir_paginacion(alumnos, base_url, limit, offset, total)
+    except Exception as e:
+        traceback.print_exc()
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
 
 def buscar_alumno(id):
     connection = None
@@ -65,13 +88,14 @@ def crear_alumno(body):
     apellido    = body.get("apellido")
     email       = body.get("email")
     abandono    = body.get("abandono")
+    id_curso = body.get("curso")
 
 
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
-        cursor.execute(create_stmt, [padron, nombre, apellido, email])
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO, ID_CURSO) VALUES (%s, %s, %s, %s, 0, %s)"
+        cursor.execute(create_stmt, [padron, nombre, apellido, email, id_curso])
 
         filas_afectadas = cursor.rowcount
         
@@ -171,6 +195,7 @@ def eliminar_alumno(id):
 
 
 
+
 def eliminar_alumno_permanente(id):
     connection = None
     cursor = None
@@ -190,6 +215,49 @@ def eliminar_alumno_permanente(id):
     except Exception as e:
         traceback.print_exc()
         
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+
+
+def crear_alumnos_csv(csv):
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        datos_alumnos = []
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
+        
+        for fila_bytes in csv:
+            try:
+                fila = fila_bytes.decode("utf-8")
+
+                padron_raw, nombre_raw, apellido_raw, email_raw = tuple(fila.split(","))
+                padron = int(padron_raw)
+                nombre = nombre_raw.strip()
+                apellido = apellido_raw.strip()
+                email = email_raw.strip()
+                datos_alumnos.append([padron, nombre, apellido, email])
+            except ValueError:
+                continue
+            
+        if len(datos_alumnos) == 0:
+            return construir_error(400, "Filas vacías en el archivo .csv")
+        
+        cursor.executemany(create_stmt, datos_alumnos)
+
+        filas_afectadas = cursor.rowcount
+        
+        connection.commit()
+        return (jsonify({"filas afectadas": filas_afectadas}), 201)
+    except Exception as e:
+        traceback.print_exc()
+
         return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:
