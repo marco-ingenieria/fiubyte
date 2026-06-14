@@ -6,7 +6,7 @@ from routes.grupos import grupos_bp
 from routes.historial import historiales_bp
 from routes.notas import notas_bp
 from routes.clases import clases_bp
-from routes.materias import materias_bo
+from routes.materias import materias_bp
 
 app = Flask(__name__)
 

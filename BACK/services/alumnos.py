@@ -13,7 +13,10 @@ def listar_alumnos(limit, offset, base_url):
         cursor.execute(select_stmt, [limit, offset])
 
         alumnos = cursor.fetchall()
-        listado = construir_paginacion(alumnos, base_url, limit, offset)
+
+        cursor.execute("SELECT COUNT(*) as total FROM ALUMNOS WHERE ELIMINADO=0")
+        total = cursor.fetchone()["total"]
+        listado = construir_paginacion(alumnos, base_url, limit, offset, total)
         
         return listado
     except Exception as e:
@@ -35,7 +38,11 @@ def listar_alumno_curso(limit, offset, base_url, id_curso):
         select_stmt = "SELECT * FROM ALUMNOS WHERE ELIMINADO = 0 AND ID_CURSO = %s ORDER BY PADRON LIMIT %s OFFSET %s"
         cursor.execute(select_stmt, [id_curso, limit, offset])
         alumnos = cursor.fetchall()
-        return construir_paginacion(alumnos, base_url, limit, offset)
+
+        cursor.execute("SELECT COUNT(*) as total FROM ALUMNOS WHERE ELIMINADO = 0 AND ID_CURSO = %s", [id_curso])
+        total = cursor.fetchone()["total"]
+
+        return construir_paginacion(alumnos, base_url, limit, offset, total)
     except Exception as e:
         traceback.print_exc()
         return construir_error(500, f"Error inesperado: {e}")
