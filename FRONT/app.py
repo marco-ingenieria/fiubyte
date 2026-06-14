@@ -443,7 +443,9 @@ def ver_grupo(id):
         eliminar_alumno= request.form.get('eliminar')
         if eliminar_alumno:
             try:
-                requests.delete(f"http://backend:5000/grupos/{id}/alumnos/{eliminar_alumno}")
+                requests.delete("http://backend:5000/grupos/alumnos",
+    json={"id_grupo": id, "padron_alumno": int(eliminar_alumno)}
+)
             except Exception as e:
                 print("Error al eliminar alumno del grupo")
 
@@ -452,7 +454,7 @@ def ver_grupo(id):
         lista_alumnos = response.json()
     except Exception as e:
         print('Hubo un error al obtener los alumnos del grupo')
-    return render_template('detalle_grupo.html',nombre=nombre, integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
+    return render_template('detalle_grupo.html',eliminar=eliminar_alumno, integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
 @app.route('/listado')
 def seccion_listado():
     return render_template('listado.html')
