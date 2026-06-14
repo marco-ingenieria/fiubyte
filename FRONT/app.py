@@ -45,43 +45,36 @@ def seccion_historial():
 @app.route("/alumno/<int:padron>")
 def perfil_alumno(padron):
     nombre = request.args.get('nombre_profesor', '')
+    grupos_alumno=[]
 
     try:
-        response = requests.get(f"http://backend:5000/alumnos/{padron}")
+        response_alumno= requests.get(f"http://backend:5000/alumnos/{padron}")
+        data_alumno=response_alumno.json()
 
-        print("STATUS:", response.status_code)
-        print("RAW RESPONSE:", response.text)
-        print("JSON:", response.json())
-        
-        data = response.json()
-
-        print("DEBUG DATA:", data)
+        response_grupos = requests.get(f"http://backend:5000/grupos/del-alumno/{padron}")
+        if response_grupos.status_code == 200:
+            grupos_alumno = response_grupos.json() # Esto carga la lista real de grupos
 
         alumno = {
-            "NOMBRE": data.get("NOMBRE"),
-            "APELLIDO": data.get("APELLIDO"),
-            "MAIL": data.get("MAIL"),
-            "PADRON": data.get("PADRON", padron),
-            "ASISTENCIAS": data.get("ASISTENCIAS", 0),
-            "PROMEDIO": data.get("PROMEDIO", 0),
-            "TRABAJOS": data.get("TRABAJOS", 0),
-            "GRUPOS": data.get("GRUPOS", []),
-            "NOTAS": data.get("NOTAS", [])
+            "NOMBRE": data_alumno.get("NOMBRE") or data_alumno.get("nombre"),
+            "APELLIDO": data_alumno.get("APELLIDO") or data_alumno.get("apellido"),
+            "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail"),
+            "PADRON": data_alumno.get("PADRON") or data_alumno.get("padron", padron),
+            "ASISTENCIAS": data_alumno.get("ASISTENCIAS") or data_alumno.get("asistencias", 0),
+            "PROMEDIO": data_alumno.get("PROMEDIO") or data_alumno.get("promedio", 0),
+            "TRABAJOS": data_alumno.get("TRABAJOS") or data_alumno.get("trabajos", 0),
+            
+            # Le asignamos la lista que responda nuestra API de grupos
+            "GRUPOS": grupos_alumno, 
+            
+            "NOTAS": data_alumno.get("NOTAS") or data_alumno.get("notas", [])
         }
-        
     except Exception:
         alumno = {
-            "NOMBRE": "",
-            "APELLIDO": "",
-            "MAIL": "",
-            "PADRON": padron,
-            "asistencias": 0,
-            "promedio": 0,
-            "trabajos": 0,
-            "grupos": [],
-            "notas": []
+            "NOMBRE": "", "APELLIDO": "", "MAIL": "", "PADRON": padron,
+            "ASISTENCIAS": 0, "PROMEDIO": 0, "TRABAJOS": 0, "GRUPOS": [], "NOTAS": []
         }
-
+        
     return render_template("alumno.html", alumno=alumno, nombre_profesor=nombre)
 
 #7. Ruta para mostrar el QR de la clase actual

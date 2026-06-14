@@ -39,11 +39,16 @@
 
     <h4>Grupos Asignados</h4>
     <div id="contenedor-grupos">
-        {% for grupo in alumno.GRUPOS or [0] %}
-            <a href="{{ url_for('detalle_grupo_especifico', id=grupo, nombre_profesor=request.args.get('nombre_profesor', '')) }}">
-                {{ grupo }}
-            </a>
-        {% endfor %}
+        {% if alumno.GRUPOS %}
+            {% for grupo in alumno.GRUPOS %}
+                <!-- Forzamos que 'id' (minúscula) sea igual a grupo['ID'] (mayúscula) -->
+                <a href="{{ url_for('ver_grupo', id=grupo['ID'], nombre_profesor=nombre_profesor) }}" class="btn-grupo">
+                    Grupo {{ grupo['NOMBRE'] }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <p>Sin grupo asignado</p>
+        {% endif %}
     </div>
 
     <h4>Detalle de Evaluaciones</h4>
