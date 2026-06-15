@@ -1,6 +1,7 @@
 from flask import jsonify
 from datetime import datetime
-
+from smtplib import SMTP
+from constants import credenciales_email
 
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
@@ -49,3 +50,15 @@ def validar_fecha(fecha):
     except ValueError:
         return False
     
+
+
+def enviar_mail(contenido, destinatarios):
+    user, password = credenciales_email
+    with SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+
+        smtp.login(user, password)
+        for destinatario in destinatarios:
+            smtp.sendmail(user, destinatario, contenido)
