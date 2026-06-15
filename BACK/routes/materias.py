@@ -4,10 +4,7 @@ from services.materias import (listar_materias, crear_materia, obtener_materia,
 from utils import construir_error
 import json
 
-
-
 materias_bp = Blueprint('materias', __name__)
-
 
 @materias_bp.route("/", methods=['GET'])
 def get_materias():
@@ -24,14 +21,12 @@ def get_materias():
 
     return listar_materias(base_url, limit, offset)
 
-
 @materias_bp.route("/<int:id>", methods=['GET'])
 def get_materia(id):
     if id <= 0:
         return construir_error(400, "id_grupo debe ser un número entero positivo")
     
     return obtener_materia(id)
-
 
 @materias_bp.route("/", methods=['POST'])
 def post_materia():
@@ -52,9 +47,6 @@ def post_materia():
 
     return crear_materia(nombre, cuatrimestre, anio)
 
-
-
-
 @materias_bp.route("/<int:id>", methods=['PATCH'])
 def patch_materia(id):
 
@@ -67,10 +59,6 @@ def patch_materia(id):
         return construir_error(400, "Datos vacíos")
     
     return actualizar_materia(id, body)
-
-
-
-
 
 @materias_bp.route("/<int:id>", methods=['DELETE'])
 def delete_materia(id):

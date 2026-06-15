@@ -9,7 +9,14 @@ def listar_alumnos(limit, offset, base_url):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM ALUMNOS WHERE ELIMINADO = 0 ORDER BY PADRON LIMIT %s OFFSET %s"
+        select_stmt = """
+            SELECT A.*, M.NOMBRE_MATERIA 
+            FROM ALUMNOS A 
+            INNER JOIN MATERIAS M ON A.ID_CURSO = M.ID 
+            WHERE A.ELIMINADO = 0 
+            ORDER BY A.PADRON 
+            LIMIT %s OFFSET %s
+        """
         cursor.execute(select_stmt, [limit, offset])
 
         alumnos = cursor.fetchall()
@@ -35,7 +42,14 @@ def listar_alumno_curso(limit, offset, base_url, id_curso):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM ALUMNOS WHERE ELIMINADO = 0 AND ID_CURSO = %s ORDER BY PADRON LIMIT %s OFFSET %s"
+        select_stmt = """
+                    SELECT A.*, M.NOMBRE_MATERIA 
+                    FROM ALUMNOS A 
+                    INNER JOIN MATERIAS M ON A.ID_CURSO = M.ID 
+                    WHERE A.ELIMINADO = 0 AND A.ID_CURSO = %s 
+                    ORDER BY A.PADRON 
+                    LIMIT %s OFFSET %s
+                """
         cursor.execute(select_stmt, [id_curso, limit, offset])
         alumnos = cursor.fetchall()
 
@@ -88,7 +102,7 @@ def crear_alumno(body):
     apellido    = body.get("apellido")
     email       = body.get("email")
     abandono    = body.get("abandono")
-    id_curso = body.get("curso")
+    id_curso = body.get("id_curso")
 
 
     try:

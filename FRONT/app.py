@@ -292,24 +292,12 @@ def seccion_grupos():
 
     return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos)
 
-# NUEVA RUTA: Hoja de detalle de un grupo específico (Accedida desde el perfil o listados)
 @app.route('/grupo-detalle')
 def detalle_grupo_especifico():
     nombre_profesor = request.args.get('nombre_profesor', '')
     
-    # Atajamos cuál grupo exacto se quiere ver (ej: "Grupo 1")
     id_grupo = request.args.get('id', '')
 
-    # =========================================================================
-    # LÓGICA SQL FUTURA:
-    # # 1. Buscamos los datos de este grupo en la base de datos:
-    # grupo_datos = db.execute("SELECT * FROM grupos WHERE nombre = ?", id_grupo)
-    #
-    # # 2. Buscamos a todos los alumnos que pertenecen a este grupo para listarlos:
-    # integrantes = db.execute("SELECT nombre, padron FROM alumnos WHERE grupo = ?", id_grupo)
-    # =========================================================================
-
-    # Datos fijos temporales para que no tire error al renderizar mientras desarrollás
     grupo_simulado = {
         "nombre": id_grupo if id_grupo else "Grupo Sin Nombre",
         "materia": "Diseño de Sistemas",
@@ -322,19 +310,23 @@ def detalle_grupo_especifico():
         grupo=grupo_simulado
     )
 
-# 2. Ruta de la sección de Alumnos y Notas (Se activa al ir a /alumnos)
 @app.route('/alumnos', methods=["POST","GET"])
 def seccion_alumnos():
     nombre = request.args.get('nombre_profesor', '')
+    id_curso = request.args.get('id_curso', '')
     crear_alumno = request.form.get('crear_alumno')
     eliminar_alumno = request.form.get('eliminar_alumno')
+    
     if crear_alumno:
+        
+        print("FORM COMPLETO:", dict(request.form), flush=True)
         try:
             requests.post("http://backend:5000/alumnos/", json={
                 "nombre": request.form.get('crear_alumno'),
                 "apellido": request.form.get('apellido'),
                 "email": request.form.get('email'),
-                "padron": request.form.get('padron')
+                "padron": request.form.get('padron'),
+                "id_curso": request.form.get('id_curso')
             })
         except Exception as e:
             print("Error al crear alumno")
@@ -344,14 +336,23 @@ def seccion_alumnos():
             requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
         except Exception as e:
             print("Error al eliminar alumno")
+
     try:
-        response = requests.get("http://backend:5000/alumnos/")
+        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
+        cursos = resp_cursos.json().get("listado", [])
+    except Exception as e:
+        cursos = []
+
+    try:
+        if id_curso:
+            response = requests.get(f"http://backend:5000/alumnos/curso/{id_curso}", params={"limit": 100, "offset": 0})
+        else:
+            response = requests.get("http://backend:5000/alumnos/", params={"limit": 100, "offset": 0})
         alumnos = response.json().get("listado", [])
     except Exception as e:
         alumnos = []
 
-    return render_template('alumnos.html', nombre_profesor=nombre, alumnos=alumnos)
-
+    return render_template('alumnos.html', nombre_profesor=nombre, alumnos=alumnos, cursos=cursos, id_curso=id_curso)
 
 @app.route('/cargar_csv_alumnos', methods=['POST'])
 def crear_alumnos_csv():
@@ -400,7 +401,6 @@ def eliminar_usuario():
         pass
     return redirect(url_for('seccion_usuarios',nombre_profesor=nombre_profesor))
 
-
 # 0. Ruta del Panel Principal (Se activa al entrar a http://127.0.0.1:5000)
 @app.route('/')
 def inicio():
@@ -412,7 +412,6 @@ def menu_principal():
     error_busqueda = request.args.get('error_busqueda')
     return render_template('menu_principal.html',nombre_profesor=nombre, error_busqueda=error_busqueda)
 
-#Modifique un toque para pasar contrasenia aparte de nombre al back
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
