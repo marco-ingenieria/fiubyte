@@ -2,6 +2,9 @@ from flask import jsonify
 from datetime import datetime
 from smtplib import SMTP
 from constants import credenciales_email
+import qrcode
+from io import BytesIO
+from email.message import EmailMessage
 
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
@@ -52,7 +55,7 @@ def validar_fecha(fecha):
     
 
 
-def enviar_mail(contenido, destinatarios):
+def enviar_mail(contenido, destinatarios, asunto):
     user, password = credenciales_email
     with SMTP('smtp.gmail.com', 587) as smtp:
         smtp.ehlo()
@@ -60,5 +63,31 @@ def enviar_mail(contenido, destinatarios):
         smtp.ehlo()
 
         smtp.login(user, password)
-        for destinatario in destinatarios:
-            smtp.sendmail(user, destinatario, contenido)
+
+        contenido["Subject"] = asunto
+        contenido["From"] = user
+        contenido["To"] = ", ".join(destinatarios)
+        smtp.send_message(contenido)
+
+def enviar_mail_asistencia(link, fecha, mails_alumnos):
+    #Preparar el mensaje con la librería email
+    msg = EmailMessage()
+    msg.set_content("Este correo requiere soporte HTML.")
+    msg.add_alternative(f"""
+    <html>
+        <body>
+            <h1>Registrar asistencia a la clase de {fecha}</h1>
+            <img src="cid:qr">
+            <p>En caso de no poder escanear el QR, entrar <a href="{link}">aquí</a></p>
+        </body>
+    </html>
+    """, subtype="html")
+    
+    #Generar el qr con librería qrcode
+    qr_png = qrcode.make(link)
+    buffer = BytesIO()
+    qr_png.save(buffer, format="PNG")
+    qr = buffer.getvalue()
+
+    msg.get_payload()[0].add_related(qr, maintype="image", subtype="png", cid="qr")
+    enviar_mail(msg, mails_alumnos, "Registrar asistencia a la clase")
