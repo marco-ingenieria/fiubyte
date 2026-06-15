@@ -8,7 +8,7 @@
     <dialog id="modal-csv">
         <h3>Cargar archivo de alumnos</h3>
         <p>Selecciona el archivo .csv con los alumnos. Verifica que el formato de cada fila sea "padrón, nombre, apellido, email"</p>
-        
+
         <form id="form-csv" method="POST" enctype=multipart/form-data action="/cargar_csv_alumnos?nombre_profesor={{ nombre_profesor }}">
             <label for="alumnos">Archivo seleccionado:</label>
             <input type="file" id="campo-csv" name="alumnos" required>
@@ -22,7 +22,7 @@
     <button type="button" onclick="document.getElementById('modal-eliminar').showModal()">Eliminar alumno</button>
 </div>
 <!--crear alumno-->
-<dialog id="modal-crear">
+<dialog id="crear-alumno">
     <h3>Crear nuevo alumno</h3>
     <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
         <label for="nombre">Nombre del Nuevo Alumno:</label>
@@ -33,27 +33,29 @@
         <input type="email" id="email" name="email">
         <label for="padron">Padron</label>
         <input type="number" id="padron" name="padron">
+        
         <label for="id_curso">Curso</label>
         <select id="id_curso" name="id_curso" required>
             {% for curso in cursos %}
             <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
             {% endfor %}
         </select>
-        <div id="modal-botones-contenedor">
-            <button type="submit" id="btn-modal-guardar">Guardar</button>
-            <button type="button" id="btn-modal-cancelar" onclick="document.getElementById('modal-crear').close()">Cancelar</button>
+        
+        <div id="crear-botones-contenedor">
+            <button type="submit" id="crear-boton-guardar">Guardar</button>
+            <button type="button" id="crear-boton-cancelar" onclick="document.getElementById('crear-alumno').close()">Cancelar</button>
         </div>
     </form>
 </dialog>
 <!--eliminar alumno-->
-<dialog id="modal-eliminar">
+<dialog id="eliminar-alumno">
     <h3>Eliminar alumno</h3>
-    <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
+    <form id="form-eliminar" method="POST" action="{{url_for('seccion_alumnos')}}">
         <label for="eliminar">Padron </label>
-        <input type="number" id="nombre" name="eliminar_alumno">
-        <div id="modal-botones-contenedor">
-            <button type="submit" id="btn-modal-guardar">Guardar</button>
-            <button type="button" id="btn-modal-cancelar" onclick="document.getElementById('modal-eliminar').close()">Cancelar</button>
+        <input type="number" id="eliminar-alumno" name="eliminar_alumno">
+        <div id="eliminar-botones-contenedor">
+            <button type="submit" id="eliminar-boton-guardar">Guardar</button>
+            <button type="button" id="eliminar-boton-cancelar" onclick="document.getElementById('eliminar-alumno').close()">Cancelar</button>
         </div>
     </form>
 </dialog>

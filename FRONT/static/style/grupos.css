@@ -1,32 +1,10 @@
-#contenedor-boton {
-    margin-bottom: 20px;
-    justify-content: center;
+#contenedor-botones {
     display: flex;
-}
-
-#contenedor-boton {
+    gap: 12px;
     margin-bottom: 20px;
-    padding: 16px 20px;
-    text-align: left;
-    font-size: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    color: var(--texto-oscuro);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
-#boton-crear {
-    padding: 10px 20px;
-    border-radius: 8px;
-    background: var(--color-primario);
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s ease;
-}
-
+#boton-crear,
 #boton-eliminar {
     padding: 10px 20px;
     border-radius: 8px;
@@ -38,10 +16,7 @@
     transition: background 0.3s ease;
 }
 
-#boton-crear:hover {
-    background: var(--color-primario-hover);
-}
-
+#boton-crear:hover,
 #boton-eliminar:hover {
     background: var(--color-primario-hover);
 }
@@ -56,10 +31,10 @@
 
 #tabla-grupos td {
     padding: 16px 20px;
-    text-align: left;
     font-size: 15px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     color: var(--texto-oscuro);
+    vertical-align: middle;
 }
 
 #tabla-grupos tr:hover {
@@ -67,95 +42,139 @@
     cursor: pointer;
 }
 
-#modal-crear::backdrop {
+#tabla-grupos a {
+    color: var(--color-primario);
+    text-decoration: none;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+}
+
+#tabla-grupos form {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+#tabla-grupos input[type="number"] {
+    padding: 4px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #f8fafc;
+    width: 200px;
+    outline: none;
+}
+
+#tabla-grupos button {
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+#tabla-grupos button:hover {
+    background: var(--color-primario-hover);
+}
+
+
+/* dialogs */
+
+#crear-grupo,
+#eliminar-grupo {
+    border: none;
+    border-radius: 20px;
+    padding: 35px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+    margin: auto;
+}
+
+#crear-grupo::backdrop,
+#eliminar-grupo::backdrop {
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
 }
 
-#modal-crear {
-    border: none;
-    border-radius: 20px;
-    padding: 40px;
-    width: 350px;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-#modal-eliminar {
-    border: none;
-    border-radius: 20px;
-    padding: 40px;
-    width: 350px;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-#boton-alumno {
+#crear-grupo h3,
+#eliminar-grupo h3 {
     margin-top: 0;
-    color: #1e293b;
-    font-size: 15px;
-    margin-bottom: 15px;
-}
-
-#modal-crear h3 {
-    margin-top: 0;
-    color: #1e293b;
+    color: var(--texto-oscuro);
     font-size: 22px;
     margin-bottom: 20px;
 }
 
-#nombre {
+#form-crear,
+#form-eliminar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#form-crear label,
+#form-eliminar label {
+    font-size: 0.85rem;
+    color: #64748b;
+    text-align: left;
+}
+
+#nombre-crear,
+#id-eliminar {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
     border: 1px solid #cbd5e1;
     background-color: #f8fafc;
     font-size: 16px;
-    margin-bottom: 25px;
     box-sizing: border-box;
     outline: none;
 }
 
-#modal-botones-contenedor {
+#botones-crear,
+#botones-eliminar {
     display: flex;
     gap: 15px;
     justify-content: center;
+    margin-top: 10px;
 }
 
-#modal-crear button[onclick*="close"]:hover {
-    background-color: #cbd5e1;
-}
-
-#modal-crear {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+#boton-guardar-crear,
+#boton-eliminar-grupo {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
     border: none;
-    border-radius: 20px;
-    padding: 35px;
-    width: 350px;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    box-sizing: border-box;
-    margin: 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
 }
 
-#modal-eliminar {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+#boton-guardar-crear:hover,
+#boton-eliminar-grupo:hover {
+    background: var(--color-primario-hover);
+}
+
+#boton-cancelar-crear,
+#boton-cancelar-grupo {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    color: var(--texto-oscuro);
     border: none;
-    border-radius: 20px;
-    padding: 35px;
-    width: 350px;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    box-sizing: border-box;
-    margin: 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#boton-cancelar-crear:hover,
+#boton-cancelar-grupo:hover {
+    background: #cbd5e1;
 }

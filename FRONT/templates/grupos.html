@@ -5,31 +5,31 @@
     <h1>Listado de Grupos</h1>
     <p>Seleccione un grupo para ver los integrantes</p>
     <!--crear nuevo grupo-->
-    <div id="contenedor-boton">
-        <button id="boton-eliminar" type="button" onclick="document.getElementById('modal-eliminar').showModal()">Eliminar grupo</button>
+    <div id="contenedor-botones">
+        <button id="boton-eliminar" type="button" onclick="document.getElementById('eliminar-grupo').showModal()">Eliminar grupo</button>
 
-        <button id="boton-crear" type="button" onclick="document.getElementById('modal-crear').showModal()">Crear nuevo grupo </button>
+        <button id="boton-crear" type="button" onclick="document.getElementById('crear-grupo').showModal()">Crear nuevo grupo </button>
     </div>
-    <dialog id="modal-crear">
+    <dialog id="crear-grupo">
         <h3>Crear nuevo grupo</h3>
         <form id="form-crear" method="POST" action="{{url_for('seccion_grupos')}}">
             <label for="crear">Nombre del Nuevo Grupo:</label>
-            <input type="text" id="nombre" name="crear">
-            <div id="modal-botones-contenedor">
-                <button type="submit" id="btn-modal-guardar">Guardar</button>
-                <button type="button" onclick="document.getElementById('modal-crear').close()">Cancelar</button>
+            <input type="text" id="nombre-crear" name="crear">
+            <div id="botones-crear">
+                <button type="submit" id="boton-guardar-crear">Guardar</button>
+                <button type="button" id="boton-cancelar-crear" onclick="document.getElementById('crear-grupo').close()">Cancelar</button>
             </div>
         </form>
     </dialog>
     <!--eliminar grupo grupo-->
-    <dialog id="modal-eliminar">
+    <dialog id="eliminar-grupo">
         <h3> Eliminar Grupo</h3>
-        <form id="form-crear" method="POST" action="{{ url_for('seccion_grupos', nombre_profesor=request.args.get('nombre_profesor', '')) }}">
+        <form id="form-eliminar" method="POST" action="{{ url_for('seccion_grupos', nombre_profesor=request.args.get('nombre_profesor', '')) }}">
             <label for="eliminar">Introduzca el id del grupo:</label>
-            <input type="number" id="nombre" name="eliminar">
-            <div id="modal-botones-contenedor">
-                <button type="submit" id="btn-modal-guardar">Eliminar</button>
-                <button type="button" onclick="document.getElementById('modal-eliminar').close()">Cancelar</button>
+            <input type="number" id="id-eliminar" name="eliminar">
+            <div id="botones-eliminar">
+                <button type="submit" id="boton-eliminar-grupo">Eliminar</button>
+                <button type="button" id="boton-cancelar-grupo" onclick="document.getElementById('eliminar-grupo').close()">Cancelar</button>
             </div>
         </form>
     </dialog>
@@ -41,11 +41,12 @@
                     <p>{{grupo['ID']}}</p>
                 </td>
                 <td>
-                    <a href="{{ grupoUrl }}"> Grupo {{ grupo['NOMBRE'] }} </a>
+                    <a href="{{ grupoUrl }}"> Grupo {{ grupo['NOMBRE'] }} </a></td>
+                <td>
                     <form method="POST" action="{{ url_for('seccion_grupos', nombre_profesor=request.args.get('nombre_profesor', '')) }}">
                         <input type="hidden" name="grupo_id" value="{{ grupo['ID'] }}">
                         <input type="number" name="padron_asignar" placeholder="Padrón">
-                        <button type="submit" id="btn-modal-guardar">Agregar</button>
+                        <button type="submit">Agregar</button>
                     </form>
                 </td>
             </tr>
