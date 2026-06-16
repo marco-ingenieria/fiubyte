@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 import json
 from services.clases import (listar_clases, buscar_clase, crear_clase, actualizar_clase, eliminar_clase, eliminar_clase_permanente)
+from services.asistencias import enviar_mails_asistencia
 from utils import (construir_error, validar_fecha)
 
 clases_bp = Blueprint('clases', __name__)
@@ -75,6 +76,19 @@ def patch_clase(id):
     # Retorna directamente el resultado del servicio
     return actualizar_clase(body, id)
 
+
+
+@clases_bp.route('/<int:id>/enviar-qr', methods=['POST'])
+def post_enviar_qr(id):
+    body = request.get_json(silent=True)
+    if not body:
+        return construir_error(400, "JSON inválido o vacío")
+
+    id_curso = body.get('id_curso')
+    if not isinstance(id_curso, int) or id_curso <= 0:
+        return construir_error(400, "id_curso inválido")
+
+    return enviar_mails_asistencia(id, id_curso)
 
 
 @clases_bp.route('/<int:id>', methods=['DELETE'])

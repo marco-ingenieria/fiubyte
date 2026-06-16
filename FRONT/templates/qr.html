@@ -3,10 +3,47 @@
 {% block content %}
 <h1>QR de asistencia</h1>
 
-<p>Fecha: {{ clase.fecha }}</p>
-<p>Tema: {{ clase.tema }}</p>
-<p>Horario: {{ clase.horario }}</p>
-<p>Docente 1: {{ clase.docente1 }}</p>
-<p>Docente 2: {{ clase.docente2 }}</p>
-<p>Docente 3: {{ clase.docente3 }}</p>
+{% if error %}
+    <p style="color:#c00;">⚠️ {{ error }}</p>
+{% endif %}
+{% if success %}
+    <p style="color:#080;">✅ {{ success }}</p>
+{% endif %}
+
+{% if clase %}
+    <div style="margin-bottom:1rem;">
+        <p><strong>Fecha:</strong> {{ clase.FECHA }}</p>
+        <p><strong>Tema:</strong> {{ clase.TEMA }}</p>
+        <p><strong>Horario:</strong> {{ clase.HORARIO }}</p>
+        {% if clase.PROFESORES %}
+            {% set profesores = clase.PROFESORES | fromjson %}
+            {% for prof in profesores %}
+                <p><strong>Docente {{ loop.index }}:</strong> {{ prof }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% if qr_url %}
+        <div style="margin-bottom:1.5rem;">
+            <img src="{{ qr_url }}" alt="QR de asistencia" style="max-width:100%; border:1px solid #ccc;">
+        </div>
+    {% endif %}
+
+    <form action="/qr" method="POST">
+        <input type="hidden" name="id" value="{{ clase.ID }}">
+        <label for="curso_id">Seleccionar curso para enviar el QR:</label>
+        <select id="curso_id" name="curso_id" required>
+            <option value="">-- Elegir curso --</option>
+            {% for curso in cursos %}
+                <option value="{{ curso.ID }}" {% if curso_id == curso.ID|string %}selected{% endif %}>
+                    {{ curso.NOMBRE_MATERIA }} - {{ curso.CUATRIMESTRE }}° cuatrimestre {{ curso.ANIO }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="margin-top:1rem;">Enviar QR por mail a los alumnos</button>
+    </form>
+{% else %}
+    <p>No hay datos de clase para mostrar.</p>
+{% endif %}
+
 {% endblock %}

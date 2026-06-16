@@ -6,10 +6,17 @@
 <div id="grupo-botones">
     <button type="button" onclick="abrirModal('crear')">Crear Usuario</button>
     <button type="button" onclick="abrirModal('eliminar')">Eliminar Usuario</button>
+    <button type="button" onclick="window.location.href='{{ url_for('seccion_historiales', nombre_profesor=nombre_profesor) }}'">Ver historiales globales</button>
 </div>
+{% if mensaje %}
+    <div class="mensaje-exito">{{ mensaje }}</div>
+{% endif %}
+{% if error %}
+    <div class="mensaje-error">{{ error }}</div>
+{% endif %}
 <dialog id="modal-crear">
     <h3>Crear Nuevo Usuario</h3>
-    <form id="form-crear" method="POST" action="/crear_usuario?nombre_profesor={{ nombre_profesor }}">
+    <form id="form-crear" method="POST" action="{{ url_for('crear_usuario', nombre_profesor=nombre_profesor) }}">
         <label>Nombre de Usuario:</label>
         <input type="text" name="nombre" placeholder="usuario" required>
         <label>Contraseña:</label>
@@ -60,7 +67,11 @@
             </td>
             <!-- <td>{{ usuario.Email }}</td> -->
             <!-- <td>{{ usuario.Rol }}</td> -->
-            <td><a href="#">Ver Historial</a></td>
+            <td>
+                <a href="{{ url_for('seccion_historial', nombre_profesor=nombre_profesor, id=usuario.ID_USUARIO) }}">
+                    Ver Historial
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

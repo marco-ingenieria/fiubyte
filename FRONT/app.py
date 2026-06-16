@@ -1,7 +1,8 @@
-from flask import Flask, render_template,request,url_for,redirect
+from flask import Flask, render_template, request, url_for, redirect
 import requests
 from datetime import date, datetime, timedelta
 import json
+import urllib.parse
 
 
 app = Flask(__name__)
@@ -20,7 +21,7 @@ def buscar_seccion():
         return redirect(url_for('seccion_alumnos', nombre_profesor=nombre))
 
     if texto.startswith('historial'):
-        return redirect(url_for('seccion_historial',nombre_profesor=nombre))
+        return redirect(url_for('seccion_historiales',nombre_profesor=nombre))
 
     if texto.startswith('grupo'):
         return redirect(url_for('seccion_grupos', nombre_profesor=nombre))
@@ -40,7 +41,50 @@ def buscar_seccion():
 
 @app.route("/historial")
 def seccion_historial():
-    pass
+    nombre = request.args.get('nombre_profesor', '')
+    id_usuario = request.args.get('id', type=int)
+    registros = []
+    error = None
+
+    if not id_usuario:
+        error = "Falta el id de usuario"
+        return render_template('historial.html', nombre_profesor=nombre, historial_alumno=registros, error=error, historial_global=False, usuario_id=None)
+
+    try:
+        response = requests.get(f"http://backend:5000/historiales/{id_usuario}", params={"limit": 100, "offset": 0})
+        if response.status_code == 200:
+            registros = response.json().get('listado', [])
+        elif response.status_code == 204:
+            registros = []
+        else:
+            error = f"Error del servidor ({response.status_code})"
+    except Exception:
+        registros = []
+        error = "No se pudo conectar al servidor backend"
+
+    return render_template('historial.html', nombre_profesor=nombre, historial_alumno=registros, error=error, historial_global=False, usuario_id=id_usuario)
+
+
+@app.route("/historiales")
+def seccion_historiales():
+    nombre = request.args.get('nombre_profesor', '')
+    registros = []
+    error = None
+
+    try:
+        response = requests.get('http://backend:5000/historiales/', params={"limit": 100, "offset": 0})
+        if response.status_code == 200:
+            registros = response.json().get('listado', [])
+        elif response.status_code == 204:
+            registros = []
+        else:
+            error = f"Error del servidor ({response.status_code})"
+    except Exception:
+        registros = []
+        error = "No se pudo conectar al servidor backend"
+
+    return render_template('historial.html', nombre_profesor=nombre, historial_alumno=registros, error=error, historial_global=True, usuario_id=None)
+
 
 @app.route("/alumno/<int:padron>")
 def perfil_alumno(padron):
@@ -79,16 +123,83 @@ def perfil_alumno(padron):
 
 #7. Ruta para mostrar el QR de la clase actual
 
-@app.route("/qr")
+@app.route("/qr", methods=["GET", "POST"])
 def mostrar_qr():
-    id_clase = int(request.args.get("id"))
+    error = None
+    success = None
+    curso_id = None
     clase_encontrada = None
+    cursos = []
+    qr_url = None
 
-    for clase in clases:
-        if clase["id"] == id_clase:
-            clase_encontrada = clase
+    if request.method == "POST":
+        id_clase = request.form.get("id")
+        curso_id = request.form.get("curso_id")
+    else:
+        id_clase = request.args.get("id")
 
-    return render_template("qr.html",clase=clase_encontrada)
+    if not id_clase:
+        error = "Falta el id de la clase"
+        return render_template("qr.html", clase=None, error=error, success=success, cursos=cursos, curso_id=curso_id, qr_url=qr_url)
+
+    try:
+        id_clase_int = int(id_clase)
+    except ValueError:
+        error = "ID de clase inválido"
+        return render_template("qr.html", clase=None, error=error, success=success, cursos=cursos, curso_id=curso_id, qr_url=qr_url)
+
+    try:
+        response = requests.get(f"http://backend:5000/clases/{id_clase_int}")
+        if response.status_code == 200:
+            clase_encontrada = response.json().get("clase")
+        else:
+            error = "Clase no encontrada"
+    except Exception:
+        error = "No se pudo conectar al servidor backend"
+
+    try:
+        response = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
+        if response.status_code == 200:
+            cursos = response.json().get("listado", [])
+    except Exception:
+        cursos = []
+
+    if clase_encontrada:
+        qr_data = json.dumps({
+            "clase_id": clase_encontrada.get("ID"),
+            "tema": clase_encontrada.get("TEMA", ""),
+            "fecha": str(clase_encontrada.get("FECHA", "")),
+            "horario": str(clase_encontrada.get("HORARIO", "")),
+        }, default=str)
+        qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + urllib.parse.quote(qr_data)
+
+    if request.method == "POST":
+        if not curso_id:
+            error = "Debe seleccionar un curso para enviar el QR"
+        else:
+            try:
+                payload = {"id_curso": int(curso_id)}
+                response = requests.post(f"http://backend:5000/clases/{id_clase_int}/enviar-qr", json=payload, timeout=30)
+                if response.status_code == 200:
+                    success = "QR enviado a los alumnos del curso seleccionado"
+                else:
+                    try:
+                        data = response.json()
+                        error = data.get("errors", [])[0].get("description") if data.get("errors") else data.get("message") or f"Error del servidor ({response.status_code})"
+                    except Exception:
+                        error = f"Error del servidor ({response.status_code})"
+            except Exception:
+                error = "No se pudo conectar para enviar el QR"
+
+    return render_template(
+        "qr.html",
+        clase=clase_encontrada,
+        error=error,
+        success=success,
+        cursos=cursos,
+        curso_id=curso_id,
+        qr_url=qr_url
+    )
 
 # 7. Ruta de la sección de Asistencias
 
@@ -370,26 +481,41 @@ def crear_alumnos_csv():
 @app.route('/usuarios')
 def seccion_usuarios():
     nombre = request.args.get('nombre_profesor', '')
+    mensaje = request.args.get('mensaje', '')
+    error = request.args.get('error', '')
     try:
         response = requests.get("http://backend:5000/usuarios/", params={"limit": 30, "offset": 0})
         usuarios = response.json().get("listado", [])
     except Exception as e:
         usuarios = []
-    return render_template('usuarios.html', nombre_profesor=nombre, usuarios=usuarios)
+        if not error:
+            error = "No se pudo cargar la lista de usuarios"
+    return render_template('usuarios.html', nombre_profesor=nombre, usuarios=usuarios, mensaje=mensaje, error=error)
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
     nombre_profesor = request.args.get('nombre_profesor', '')
     nombre = request.form.get('nombre')
     contrasenia = request.form.get('contrasenia')
+
+    if not nombre or not contrasenia:
+        return redirect(url_for('seccion_usuarios', nombre_profesor=nombre_profesor, error='Nombre y contraseña son obligatorios'))
+
     try:
-        requests.post("http://backend:5000/usuarios/", json={
+        response = requests.post("http://backend:5000/usuarios/", json={
             "nombre": nombre,
             "contrasenia": contrasenia
-        })
-    except Exception as e:
-        pass
-    return redirect(url_for('seccion_usuarios',nombre_profesor=nombre_profesor))
+        }, timeout=10)
+        if response.status_code == 201:
+            return redirect(url_for('seccion_usuarios', nombre_profesor=nombre_profesor, mensaje='Usuario creado correctamente'))
+        else:
+            dato = response.json()
+            descripcion = 'No se pudo crear el usuario'
+            if isinstance(dato, dict) and dato.get('errors'):
+                descripcion = dato['errors'][0].get('description', descripcion)
+            return redirect(url_for('seccion_usuarios', nombre_profesor=nombre_profesor, error=descripcion))
+    except Exception:
+        return redirect(url_for('seccion_usuarios', nombre_profesor=nombre_profesor, error='Error de conexión con el backend'))
 
 @app.route('/eliminar_usuario', methods=['POST'])
 def eliminar_usuario():
