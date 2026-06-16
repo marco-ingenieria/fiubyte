@@ -18,7 +18,7 @@ app.register_blueprint(historiales_bp, url_prefix='/historiales')
 app.register_blueprint(notas_bp, url_prefix='/notas')
 app.register_blueprint(clases_bp, url_prefix='/clases')
 app.register_blueprint(materias_bp, url_prefix='/materias')
-app.register_blueprint(asistencias_bp, url_prefix='/asistenciaas')
+app.register_blueprint(asistencias_bp, url_prefix='/asistencias')
 
 @app.route("/")
 def index():

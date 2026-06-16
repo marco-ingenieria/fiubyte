@@ -1,10 +1,10 @@
 from flask import jsonify
 from datetime import datetime
 from smtplib import SMTP
-from constants import credenciales_email
 import qrcode
 from io import BytesIO
 from email.message import EmailMessage
+from constants import (credenciales_email)
 
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
@@ -55,7 +55,7 @@ def validar_fecha(fecha):
     
 
 
-def enviar_mail(contenido, destinatarios, asunto):
+def enviar_mail(contenido, destinatario, asunto):
     user, password = credenciales_email
     with SMTP('smtp.gmail.com', 587) as smtp:
         smtp.ehlo()
@@ -66,10 +66,10 @@ def enviar_mail(contenido, destinatarios, asunto):
 
         contenido["Subject"] = asunto
         contenido["From"] = user
-        contenido["To"] = ", ".join(destinatarios)
+        contenido["To"] = destinatario
         smtp.send_message(contenido)
 
-def enviar_mail_asistencia(link, fecha, mails_alumnos):
+def enviar_mail_asistencia(link, fecha, mail_alumno):
     #Preparar el mensaje con la librería email
     msg = EmailMessage()
     msg.set_content("Este correo requiere soporte HTML.")
@@ -90,4 +90,4 @@ def enviar_mail_asistencia(link, fecha, mails_alumnos):
     qr = buffer.getvalue()
 
     msg.get_payload()[0].add_related(qr, maintype="image", subtype="png", cid="qr")
-    enviar_mail(msg, mails_alumnos, "Registrar asistencia a la clase")
+    enviar_mail(msg, mail_alumno, "Registrar asistencia a la clase")
