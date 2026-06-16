@@ -357,11 +357,78 @@ def seccion_notas():
     nombre = request.args.get('nombre_profesor', '')
     return render_template('notas.html', nombre_profesor=nombre)
 
+@app.route('/api/notas', methods=['GET'])
+def api_get_notas():
+    id_evaluacion = request.args.get('id_evaluacion', type=int)
+    padron        = request.args.get('padron', type=int)
+    params = {'limit': 100, 'offset': 0}
+    if id_evaluacion:
+        params['id_evaluacion'] = id_evaluacion
+    if padron:
+        params['padron'] = padron
+    try:
+        r = requests.get('http://backend:5000/notas/', params=params)
+        return r.json(), r.status_code
+    except Exception:
+        return {'error': 'No se pudo conectar al backend'}, 500
+        
+@app.route('/api/notas', methods=['POST'])
+def api_crear_nota():
+    try:
+        r = requests.post('http://backend:5000/notas/',
+                          json=request.get_json())
+        return r.json(), r.status_code
+    except Exception:
+        return {'error': 'No se pudo conectar al backend'}, 500
+        
 # 5. Ruta de la sección de Evaluaciones
 @app.route('/evaluaciones')
 def seccion_evaluaciones():
     nombre = request.args.get('nombre_profesor', '')
     return render_template('registro_evaluaciones.html', nombre_profesor=nombre)
+
+
+@app.route('/api/evaluaciones', methods=['GET'])
+def api_get_evaluaciones():
+    try:
+        r = requests.get('http://backend:5000/evaluaciones/',
+                         params={'limit': 100, 'offset': 0})
+        return r.json(), r.status_code
+    except Exception:
+        return {'error': 'No se pudo conectar al backend'}, 500
+
+
+@app.route('/api/evaluaciones', methods=['POST'])
+def api_crear_evaluacion():
+    try:
+        r = requests.post('http://backend:5000/evaluaciones/',
+                          json=request.get_json())
+        return r.json(), r.status_code
+    except Exception:
+        return {'error': 'No se pudo conectar al backend'}, 500
+
+
+@app.route('/api/evaluaciones/<int:id>', methods=['PATCH'])
+def api_editar_evaluacion(id):
+    try:
+        r = requests.patch(f'http://backend:5000/evaluaciones/{id}',
+                           json=request.get_json())
+        return r.json(), r.status_code
+    except Exception:
+        return {'error': 'No se pudo conectar al backend'}, 500
+
+
+@app.route('/api/evaluaciones/<int:id>', methods=['DELETE'])
+def api_eliminar_evaluacion(id):
+    try:
+        r = requests.delete(f'http://backend:5000/evaluaciones/{id}')
+        # 204 no tiene body
+        if r.status_code == 204:
+            return '', 204
+        return r.json(), r.status_code
+    except Exception:
+        return {'error': 'No se pudo conectar al backend'}, 500
+        
 
 @app.route('/grupos', methods=["POST", "GET"])
 def seccion_grupos():
