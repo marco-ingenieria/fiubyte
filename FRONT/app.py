@@ -4,6 +4,7 @@ import requests
 from datetime import date, datetime, timedelta
 import json
 import urllib.parse
+import requests
 
 
 app = Flask(__name__)
@@ -306,9 +307,6 @@ def seccion_asistencias():
 
 
     orden = request.args.get("orden", "asc")
-    print("ARGS:", request.args)
-    print("CURSO:", request.args.get("curso_id"))
-    print("ORDEN:", request.args.get("orden"))
 
     if orden == "asc":
         clases.sort(key=lambda c: c["fecha"])
@@ -695,11 +693,96 @@ def eliminar_usuario():
 def inicio():
     return render_template('inicio.html')
 
+
+def obtener_estadisticas_cursada():
+    """
+    Función auxiliar para obtener los contadores en tiempo real del panel lateral.
+    Filtra las clases ya cursadas (antiguas o de HOY) de forma nativa por fecha.
+    """
+    total_alumnos = 0
+    total_grupos = 0
+    total_clases = 0
+    total_usuarios = 0
+    total_cursos = 0
+
+    hora_local = datetime.utcnow() - timedelta(hours=3)
+    hoy_str = hora_local.strftime("%Y-%m-%d")
+
+    fecha_hoy_formateada = hora_local.strftime("%d/%m/%Y")
+    try:
+        res_alumnos = requests.get("http://backend:5000/alumnos/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_alumnos.status_code == 200:
+            datos = res_alumnos.json()
+            alumnos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_alumnos = sum(1 for al in alumnos_lista if al.get("ABANDONO") == 0)
+    except Exception:
+        total_alumnos = 0
+
+    try:
+        res_clases = requests.get("http://backend:5000/clases/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_clases.status_code == 200:
+            datos = res_clases.json()
+            clases_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            
+            for c in clases_lista:
+                try:
+                    fecha_obj = datetime.strptime(c.get("FECHA", ""), "%a, %d %b %Y %H:%M:%S %Z").date()
+                    fecha_str = fecha_obj.strftime("%Y-%m-%d")
+                    
+                    if fecha_str <= hoy_str:
+                        total_clases += 1
+                except Exception:
+                    total_clases += 1
+    except Exception:
+        total_clases = 0
+
+    try:
+        res_grupos = requests.get("http://backend:5000/grupos/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_grupos.status_code == 200:
+            datos = res_grupos.json()
+            grupos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_grupos = len(grupos_lista)
+    except Exception:
+        total_grupos = 0
+
+    try:
+        res_usuarios = requests.get("http://backend:5000/usuarios/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_usuarios.status_code == 200:
+            datos = res_usuarios.json()
+            usuarios_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_usuarios = len(usuarios_lista)
+    except Exception:
+        total_usuarios = 0
+
+    try:
+        res_cursos = requests.get("http://backend:5000/materias/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_cursos.status_code == 200:
+            datos = res_cursos.json()
+            cursos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_cursos = len(cursos_lista)
+    except Exception:
+        total_cursos = 0
+
+    return total_alumnos, total_grupos, total_clases, total_usuarios, total_cursos,fecha_hoy_formateada
+
 @app.route('/menu')
 def menu_principal():
     nombre = request.args.get('nombre_profesor', '')
     error_busqueda = request.args.get('error_busqueda')
-    return render_template('menu_principal.html',nombre_profesor=nombre, error_busqueda=error_busqueda)
+
+    t_alumnos, t_grupos, t_clases, t_usuarios, t_cursos, f_hoy = obtener_estadisticas_cursada()
+
+    return render_template(
+        'menu_principal.html',
+        nombre_profesor=nombre, 
+        error_busqueda=error_busqueda,
+        total_alumnos=t_alumnos,
+        total_grupos=t_grupos,
+        total_clases=t_clases,
+        total_usuarios=t_usuarios,
+        total_cursos=t_cursos,
+        fecha_actual=f_hoy
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -712,7 +795,17 @@ def login():
                 "contrasenia": password
             })
             if response.status_code == 200:
-                return render_template("menu_principal.html", nombre_profesor=nombre)
+                t_alumnos, t_grupos, t_clases, t_usuarios, t_cursos, f_hoy = obtener_estadisticas_cursada()
+                return render_template(
+                    'menu_principal.html',
+                    nombre_profesor=nombre,
+                    total_alumnos=t_alumnos,
+                    total_grupos=t_grupos,
+                    total_clases=t_clases,
+                    total_usuarios=t_usuarios,
+                    total_cursos=t_cursos,
+                    fecha_actual=f_hoy
+                )
             else:
                 return render_template("login.html", error="Usuario o contraseña incorrectos")
         except Exception as e:
