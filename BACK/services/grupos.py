@@ -1,6 +1,7 @@
-from flask import jsonify
+from io import BytesIO
+from flask import jsonify, send_file
 from db.init_db import get_connection
-from utils import (construir_paginacion, construir_error, existe_en_bd)
+from utils import (construir_paginacion, construir_error, existe_en_bd, pdf_listado_grupos)
 import traceback
 
 
@@ -330,6 +331,59 @@ def eliminar_alumno(id_grupo, padron_alumno):
         traceback.print_exc()
         return construir_error(500, "Error inesperado del servidor")
     
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+def listar_grupos_pdf():
+    connection = None
+    cursor = None
+    
+    try: 
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT ID, NOMBRE
+            FROM GRUPOS
+            WHERE ELIMINADO = 0
+            ORDER BY FECHA_CREACION DESC
+        """)
+
+        grupos = cursor.fetchall()
+
+        for grupo in grupos:
+            cursor.execute("""
+                SELECT A.PADRON, A.NOMBRE, A.APELLIDO
+                FROM ALUMNOS A
+                JOIN GRUPO_ALUMNO GA
+                    ON A.PADRON = GA.PADRON_ALUMNO
+                WHERE GA.ID_GRUPO = %s
+                ORDER BY A.APELLIDO, A.NOMBRE
+            """, (grupo["ID"],))
+
+            grupo["INTEGRANTES"] = cursor.fetchall()
+
+        pdf = pdf_listado_grupos(grupos)
+
+        if pdf:
+            respuesta_pdf = send_file(
+                BytesIO(pdf),
+                mimetype="application/pdf",
+                as_attachment=True,
+                download_name="listado_grupos.pdf"
+            )
+
+            return respuesta_pdf
+        else:
+            return construir_error(500, "Error construyendo el pdf")
+    
+    except Exception:
+        traceback.print_exc()
+        return  construir_error(500, "Error inesperado del servidor")
+
     finally:
         if cursor:
             cursor.close()

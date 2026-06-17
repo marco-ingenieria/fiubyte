@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
-from services.alumnos import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente, crear_alumnos_csv)
+from services.alumnos import (listar_alumnos, buscar_alumno, crear_alumno, actualizar_alumno, eliminar_alumno, eliminar_alumno_permanente, crear_alumnos_csv, listar_alumnos_pdf)
 from utils import (construir_error)
 
 alumnos_bp = Blueprint('alumnos', __name__)
@@ -31,6 +31,21 @@ def get_alumno(id):
 
     return alumno
 
+
+
+@alumnos_bp.route('/pdf', methods=['GET'])
+def get_alumnos_pdf():
+    padron      = request.args.get('padron') is not None
+    nombre      = request.args.get('nombre') is not None
+    apellido    = request.args.get('apellido') is not None
+    email       = request.args.get('email') is not None
+    
+    if not padron and not nombre and not apellido and not email:
+        return construir_error(400, "Datos vacíos")
+
+    pdf = listar_alumnos_pdf(padron, nombre, apellido, email)
+
+    return pdf
 
 
 @alumnos_bp.route('/csv', methods=['POST'])

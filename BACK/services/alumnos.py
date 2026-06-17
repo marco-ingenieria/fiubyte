@@ -1,6 +1,7 @@
-from flask import jsonify
+from io import BytesIO
+from flask import jsonify, send_file
 from db.init_db import get_connection
-from utils import (construir_paginacion, construir_error)
+from utils import (construir_paginacion, construir_error, pdf_listado_alumnos)
 import traceback
 
 
@@ -234,6 +235,56 @@ def crear_alumnos_csv(csv):
         
         connection.commit()
         return (jsonify({"filas afectadas": filas_afectadas}), 201)
+    except Exception as e:
+        traceback.print_exc()
+
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+def listar_alumnos_pdf(padron, nombre, apellido, email):
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        columnas_seleccionadas = []
+
+        if padron:
+            columnas_seleccionadas.append("PADRON")
+        if nombre:
+            columnas_seleccionadas.append("NOMBRE")
+        if apellido:
+            columnas_seleccionadas.append("APELLIDO")
+        if email:
+            columnas_seleccionadas.append("MAIL")
+        
+        string_columnas = ", ".join(columnas_seleccionadas)
+
+        select_stmt = f"SELECT {string_columnas} FROM ALUMNOS WHERE ELIMINADO = 0 ORDER BY PADRON"
+        cursor.execute(select_stmt)
+
+        encabezado = columnas_seleccionadas
+        alumnos = cursor.fetchall()
+        alumnos.insert(0, encabezado)
+        
+        pdf = pdf_listado_alumnos(alumnos)
+
+        if pdf:
+            respuesta_pdf = send_file(
+                BytesIO(pdf),
+                mimetype="application/pdf",
+                as_attachment=True,
+                download_name="listado_alumnos.pdf"
+            )
+
+            return respuesta_pdf
+        else:
+            return construir_error(500, "Error construyendo el pdf")
     except Exception as e:
         traceback.print_exc()
 
