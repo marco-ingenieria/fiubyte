@@ -92,23 +92,21 @@ def obtener_alumnos(id_grupo):
         if connection and connection.is_connected():
             connection.close()
 
-def crear_grupo(nombre_grupo):
+def crear_grupo(nombre_grupo, id_curso):
     connection = None
     cursor = None 
-
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary = True)
-
-        query = "INSERT INTO GRUPOS (NOMBRE) VALUES(%s);"
-        cursor.execute(query, [nombre_grupo])
+        query = "INSERT INTO GRUPOS (NOMBRE, ID_CURSO) VALUES(%s, %s);"
+        cursor.execute(query, [nombre_grupo, id_curso])
         connection.commit()
-
         return (jsonify({
             "mensaje": "Creacion de grupo exitosa",
             "grupo": {
                 "ID": cursor.lastrowid,
-                "NOMBRE": nombre_grupo}
+                "NOMBRE": nombre_grupo,
+                "ID_CURSO": id_curso}
         }), 201)
     
     except:
@@ -138,6 +136,18 @@ def insertar_alumnos(cursor, id_grupo, padrones_alumnos):
 
     return alumnos_insertados
 
+def alumnos_son_del_curso(cursor, id_grupo, padrones_alumnos):
+    cursor.execute("SELECT ID_CURSO FROM GRUPOS WHERE ID = %s", [id_grupo])
+    grupo = cursor.fetchone()
+    id_curso_grupo = grupo["ID_CURSO"]
+
+    for padron in padrones_alumnos:
+        cursor.execute("SELECT ID_CURSO FROM ALUMNOS WHERE PADRON = %s", [padron["padron"]])
+        alumno = cursor.fetchone()
+        if alumno["ID_CURSO"] != id_curso_grupo:
+            return False
+    return True
+
 def asignar_alumnos_a_grupo(id_grupo, padrones_alumnos):
     connection = None
     cursor = None 
@@ -145,7 +155,6 @@ def asignar_alumnos_a_grupo(id_grupo, padrones_alumnos):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary = True)
-
         #existe grupo
         if not existe_en_bd(cursor, "GRUPOS", "ID", id_grupo):
             return construir_error(404, "Grupo no encontrado")
@@ -154,12 +163,15 @@ def asignar_alumnos_a_grupo(id_grupo, padrones_alumnos):
         if not existen_alumnos(cursor, padrones_alumnos):
             return construir_error(404, "Uno o más padrones no corresponden a alumnos existentes")
 
+        #alumnos deben pertenecer al curso del grupo
+        if not alumnos_son_del_curso(cursor, id_grupo, padrones_alumnos):
+            return construir_error(400, "Uno o más alumnos no pertenecen al curso de este grupo")
+
         alumnos_insertados = insertar_alumnos(cursor, id_grupo, padrones_alumnos)
         
         connection.commit()
         response = f"Se agregaron {alumnos_insertados} alumnos, al grupo de id={id_grupo}"
         return (jsonify(response), 200)        
-
     except:
         traceback.print_exc()
         return construir_error(500, "Error inesperado del servidor")

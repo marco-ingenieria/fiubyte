@@ -16,7 +16,7 @@
         <p><strong>Tema:</strong> {{ clase.TEMA }}</p>
         <p><strong>Horario:</strong> {{ clase.HORARIO }}</p>
         {% if clase.PROFESORES %}
-            {% set profesores = clase.PROFESORES | fromjson %}
+            {% set profesores = clase.PROFESORES %}
             {% for prof in profesores %}
                 <p><strong>Docente {{ loop.index }}:</strong> {{ prof }}</p>
             {% endfor %}

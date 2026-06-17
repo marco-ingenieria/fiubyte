@@ -1,10 +1,11 @@
- {% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+{% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
+{% if error_asignar %}
+<script>alert("{{ error_asignar }}");</script>
+{% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/grupos.css') }}">
-<!--contenedor principal-->
 <main>
     <h1>Listado de Grupos</h1>
     <p>Seleccione un grupo para ver los integrantes</p>
-    <!--crear nuevo grupo-->
     <div id="contenedor-botones">
         <button id="boton-eliminar" type="button" onclick="document.getElementById('eliminar-grupo').showModal()">Eliminar grupo</button>
 
@@ -15,13 +16,18 @@
         <form id="form-crear" method="POST" action="{{url_for('seccion_grupos')}}">
             <label for="crear">Nombre del Nuevo Grupo:</label>
             <input type="text" id="nombre-crear" name="crear">
+            <label for="id_curso">Curso</label>
+            <select id="id_curso" name="id_curso" required>
+                {% for curso in cursos %}
+                <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
+                {% endfor %}
+            </select>
             <div id="botones-crear">
                 <button type="submit" id="boton-guardar-crear">Guardar</button>
                 <button type="button" id="boton-cancelar-crear" onclick="document.getElementById('crear-grupo').close()">Cancelar</button>
             </div>
         </form>
     </dialog>
-    <!--eliminar grupo grupo-->
     <dialog id="eliminar-grupo">
         <h3> Eliminar Grupo</h3>
         <form id="form-eliminar" method="POST" action="{{ url_for('seccion_grupos', nombre_profesor=request.args.get('nombre_profesor', '')) }}">

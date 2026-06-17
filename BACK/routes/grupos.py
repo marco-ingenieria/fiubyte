@@ -48,14 +48,15 @@ def get_grupos_pdf():
 
 @grupos_bp.route("/", methods=['POST'])
 def post_grupo():
-
     data=request.get_json()
     nombre = data.get('nombre')
-
+    id_curso = data.get('id_curso')
     if not nombre:
-        return construir_error(400, "No se ha especificado ningun nombre") 
+        return construir_error(400, "Ingresar nombre")
+    if not id_curso:
+        return construir_error(400, "Ingresar curso")
     
-    return crear_grupo(nombre)
+    return crear_grupo(nombre, id_curso)
 
 
 ####post_asignar_alumnos####
