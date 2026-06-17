@@ -4,7 +4,6 @@ import requests
 from datetime import date, datetime, timedelta
 import json
 import urllib.parse
-import requests
 
 
 app = Flask(__name__)
@@ -887,7 +886,8 @@ def login():
 def ver_grupo(id):
     nombre = request.args.get('nombre_profesor', '')
     lista_alumnos = [] 
-    if request.method == "POST":   
+    eliminar_alumno = None
+    if request.method == "POST":
         eliminar_alumno= request.form.get('eliminar')
         if eliminar_alumno:
             try:
