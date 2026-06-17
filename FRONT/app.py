@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, url_for, redirect
+from io import BytesIO
+from flask import Flask, render_template, request, url_for, redirect, send_file
 import requests
 from datetime import date, datetime, timedelta
 import json
@@ -84,7 +85,6 @@ def seccion_historiales():
         error = "No se pudo conectar al servidor backend"
 
     return render_template('historial.html', nombre_profesor=nombre, historial_alumno=registros, error=error, historial_global=True, usuario_id=None)
-
 
 @app.route("/alumno/<int:padron>")
 def perfil_alumno(padron):
@@ -512,6 +512,23 @@ def detalle_grupo_especifico():
         grupo=grupo_simulado
     )
 
+@app.route('/descargar_pdf_grupos', methods=['GET'])
+def descargar_grupos_pdf():
+    nombre_profesor = request.args.get('nombre_profesor', '')
+    try:
+        r = requests.get("http://backend:5000/grupos/pdf")
+        if r.ok:
+            return send_file(
+                BytesIO(r.content),
+                mimetype="application/pdf",
+                as_attachment=True,
+                download_name="listado_grupos.pdf"
+            )
+    except Exception as e:
+        print(e)
+    return redirect(url_for('seccion_grupos',nombre_profesor=nombre_profesor))
+
+
 @app.route('/alumnos', methods=["POST","GET"])
 def seccion_alumnos():
     nombre = request.args.get('nombre_profesor') or request.form.get('nombre_profesor', '')
@@ -564,7 +581,25 @@ def crear_alumnos_csv():
         r = requests.post("http://backend:5000/alumnos/csv", files={"alumnos": (csv.filename, csv.stream, csv.content_type)})
     except Exception as e:
         print(e)
-        pass
+    return redirect(url_for('seccion_alumnos',nombre_profesor=nombre_profesor))
+
+@app.route('/descargar_pdf_alumnos', methods=['GET'])
+def descargar_alumnos_pdf():
+    nombre_profesor = request.args.get('nombre_profesor', '')
+    columnas = request.args.getlist("columnas")    
+    
+    query = "&".join([f"{columna}=1" for columna in columnas])
+    try:
+        r = requests.get(f"http://backend:5000/alumnos/pdf?{query}")
+        if r.ok:
+            return send_file(
+                BytesIO(r.content),
+                mimetype="application/pdf",
+                as_attachment=True,
+                download_name="listado_alumnos.pdf"
+            )
+    except Exception as e:
+        print(e)
     return redirect(url_for('seccion_alumnos',nombre_profesor=nombre_profesor))
 
 
