@@ -94,7 +94,7 @@ def perfil_alumno(padron):
 
         response_grupos = requests.get(f"http://backend:5000/grupos/del-alumno/{padron}")
         if response_grupos.status_code == 200:
-            grupos_alumno = response_grupos.json() # Esto carga la lista real de grupos
+            grupos_alumno = response_grupos.json() 
 
         alumno = {
             "NOMBRE": data_alumno.get("NOMBRE") or data_alumno.get("nombre"),
@@ -345,7 +345,6 @@ def editar_clase(id):
     horario = request.form.get('horario')
     tema = request.form.get('tema', '').strip()
 
-    # Mantenemos las vistas actuales al guardar la edición
     curso_id_actual = request.args.get('curso_id', '')
     orden_actual = request.args.get('orden', '')
 
