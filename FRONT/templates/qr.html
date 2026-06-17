@@ -26,6 +26,12 @@
     {% if qr_url %}
         <div style="margin-bottom:1.5rem;">
             <img src="{{ qr_url }}" alt="QR de asistencia" style="max-width:100%; border:1px solid #ccc;">
+            {% if registro_url %}
+                <p>
+                    Link del QR:
+                    <a href="{{ registro_url }}">{{ registro_url }}</a>
+                </p>
+            {% endif %}
         </div>
     {% endif %}
 
@@ -42,6 +48,34 @@
         </select>
         <button type="submit" style="margin-top:1rem;">Enviar QR por mail a los alumnos</button>
     </form>
+
+    <section style="margin-top:2rem;">
+        <h2>Alumnos que marcaron asistencia</h2>
+        {% if asistieron %}
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Padrón</th>
+                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Nombre</th>
+                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Apellido</th>
+                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alumno in asistieron %}
+                        <tr>
+                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.PADRON }}</td>
+                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.NOMBRE }}</td>
+                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.APELLIDO }}</td>
+                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.FECHA_ASISTENCIA }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay asistencias registradas para esta clase.</p>
+        {% endif %}
+    </section>
 {% else %}
     <p>No hay datos de clase para mostrar.</p>
 {% endif %}

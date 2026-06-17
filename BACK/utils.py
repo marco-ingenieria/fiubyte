@@ -4,6 +4,7 @@ from smtplib import SMTP
 import qrcode
 from io import BytesIO
 from email.message import EmailMessage
+from email.utils import make_msgid
 from constants import (credenciales_email)
 from fpdf import FPDF
 
@@ -77,12 +78,13 @@ def enviar_mail(contenido, destinatario, asunto):
 def enviar_mail_asistencia(link, fecha, mail_alumno):
     #Preparar el mensaje con la librería email
     msg = EmailMessage()
+    qr_cid = make_msgid(domain="fiubyte.local")
     msg.set_content("Este correo requiere soporte HTML.")
     msg.add_alternative(f"""
     <html>
         <body>
             <h1>Registrar asistencia a la clase de {fecha}</h1>
-            <img src="cid:qr">
+            <img src="cid:{qr_cid[1:-1]}">
             <p>En caso de no poder escanear el QR, entrar <a href="{link}">aquí</a></p>
         </body>
     </html>
@@ -94,7 +96,7 @@ def enviar_mail_asistencia(link, fecha, mail_alumno):
     qr_png.save(buffer, format="PNG")
     qr = buffer.getvalue()
 
-    msg.get_payload()[0].add_related(qr, maintype="image", subtype="png", cid="qr")
+    msg.get_payload()[1].add_related(qr, maintype="image", subtype="png", cid=qr_cid)
     enviar_mail(msg, mail_alumno, "Registrar asistencia a la clase")
 
 def get_anchos_maximos(filas):

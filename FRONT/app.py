@@ -133,6 +133,8 @@ def mostrar_qr():
     clase_encontrada = None
     cursos = []
     qr_url = None
+    registro_url = None
+    asistieron = []
 
     if request.method == "POST":
         id_clase = request.form.get("id")
@@ -167,20 +169,31 @@ def mostrar_qr():
         cursos = []
 
     if clase_encontrada:
-        qr_data = json.dumps({
-            "clase_id": clase_encontrada.get("ID"),
-            "tema": clase_encontrada.get("TEMA", ""),
-            "fecha": str(clase_encontrada.get("FECHA", "")),
-            "horario": str(clase_encontrada.get("HORARIO", "")),
-        }, default=str)
-        qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + urllib.parse.quote(qr_data)
+        registro_base_url = request.host_url.rstrip("/")
+        registro_url = f"{registro_base_url}/asistencias/registro/{clase_encontrada.get('ID')}"
+        qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + urllib.parse.quote(registro_url)
+
+        try:
+            response = requests.get(
+                f"http://backend:5000/asistencias/{id_clase_int}",
+                params={"limit": 100, "offset": 0},
+                timeout=10
+            )
+            if response.status_code == 200:
+                listado = response.json().get("listado", [])
+                asistieron = [alumno for alumno in listado if alumno.get("ASISTIO")]
+        except Exception:
+            asistieron = []
 
     if request.method == "POST":
         if not curso_id:
             error = "Debe seleccionar un curso para enviar el QR"
         else:
             try:
-                payload = {"id_curso": int(curso_id)}
+                payload = {
+                    "id_curso": int(curso_id),
+                    "registro_base_url": request.host_url.rstrip("/")
+                }
                 response = requests.post(f"http://backend:5000/clases/{id_clase_int}/enviar-qr", json=payload, timeout=30)
                 if response.status_code == 200:
                     success = "QR enviado a los alumnos del curso seleccionado"
@@ -200,10 +213,54 @@ def mostrar_qr():
         success=success,
         cursos=cursos,
         curso_id=curso_id,
-        qr_url=qr_url
+        qr_url=qr_url,
+        registro_url=registro_url,
+        asistieron=asistieron
     )
 
 # 7. Ruta de la sección de Asistencias
+
+ #la idea de dejarla afuera es para q acumule las clses agregadas, si la dejo adentro se reinicia cada vez que se hace un POST
+
+@app.route("/asistencias/registro/<int:clase_id>")
+def registrar_asistencia_qr(clase_id):
+    padron = request.args.get("padron", type=int)
+
+    if padron is None:
+        return f"""
+        <html>
+            <head>
+                <title>Registrar asistencia</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body style="font-family: Arial, sans-serif; max-width: 420px; margin: 40px auto; padding: 0 16px;">
+                <h1>Registrar asistencia</h1>
+                <form method="GET" action="/asistencias/registro/{clase_id}">
+                    <label for="padron">Padrón</label>
+                    <input id="padron" name="padron" type="number" required
+                           style="display:block; width:100%; box-sizing:border-box; margin:8px 0 16px; padding:10px;">
+                    <button type="submit" style="padding:10px 14px;">Registrar</button>
+                </form>
+            </body>
+        </html>
+        """, 200
+
+    try:
+        response = requests.get(
+            f"http://backend:5000/asistencias/registro/{clase_id}",
+            params={"padron": padron},
+            timeout=10
+        )
+        if response.status_code in (200, 201):
+            return "<h1>Asistencia registrada</h1><p>Ya podés cerrar esta página.</p>", 200
+        try:
+            data = response.json()
+            error = data.get("errors", [{}])[0].get("description", "No se pudo registrar la asistencia")
+        except Exception:
+            error = "No se pudo registrar la asistencia"
+        return f"<h1>No se pudo registrar la asistencia</h1><p>{error}</p>", response.status_code
+    except Exception:
+        return "<h1>No se pudo registrar la asistencia</h1><p>No se pudo conectar con el servidor.</p>", 500
 
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
@@ -297,14 +354,26 @@ def seccion_asistencias():
             "docente1": profesores_lista[0] if len(profesores_lista) > 0 else "",
             "docente2": profesores_lista[1] if len(profesores_lista) > 1 else "",
             "docente3": profesores_lista[2] if len(profesores_lista) > 2 else "",
-            "estado": estado
+            "estado": estado,
+            "asistieron": []
         })
-
 
     filtrar_curso = request.args.get("curso_id", "")
     if filtrar_curso and filtrar_curso not in ["None", "", "Todos"]:
         clases = [c for c in clases if c["tema"] == str(filtrar_curso)]
 
+    for clase in clases:
+        try:
+            response = requests.get(
+                f"http://backend:5000/asistencias/{clase['id']}",
+                params={"limit": 100, "offset": 0},
+                timeout=10
+            )
+            if response.status_code == 200:
+                listado = response.json().get("listado", [])
+                clase["asistieron"] = [alumno for alumno in listado if alumno.get("ASISTIO")]
+        except Exception:
+            clase["asistieron"] = []
 
     orden = request.args.get("orden", "asc")
 

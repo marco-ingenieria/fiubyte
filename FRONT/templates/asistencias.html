@@ -186,6 +186,32 @@
                 </form>
             {% endif %}
 
+            <h4>Alumnos que asistieron</h4>
+            {% if clase.asistieron %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Padrón</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alumno in clase.asistieron %}
+                            <tr>
+                                <td>{{ alumno.PADRON }}</td>
+                                <td>{{ alumno.NOMBRE }}</td>
+                                <td>{{ alumno.APELLIDO }}</td>
+                                <td>{{ alumno.FECHA_ASISTENCIA }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No hay asistencias registradas.</p>
+            {% endif %}
+
         </div>
 
         {% endfor %}
