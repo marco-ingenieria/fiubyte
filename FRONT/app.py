@@ -35,6 +35,10 @@ def buscar_seccion():
 
     return redirect(url_for('menu_principal', nombre_profesor=nombre, error_busqueda=True))
 
+@app.route("/cursos")
+def seccion_materias():
+    return 
+
 # 8. Ruta para mostrar el perfil del alumno
 
 @app.route("/historial")
