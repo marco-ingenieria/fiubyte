@@ -1,6 +1,7 @@
 {% extends 'base_sistema.html' %} {% block title %}Alumnos - Panel Docente{% endblock %} {% block content %}
 <p>Bienvenido,{{ nombre_profesor }}. Aquí puedes ver los datos de los alumnos.</p>
 <link rel="stylesheet" href="{{ url_for('static', filename='style/grupos.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style/alumnos.css') }}">
 <h1>Listado de Alumnos </h1>
 <div id="grupo-botones">
     <button type="button" onclick="abrirModal('modal-pdf')">Exportar pdf</button>
@@ -18,8 +19,8 @@
             </div>
         </form>
     </dialog>
-    <button type="button" onclick="document.getElementById('modal-crear').showModal()">Crear alumno</button>
-    <button type="button" onclick="document.getElementById('modal-eliminar').showModal()">Eliminar alumno</button>
+    <button type="button" onclick="document.getElementById('crear-alumno').showModal()">Crear alumno</button>
+    <button type="button" onclick="document.getElementById('eliminar-alumno').showModal()">Eliminar alumno</button>
 </div>
 <!--crear alumno-->
 <dialog id="crear-alumno">
