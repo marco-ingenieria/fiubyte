@@ -433,7 +433,8 @@ def login():
 @app.route('/grupo/<int:id>', methods=["GET", "POST"])
 def ver_grupo(id):
     nombre = request.args.get('nombre_profesor', '')
-    lista_alumnos = [] 
+    lista_alumnos = []
+    eliminar_alumno = None
     if request.method == "POST":   
         eliminar_alumno= request.form.get('eliminar')
         if eliminar_alumno:
