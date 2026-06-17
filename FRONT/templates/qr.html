@@ -2,15 +2,14 @@
 
 {% block content %}
 <h1>QR de asistencia</h1>
-
 {% if error %}
     <p style="color:#c00;">⚠️ {{ error }}</p>
 {% endif %}
 {% if success %}
     <p style="color:#080;">✅ {{ success }}</p>
 {% endif %}
-
-{% if clase %}
+<div style="display: flex; align-items: center; gap: 2rem;">
+    {% if clase %}
     <div style="margin-bottom:1rem;">
         <p><strong>Fecha:</strong> {{ clase.FECHA }}</p>
         <p><strong>Tema:</strong> {{ clase.TEMA }}</p>
@@ -34,7 +33,7 @@
             {% endif %}
         </div>
     {% endif %}
-
+</div>
     <form action="/qr" method="POST">
         <input type="hidden" name="id" value="{{ clase.ID }}">
         <label for="curso_id">Seleccionar curso para enviar el QR:</label>

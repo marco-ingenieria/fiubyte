@@ -156,6 +156,8 @@ def mostrar_qr():
         response = requests.get(f"http://backend:5000/clases/{id_clase_int}")
         if response.status_code == 200:
             clase_encontrada = response.json().get("clase")
+            if isinstance(clase_encontrada.get("PROFESORES"), str):
+                clase_encontrada["PROFESORES"] = json.loads(clase_encontrada["PROFESORES"])
         else:
             error = "Clase no encontrada"
     except Exception:
