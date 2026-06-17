@@ -359,7 +359,7 @@ def listar_grupos_pdf():
         cursor = connection.cursor(dictionary=True)
 
         cursor.execute("""
-            SELECT ID, NOMBRE
+            SELECT *
             FROM GRUPOS
             WHERE ELIMINADO = 0
             ORDER BY FECHA_CREACION DESC

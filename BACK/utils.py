@@ -134,7 +134,7 @@ def pdf_listado_grupos(grupos):
 
     for grupo in grupos:
         pdf.set_font('Courier', size=14, style='B')
-        pdf.cell(text=f"Grupo {grupo['ID']} - {grupo['NOMBRE']}")
+        pdf.cell(text=f"Grupo {grupo['ID']} - {grupo['NOMBRE']} - Curso {grupo['ID_CURSO']}")
         pdf.ln(pdf.font_size)
         pdf.set_font('Courier', size=11)
         for integrante in grupo["INTEGRANTES"]:
