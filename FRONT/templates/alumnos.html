@@ -22,7 +22,6 @@
     <button type="button" onclick="document.getElementById('crear-alumno').showModal()">Crear alumno</button>
     <button type="button" onclick="document.getElementById('eliminar-alumno').showModal()">Eliminar alumno</button>
 </div>
-<!--crear alumno-->
 <dialog id="crear-alumno">
     <h3>Crear nuevo alumno</h3>
     <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
@@ -48,7 +47,6 @@
         </div>
     </form>
 </dialog>
-<!--eliminar alumno-->
 <dialog id="eliminar-alumno">
     <h3>Eliminar alumno</h3>
     <form id="form-eliminar" method="POST" action="{{url_for('seccion_alumnos')}}">

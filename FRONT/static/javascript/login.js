@@ -69,17 +69,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = usuario.value.trim();
         const clave = password.value.trim();
 
-        if (!email.includes("@")) {
-            e.preventDefault();
-            mostrarError("El usuario debe incluir @");
-            return;
-        }
+        // if (!email.includes("@")) {
+        //     e.preventDefault();
+        //     mostrarError("El usuario debe incluir @");
+        //     return;
+        // }
 
-        if (!email.endsWith("@fi.uba.ar")) {
-            e.preventDefault();
-            mostrarError("Ingresá un correo @fi.uba.ar");
-            return;
-        }
+        // if (!email.endsWith("@fi.uba.ar")) {
+        //     e.preventDefault();
+        //     mostrarError("Ingresá un correo @fi.uba.ar");
+        //     return;
+        // }
 
         if (clave.length < 4) {
             e.preventDefault();

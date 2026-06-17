@@ -5,6 +5,7 @@ import qrcode
 from io import BytesIO
 from email.message import EmailMessage
 from constants import (credenciales_email)
+from fpdf import FPDF
 
 def construir_error(code: int, description: str = '') -> dict:
     errores = {
@@ -95,3 +96,48 @@ def enviar_mail_asistencia(link, fecha, mail_alumno):
 
     msg.get_payload()[0].add_related(qr, maintype="image", subtype="png", cid="qr")
     enviar_mail(msg, mail_alumno, "Registrar asistencia a la clase")
+
+def get_anchos_maximos(filas):
+    #Se recorren todas las filas de cada columna para buscar el string más largo y aplicar un largo máximo
+    #Sino las columnas quedan desfasadas
+    #Máximo fijo no es viable porque puede pasarse del ancho de página o cortar un dato
+    anchos_maximos = []
+    for i in range(len(filas[0])):
+        anchos_maximos.append(max([len(str(fila[i])) for fila in filas]))
+
+    return anchos_maximos
+
+def pdf_listado_alumnos(filas):
+    anchos_maximos = get_anchos_maximos(filas)
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Courier', size=20, style='BU')
+    pdf.cell(text="Listado de alumnos")
+    pdf.ln(pdf.font_size * 2)
+
+    pdf.set_font('Courier', size=11)
+    for fila in filas:
+        for indice, dato in enumerate(fila):
+            pdf.cell(text=f"{str(dato).center(anchos_maximos[indice], ' ')}", border=1)
+        pdf.ln(pdf.font_size)
+
+    return pdf.output()
+
+def pdf_listado_grupos(grupos):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Courier', size=20, style='BU')
+    pdf.cell(text="Listado de grupos")
+    pdf.ln(pdf.font_size * 2)
+
+    for grupo in grupos:
+        pdf.set_font('Courier', size=14, style='B')
+        pdf.cell(text=f"Grupo {grupo['ID']} - {grupo['NOMBRE']}")
+        pdf.ln(pdf.font_size)
+        pdf.set_font('Courier', size=11)
+        for integrante in grupo["INTEGRANTES"]:
+            pdf.cell(text=f"* {integrante['NOMBRE']} {integrante['APELLIDO']} ({integrante['PADRON']})")
+            pdf.ln(pdf.font_size)
+        pdf.ln(pdf.font_size * 2)
+
+    return pdf.output()

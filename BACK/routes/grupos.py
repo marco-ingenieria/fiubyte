@@ -2,13 +2,12 @@ from flask import Blueprint, jsonify, request
 from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
                              asignar_alumnos_a_grupo, actualizar_grupo,
                              obtener_alumnos, eliminar_grupo, asignar_tp,
-                             eliminar_alumno,obtener_grupos_de_un_alumno)
+                             eliminar_alumno,obtener_grupos_de_un_alumno,
+                             listar_grupos_pdf)
 from utils import construir_error
 import json
 
-
 grupos_bp = Blueprint('grupos', __name__)
-
 
 @grupos_bp.route("/", methods=['GET'])
 def get_grupos():
@@ -32,7 +31,6 @@ def get_alumnos(id):
     
     return obtener_alumnos(id)
 
-
 @grupos_bp.route("/<int:id>", methods=['GET'])
 def get_grupo(id):
     
@@ -40,6 +38,12 @@ def get_grupo(id):
         return construir_error(400, "id_grupo debe ser un número entero positivo")
     
     return obtener_grupo(id)
+
+@grupos_bp.route('/pdf', methods=['GET'])
+def get_grupos_pdf():
+    pdf = listar_grupos_pdf()
+
+    return pdf
 
 
 @grupos_bp.route("/", methods=['POST'])
