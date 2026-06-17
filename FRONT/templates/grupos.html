@@ -10,6 +10,8 @@
         <button id="boton-eliminar" type="button" onclick="document.getElementById('eliminar-grupo').showModal()">Eliminar grupo</button>
 
         <button id="boton-crear" type="button" onclick="document.getElementById('crear-grupo').showModal()">Crear nuevo grupo </button>
+
+        <a id="boton-pdf" href="{{url_for('descargar_grupos_pdf')}}">Descargar listado</a>
     </div>
     <dialog id="crear-grupo">
         <h3>Crear nuevo grupo</h3>
