@@ -1,8 +1,8 @@
 #inicio-bienvenida {
     position: relative;
     width: 100%;
-    min-height: 80vh;
-    padding: 20px 0;
+    min-height: 60vh;
+    padding: 10px 0;
     z-index: 1;
 }
 
@@ -116,4 +116,8 @@
     box-shadow: 0 6px 16px rgba(79, 70, 229, 0.1);
 }
 
-
+footer {
+    position: relative;
+    z-index: 10; 
+    margin-top: auto; 
+}
