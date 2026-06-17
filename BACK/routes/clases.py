@@ -73,7 +73,6 @@ def patch_clase(id):
     if fecha and not validar_fecha(fecha):
         return construir_error(400, "Fecha inválida")
     
-    # Retorna directamente el resultado del servicio
     return actualizar_clase(body, id)
 
 

@@ -20,9 +20,6 @@ def buscar_seccion():
     if texto.startswith('alumno'):
         return redirect(url_for('seccion_alumnos', nombre_profesor=nombre))
 
-    if texto.startswith('historial'):
-        return redirect(url_for('seccion_historiales',nombre_profesor=nombre))
-
     if texto.startswith('grupo'):
         return redirect(url_for('seccion_grupos', nombre_profesor=nombre))
 
@@ -147,16 +144,11 @@ def mostrar_qr():
     except ValueError:
         error = "ID de clase inválido"
         return render_template("qr.html", clase=None, error=error, success=success, cursos=cursos, curso_id=curso_id, qr_url=qr_url)
-    
+
     try:
         response = requests.get(f"http://backend:5000/clases/{id_clase_int}")
         if response.status_code == 200:
             clase_encontrada = response.json().get("clase")
-            if clase_encontrada and isinstance(clase_encontrada.get("PROFESORES"), str):
-                try:
-                    clase_encontrada["PROFESORES"] = json.loads(clase_encontrada["PROFESORES"])
-                except:
-                    clase_encontrada["PROFESORES"] = []
         else:
             error = "Clase no encontrada"
     except Exception:
@@ -208,12 +200,9 @@ def mostrar_qr():
 
 # 7. Ruta de la sección de Asistencias
 
- #la idea de dejarla afuera es para q acumule las clses agregadas, si la dejo adentro se reinicia cada vez que se hace un POST
-
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
     clases = []
-    # Reemplaza tu hoy_str actual por este:
     hora_local = datetime.utcnow() - timedelta(hours=3)
     hoy_str = hora_local.strftime("%Y-%m-%d")
     nombre = request.args.get('nombre_profesor', '')
@@ -226,6 +215,17 @@ def seccion_asistencias():
 
     global_error = error_url if error_url else None
 
+    cursos = []
+    try:
+        response_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
+        if response_cursos.status_code == 200:
+            cursos = response_cursos.json().get("listado", [])
+        else:
+            cursos = []
+    except Exception:
+        cursos = []
+
+
     if request.method == "POST":
         fecha = request.form.get("fecha")
         tema = request.form.get("tema", "").strip()
@@ -237,7 +237,7 @@ def seccion_asistencias():
         profesores = [d for d in [docente1, docente2, docente3] if d]
 
         if not fecha or not tema or not horario:
-            global_error="El tema es obligatorio"
+            global_error="Fecha, curso y horario obligatorios"
         
         else:
             try:
@@ -248,7 +248,12 @@ def seccion_asistencias():
                     "tema": tema
                 })
                 if response.status_code == 201:
-                    return redirect(url_for('seccion_asistencias', nombre_profesor=nombre))
+                    return redirect(url_for('seccion_asistencias', 
+                                            nombre_profesor=nombre,
+                                            curso_id=request.args.get('curso_id', ''),
+                                            orden=request.args.get('orden', '')))
+                elif response.status_code == 400:
+                    global_error = response.json().get("error", "El curso seleccionado no existe")
                 else:
                     global_error = "Campos obligatorios incompletos o inválidos"
             except Exception:
@@ -290,7 +295,17 @@ def seccion_asistencias():
             "estado": estado
         })
 
+
+    filtrar_curso = request.args.get("curso_id", "")
+    if filtrar_curso and filtrar_curso not in ["None", "", "Todos"]:
+        clases = [c for c in clases if c["tema"] == str(filtrar_curso)]
+
+
     orden = request.args.get("orden", "asc")
+    print("ARGS:", request.args)
+    print("CURSO:", request.args.get("curso_id"))
+    print("ORDEN:", request.args.get("orden"))
+
     if orden == "asc":
         clases.sort(key=lambda c: c["fecha"])
     elif orden == "desc":
@@ -308,9 +323,12 @@ def seccion_asistencias():
         if edit_error_id in ["None","","null"]:
             edit_error_id=""
 
+    print(request.args)
+    
     return render_template(
         "asistencias.html",
         clases=clases,
+        cursos=cursos,
         nombre_profesor=nombre,
         error=global_error,
         edit_error_id=edit_error_id
@@ -327,12 +345,18 @@ def editar_clase(id):
     horario = request.form.get('horario')
     tema = request.form.get('tema', '').strip()
 
+    # Mantenemos las vistas actuales al guardar la edición
+    curso_id_actual = request.args.get('curso_id', '')
+    orden_actual = request.args.get('orden', '')
+
     if not fecha or not tema or not horario:
         return redirect(url_for('seccion_asistencias', 
                                 nombre_profesor=nombre,
                                 error_msg="Campos obligatorios incompletos o inválidos",
-                                edit_error_id=id))
-
+                                edit_error_id=id,
+                                curso_id=curso_id_actual,
+                                orden=orden_actual))
+    
     try:
         response = requests.patch(f"http://backend:5000/clases/{id}", json={
             "profesores": profesores,
@@ -340,21 +364,50 @@ def editar_clase(id):
             "horario": horario,
             "tema": tema
         })
-        if response.status_code != 200:
+        print("STATUS PATCH:", response.status_code)
+        print("BODY:", response.text)
+        if response.status_code == 400:
+            error_msg_back = response.json().get("error", "El curso seleccionado no existe")
             return redirect(url_for('seccion_asistencias', 
-                                    nombre_profesor=nombre))
+                                    nombre_profesor=nombre,
+                                    error_msg=error_msg_back,
+                                    edit_error_id=id,
+                                    curso_id=curso_id_actual,
+                                    orden=orden_actual))
+        
+        if response.status_code == 200 or response.status_code ==201:
+            return redirect(url_for('seccion_asistencias', 
+                                    nombre_profesor=nombre, 
+                                    curso_id=curso_id_actual, 
+                                    orden=orden_actual))
+        
+        return redirect(url_for('seccion_asistencias', 
+                                nombre_profesor=nombre,
+                                error_msg="No se pudo actualizar la clase en el servidor",
+                                edit_error_id=id,
+                                curso_id=curso_id_actual,
+                                orden=orden_actual))
+                                    
     except Exception:
-        pass
+        return redirect(url_for('seccion_asistencias', 
+                                nombre_profesor=nombre, 
+                                curso_id=curso_id_actual, 
+                                orden=orden_actual))
 
-    return redirect(url_for('seccion_asistencias', nombre_profesor=nombre))
 
 @app.route('/eliminar_clase/<int:id>', methods=['POST'])
 def eliminar_clase(id):
+    nombre = request.args.get('nombre_profesor', '')
+    curso_id_actual = request.args.get('curso_id', '')
+    orden_actual = request.args.get('orden', '')
     try:
         requests.delete(f"http://backend:5000/clases/{id}")
     except Exception as e:
         pass
-    return redirect(url_for('seccion_asistencias', nombre_profesor=request.args.get('nombre_profesor', '')))
+    return redirect(url_for('seccion_asistencias', 
+                            nombre_profesor=nombre, 
+                            curso_id=curso_id_actual, 
+                            orden=orden_actual))
 
 # 6. Ruta de la sección de Notas
 @app.route('/notas')
@@ -440,8 +493,7 @@ def seccion_grupos():
     nombre_profesor = request.args.get('nombre_profesor', '')
     padron_asignar = request.form.get('padron_asignar')
     grupo_id = request.form.get('grupo_id')
-    error_asignar = None
-
+ 
     if request.method == "POST":
         crear = request.form.get('crear')
         eliminar = request.form.get('eliminar')
@@ -452,38 +504,20 @@ def seccion_grupos():
             except Exception as e:
                 print("Error al eliminar grupo")
         elif crear:
-            id_curso_crear = request.form.get('id_curso')
             try:
                 requests.post("http://backend:5000/grupos/", json={
-                    "nombre": crear,
-                    "id_curso": id_curso_crear
+                    "nombre": crear
                 })
             except Exception as e:
                 print("Error al crear grupo")
         elif padron_asignar and grupo_id:
             try:
-                resp = requests.post(f"http://backend:5000/grupos/asignar-alumnos", json={
-                    "id_grupo": int(grupo_id),
-                    "padrones_alumnos": [{"padron": int(padron_asignar)}]
+                requests.post(f"http://backend:5000/grupos/asignar-alumnos", json={
+            "id_grupo": int(grupo_id),
+            "padrones_alumnos": [{"padron": int(padron_asignar)}]
                 })
-                if resp.status_code != 200:
-                    try:
-                        data = resp.json()
-                        error_asignar = data.get("errors", [])[0].get("description") if data.get("errors") else "No se pudo asignar el alumno"
-                    except:
-                        error_asignar = "No se pudo asignar el alumno"
-                else:
-                    error_asignar = None
             except Exception as e:
-                error_asignar = "No se pudo conectar al servidor"
-                print("Error al asignar alumno")
-
-    cursos = []
-    try:
-        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
-        cursos = resp_cursos.json().get("listado", [])
-    except Exception as e:
-        cursos = []
+                print("Error al asignar alumno ")
 
     grupos = []
     try:
@@ -492,7 +526,7 @@ def seccion_grupos():
     except Exception as e:
         print("Hubo un error")
 
-    return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos, cursos=cursos, error_asignar=error_asignar)
+    return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos)
 
 @app.route('/grupo-detalle')
 def detalle_grupo_especifico():
@@ -514,7 +548,7 @@ def detalle_grupo_especifico():
 
 @app.route('/alumnos', methods=["POST","GET"])
 def seccion_alumnos():
-    nombre = request.args.get('nombre_profesor') or request.form.get('nombre_profesor', '')
+    nombre = request.args.get('nombre_profesor', '')
     id_curso = request.args.get('id_curso', '')
     crear_alumno = request.form.get('crear_alumno')
     eliminar_alumno = request.form.get('eliminar_alumno')
@@ -650,8 +684,7 @@ def login():
 @app.route('/grupo/<int:id>', methods=["GET", "POST"])
 def ver_grupo(id):
     nombre = request.args.get('nombre_profesor', '')
-    lista_alumnos = []
-    eliminar_alumno = None
+    lista_alumnos = [] 
     if request.method == "POST":   
         eliminar_alumno= request.form.get('eliminar')
         if eliminar_alumno:

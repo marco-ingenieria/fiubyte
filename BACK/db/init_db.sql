@@ -150,3 +150,5 @@ INSERT INTO USUARIOS (NOMBRE, PASS) VALUES ('BrunoLanzillota', 'linustorvaldsroo
 INSERT INTO MATERIAS (NOMBRE_MATERIA, CUATRIMESTRE, ANIO) VALUES ('Introduccion al Desarrollo', 1, 2026);
 
 INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO, ID_CURSO) VALUES (115599, 'Agustin', 'Maseda', 'amaseda@fi.uba.ar', 0, 1);
+
+

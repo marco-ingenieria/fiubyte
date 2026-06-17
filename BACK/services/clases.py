@@ -74,14 +74,19 @@ def crear_clase(body):
     tema            = body.get('tema')
     #materia         = body.get('id_materia')
 
-    #parse a JSON
     profesores = json.dumps(profesores)
-    #parse a fecha
     fecha = datetime.strptime(fecha, "%Y-%m-%d")
     
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
+
+        check_stmt = "SELECT ID FROM MATERIAS WHERE ID = %s AND ELIMINADO = 0"
+        cursor.execute(check_stmt, [tema])
+        if not cursor.fetchone():
+            return construir_error(400, "El curso seleccionado no existe")
+
+
         create_stmt = "INSERT INTO CLASES (PROFESORES, FECHA, HORARIO, TEMA) VALUES (%s, %s, %s, %s)"
         cursor.execute(create_stmt, [profesores, fecha, horario, tema])
 
@@ -109,8 +114,7 @@ def actualizar_clase(body, id):
     tema            = body.get('tema')
     horario         = body.get('horario')
 
-    # Convertimos a JSON string únicamente si la lista contiene profesores reales
-    if profesores is not None and isinstance(profesores, list) and len(profesores) > 0:
+    if profesores is not None:
         profesores_json = json.dumps(profesores)
     else:
         profesores_json = None
@@ -126,12 +130,18 @@ def actualizar_clase(body, id):
         if not clase:
             return construir_error(404, f"Clase no encontrada")
         
-        # --- COMBINACIÓN TOTALMENTE REPARADA ---
+        final_tema= tema if (tema is not None and tema != "") else clase["TEMA"]
+
+        if tema is not None and tema != "":
+            check_stmt = "SELECT ID FROM MATERIAS WHERE ID = %s AND ELIMINADO = 0"
+            cursor.execute(check_stmt, [final_tema])
+            if not cursor.fetchone():
+                return construir_error(400, "El curso seleccionado no existe")
+
+
         final_profesores = profesores_json if profesores_json is not None else clase["PROFESORES"]
-        final_tema       = tema if (tema is not None and tema != "") else clase["TEMA"]
         final_horario    = horario if (horario is not None and horario != "") else clase["HORARIO"]
 
-        # Evitamos mandar horas/segundos a una columna tipo DATE de SQL
         if fecha and fecha != "":
             final_fecha = datetime.strptime(fecha, "%Y-%m-%d").date()
         else:
@@ -150,10 +160,22 @@ def actualizar_clase(body, id):
 
         cursor.execute(select_stmt, [id])
         clase_actualizada = cursor.fetchone()
+
+        if clase_actualizada and clase_actualizada.get("HORARIO") is not None:
+            clase_actualizada["HORARIO"] = str(clase_actualizada["HORARIO"])
+
+        if clase_actualizada and clase_actualizada.get("FECHA") is not None:
+            clase_actualizada["FECHA"] = str(clase_actualizada["FECHA"])
+
         connection.commit()
-        
-        # Retorno exitoso en tu formato nativo
-        return (jsonify({"filas afectadas": filas_afectadas, "clase_actualizada": clase_actualizada}), 200)
+
+        return (
+            jsonify({
+                "filas afectadas": filas_afectadas,
+                "clase_actualizada": clase_actualizada
+            }),
+            200
+        )
 
     except Exception as e:
         traceback.print_exc()

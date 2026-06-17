@@ -16,7 +16,6 @@
         <summary>➕ Añadir clase</summary>
         <form id="formulario-clase" method="POST">
 
-            <!-- El cartel de arriba solo aparece si el error NO es del modal -->
             {% if error and not edit_error_id %}
                 <p id="error-msg">⚠️ {{ error }}</p>
             {% endif %}
@@ -24,8 +23,13 @@
             <label>Fecha de clase</label>
             <input type="date" name="fecha" min="2025-01-01" max="9999-01-01" required>
 
-            <label>Temas</label>
-            <input type="text" name="tema" placeholder="Tema obligatorio..." required>
+            <label for="tema">Curso Asignado:</label >
+            <select id="tema" name="tema" required>
+                <option value="" disabled selected>-- Seleccione un Curso (obligatorio) --</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
+                {% endfor %}
+            </select>
 
             <label>Horario</label>
             <input type="time" name="horario" required>
@@ -45,23 +49,66 @@
 
     <div id="barra-filtros">
 
+    <div id="filtro-caja-curso">
         <form method="GET">
-
             <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+            <input type="hidden" name="orden" value="{{ request.args.get('orden', 'asc') }}">
 
-            <label>Ordenar:</label>
+            <label for="filtro-curso">Filtrar por cursos:</label>
 
-            <select name="orden"> 
-                <option value="asc">Fechas ascendente</option>
-                <option value="desc">Fechas descendente</option>
-                <option value="HOY">Hoy primero</option>
+            <select id="filtro-curso" name="curso_id" onchange="this.form.submit()">
+                <option value="Todos"
+                    {% if request.args.get('curso_id') == 'Todos' or not request.args.get('curso_id') %}
+                        selected
+                    {% endif %}>
+                    Todos los cursos
+                </option>
+
+                {% for curso in cursos %}
+                <option value="{{ curso.ID }}"
+                    {% if request.args.get('curso_id') == curso.ID|string %}
+                        selected
+                    {% endif %}>
+                    {{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }}
+                </option>
+                {% endfor %}
             </select>
-
-            <button type="submit">Aplicar</button>
-
         </form>
-
     </div>
+
+    <div id="filtro-caja-orden">
+        <form method="GET">
+            <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+            <input type="hidden" name="curso_id" value="{{ request.args.get('curso_id', 'Todos') }}">
+
+            <label for="filtro-orden">Ordenar:</label>
+
+            <select id="filtro-orden" name="orden" onchange="this.form.submit()">
+                <option value="asc"
+                    {% if request.args.get('orden') == 'asc' %}
+                        selected
+                    {% endif %}>
+                    Fechas ascendente
+                </option>
+
+                <option value="desc"
+                    {% if request.args.get('orden') == 'desc' %}
+                        selected
+                    {% endif %}>
+                    Fechas descendente
+                </option>
+
+                <option value="HOY"
+                    {% if request.args.get('orden') == 'HOY' %}
+                        selected
+                    {% endif %}>
+                    Hoy primero
+                </option>
+            </select>
+        </form>
+    </div>
+
+</div>
 
     <div id="contenedor-clases">
 
@@ -94,13 +141,21 @@
                 </div>
             </div>
 
-            <!-- INFO -->
             <p>
                 {{ clase.fecha[8:10] }}/{{ clase.fecha[5:7] }}/{{ clase.fecha[0:4] }}
             </p>
 
             {% if clase.tema %}
-                <p>TEMA: {{ clase.tema }}</p>
+                {% set curso_encontrado = false %}
+                {% for curso in cursos %}
+                    {% if curso.ID|string == clase.tema|string %}
+                        <p>CURSO: {{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }}</p>
+                        {% set curso_encontrado = true %}
+                    {% endif %}
+                {% endfor %}
+                {% if not curso_encontrado %}
+                    <p>CURSO ID: {{ clase.tema }}</p>
+                {% endif %}
             {% endif %}
 
             {% if clase.horario %}
@@ -152,8 +207,13 @@
             <label>Fecha</label>
             <input type="date" id="edit-fecha" name="fecha" min="2025-01-01" max="9999-01-01" required>
 
-            <label>Tema</label>
-            <input type="text" id="edit-tema" name="tema" required>
+            <label for="edit-tema">Curso Asignado:</label>
+            <select id="edit-tema" name="tema" required>
+                <option value="" disabled selected>-- Elige un curso (Obligatorio) --</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
+                {% endfor %}
+            </select>
 
             <label>Horario</label>
             <input type="time" id="edit-horario" name="horario" required>
@@ -188,7 +248,6 @@
     </div>
 </div>
 
-<!-- JS -->
 <script src="{{ url_for('static', filename='javascript/asistencia.js') }}"></script>
 
 {% endblock %}

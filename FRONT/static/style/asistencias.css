@@ -29,11 +29,12 @@
     margin-top: 15px;
 }
 
-#formulario-clase input{
+#formulario-clase input, #formulario-clase select{
     padding: 12px;
     border: 1px solid #d9d9d9;
     border-radius: 8px;
     font-size: 14px;
+    background-color: white;
 }
 
 #formulario-clase button{
@@ -50,7 +51,6 @@
     flex-wrap: wrap;
     gap: 8px;
 }
-
 
 #contenedor-clases > div{  
     width: 280px;
@@ -138,11 +138,10 @@
 
 #barra-filtros{
     display: flex;
-    justify-content: flex-end;
-    margin: 20px 0 25px 0;
+    margin: 20px -10px 25px -10px;
     position: relative;
 }
-/* línea divisoria */
+
 #barra-filtros::before{
     content: "";
     position: absolute;
@@ -153,17 +152,33 @@
     background-color: rgba(0,0,0,0.08);
     z-index: 0;
 }
+
 #barra-filtros form{
+    width: 100%;
     position: relative;
     z-index: 1;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+/* Estilos de las cajas contenedoras internas */
+#filtro-caja-curso, #filtro-caja-orden{
+    display: flex;
     align-items: center;
     gap: 10px;
-
     background-color: #fff;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 12px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+#filtro-caja-curso{
+    margin-right: auto;
+}
+
+#filtro-caja-orden{
+    margin-left: auto;
 }
 
 #barra-filtros label{
@@ -187,6 +202,7 @@
     font-size: 13px;
     font-weight: 600;
 }
+
 button[id^="btn-qr"]{
     margin-top: 15px;
     width: 100%;
@@ -281,7 +297,6 @@ button[id^="btn-qr"]:active{
     font-size: 11px;
     font-weight: 600;
     color: #dc2626 !important;
-
 }
 
 #contenedor-clases p{
@@ -313,18 +328,14 @@ button[id^="btn-qr"]:active{
 
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-
-    /* sin animaciones, pero más limpio */
 }
 
-/* Título */
 #modal h2 {
     margin-top: 0;
     margin-bottom: 15px;
 }
 
-/* Inputs */
-#modal input {
+#modal input, #modal select {
     width: 100%;
     padding: 8px 10px;
     margin-top: 4px;
@@ -334,13 +345,13 @@ button[id^="btn-qr"]:active{
     border-radius: 6px;
 
     outline: none;
+    background-color: white;
 }
 
-#modal input:focus {
+#modal input:focus, #modal select:focus {
     border-color: #4a90e2;
 }
 
-/* Botones */
 #modal button {
     padding: 8px 12px;
     border: none;
@@ -357,6 +368,7 @@ button[id^="btn-qr"]:active{
 #modal button[type="button"] {
     background: #ccc;
 }
+
 #delete-overlay {
     position: fixed;
     top: 0;
@@ -404,9 +416,11 @@ button[id^="btn-qr"]:active{
 #delete-box button[type="button"] {
     background: #bbb;
 }
+
 #delete-box h3 {
     margin: 0;
 }
+
 #delete-box form {
     display: flex;
     justify-content: space-between;
@@ -418,10 +432,6 @@ button[id^="btn-qr"]:active{
     flex: 1;
 }
 
-.ocultar-modal-firme {
-    display: none !important;
-}
-
 #error-msg-edit {
     display: none; 
     color: #ff4d4d;
@@ -429,6 +439,6 @@ button[id^="btn-qr"]:active{
     margin-bottom: 15px;
 }
 
-#error-msg-edit.mostrar-error {
+#error-msg-edit[data-visible="true"] {
     display: block;
 }
