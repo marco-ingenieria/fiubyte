@@ -35,7 +35,7 @@
         <h2>👥 Usuarios</h2>
 
         <p>
-            Vea el listado de ayudantes, editelos o agregue nuevos.
+            Gestion de usuarios del sistema y registros.
         </p>
         <a href="{{ url_for('seccion_usuarios', nombre_profesor=nombre_profesor) }}">
             Usuarios
@@ -50,19 +50,6 @@
         </p>
         <a href="{{ url_for('seccion_alumnos', nombre_profesor=nombre_profesor) }}">
             Alumnos
-        </a>
-    </div>
-
-    <!-- Tarjeta 3 -->
-    <div>
-        <h2>📚 Historial</h2>
-
-        <p>
-            Registro de movimientos, cambios y actividades realizadas en la plataforma.
-        </p>
-
-        <a href="{{ url_for('seccion_historial', nombre_profesor=nombre_profesor) }}">
-            Historial
         </a>
     </div>
 

@@ -7,6 +7,7 @@ from routes.historial import historiales_bp
 from routes.notas import notas_bp
 from routes.clases import clases_bp
 from routes.materias import materias_bp
+from routes.asistencias import asistencias_bp
 
 app = Flask(__name__)
 
@@ -18,6 +19,7 @@ app.register_blueprint(historiales_bp, url_prefix='/historiales')
 app.register_blueprint(notas_bp, url_prefix='/notas')
 app.register_blueprint(clases_bp, url_prefix='/clases')
 app.register_blueprint(materias_bp, url_prefix='/materias')
+app.register_blueprint(asistencias_bp, url_prefix='/asistencias')
 
 @app.route("/")
 def index():
