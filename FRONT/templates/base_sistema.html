@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Sistema Universitario{% endblock %}</title>
-    <!-- Conexión al CSS potente -->
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/menu.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/asistencias.css') }}?v=3">
@@ -20,12 +20,11 @@
         <p>Profesor: {{ nombre_profesor }}</p>
     </div>
 </div>
-    <!-- Caja contenedora general de las páginas -->
+
     <div id="contenedor-principal">
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Pie de página simple con etiqueta footer que te dieron en el ejemplo -->
     <footer>
         <p>2026 - Introducción al Desarrollo de Software - Grupo 7</p>
         <p id="texto-footer">
