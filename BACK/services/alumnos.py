@@ -68,13 +68,11 @@ def crear_alumno(body):
     nombre      = body.get("nombre")
     apellido    = body.get("apellido")
     email       = body.get("email")
-    abandono    = body.get("abandono")
-
 
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, APROBO, ABANDONO) VALUES (%s, %s, %s, %s, 0, 0)"
         cursor.execute(create_stmt, [padron, nombre, apellido, email])
 
         filas_afectadas = cursor.rowcount
@@ -100,6 +98,7 @@ def actualizar_alumno(body, id):
     nombre      = body.get("nombre")
     apellido    = body.get("apellido")
     email       = body.get("email")
+    aprobo      = body.get("aprobo")
     abandono    = body.get("abandono")
 
     try:
@@ -117,6 +116,7 @@ def actualizar_alumno(body, id):
         nombre      = nombre    or alumno["NOMBRE"]
         apellido    = apellido  or alumno["APELLIDO"]
         email       = email     or alumno["MAIL"]
+        aprobo      = aprobo    or alumno["APROBO"]
         abandono    = abandono  or alumno["ABANDONO"]
 
         update_stmt = """
@@ -124,10 +124,11 @@ def actualizar_alumno(body, id):
         NOMBRE = %s,
         APELLIDO = %s,
         MAIL = %s,
+        APROBO = %s,
         ABANDONO = %s
         WHERE PADRON = %s
         """
-        cursor.execute(update_stmt, [nombre, apellido, email, abandono, id])
+        cursor.execute(update_stmt, [nombre, apellido, email, aprobo, abandono, id])
         filas_afectadas = cursor.rowcount
 
         cursor.execute(select_stmt, [id])
@@ -211,7 +212,7 @@ def crear_alumnos_csv(csv):
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         datos_alumnos = []
-        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, APROBO, ABANDONO) VALUES (%s, %s, %s, %s, 0, 0)"
         
         for fila_bytes in csv:
             try:
@@ -245,7 +246,7 @@ def crear_alumnos_csv(csv):
         if connection and connection.is_connected():
             connection.close()
 
-def listar_alumnos_pdf(padron, nombre, apellido, email):
+def listar_alumnos_pdf(padron, nombre, apellido, email, aprobo, abandono):
     connection = None
     cursor = None
     try:
@@ -262,7 +263,11 @@ def listar_alumnos_pdf(padron, nombre, apellido, email):
             columnas_seleccionadas.append("APELLIDO")
         if email:
             columnas_seleccionadas.append("MAIL")
-        
+        if aprobo:
+            columnas_seleccionadas.append("APROBO")
+        if abandono:
+            columnas_seleccionadas.append("ABANDONO")
+
         string_columnas = ", ".join(columnas_seleccionadas)
 
         select_stmt = f"SELECT {string_columnas} FROM ALUMNOS WHERE ELIMINADO = 0 ORDER BY PADRON"
