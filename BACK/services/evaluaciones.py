@@ -186,3 +186,32 @@ def eliminar_evaluacion_permanente(id):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+def listar_evaluaciones_alumno(padron):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        query = """
+                SELECT E.*
+                FROM EVALUACIONES E
+                INNER JOIN ALUMNOS A ON E.ID_MATERIA = A.ID_CURSO
+                WHERE A.PADRON = %s AND E.ELIMINADO = 0 AND A.ELIMINADO = 0
+                """
+        cursor.execute(query, [padron])
+        data = cursor.fetchall()
+
+        return jsonify(data), 200
+
+    except Exception:
+        traceback.print_exc()
+        return construir_error(500, "Error inesperado")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()

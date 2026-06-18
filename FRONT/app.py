@@ -90,34 +90,78 @@ def seccion_historiales():
 @app.route("/alumno/<int:padron>")
 def perfil_alumno(padron):
     nombre = request.args.get('nombre_profesor', '')
-    grupos_alumno=[]
+    grupos_alumno = []
+    evaluaciones_alumno = []
+    notas_alumno = []
+    curso_nombre = None
+    promedio = 0
+    porcentaje = 0
+    total_evaluaciones = 0
+    evaluaciones_rendidas = 0
 
     try:
-        response_alumno= requests.get(f"http://backend:5000/alumnos/{padron}")
-        data_alumno=response_alumno.json()
+        response_alumno = requests.get(f"http://backend:5000/alumnos/{padron}")
+        data_alumno = response_alumno.json() if response_alumno.status_code == 200 else {}
+
+        id_curso = data_alumno.get("ID_CURSO") or data_alumno.get("id_curso")
+
+        if id_curso:
+            response_curso = requests.get(f"http://backend:5000/materias/{id_curso}")
+            if response_curso.status_code == 200:
+                curso_nombre = response_curso.json().get("NOMBRE_MATERIA")
 
         response_grupos = requests.get(f"http://backend:5000/grupos/del-alumno/{padron}")
         if response_grupos.status_code == 200:
             grupos_alumno = response_grupos.json() 
 
+        response_evaluaciones = requests.get(f"http://backend:5000/evaluaciones/del-alumno/{padron}")
+        if response_evaluaciones.status_code == 200:
+            evaluaciones_alumno = response_evaluaciones.json()
+            if not isinstance(evaluaciones_alumno, list):
+                evaluaciones_alumno = []
+        
+        response_notas = requests.get(f"http://backend:5000/notas/", params={"padron": padron})
+        if response_notas.status_code == 200:
+            notas_alumno = response_notas.json().get("listado", [])
+
+        if notas_alumno:
+            total = sum(float(n.get("NOTA", 0)) for n in notas_alumno)
+            promedio = round(total / len(notas_alumno), 2)
+
+        total_evaluaciones = len(evaluaciones_alumno) 
+        evaluaciones_rendidas = len(notas_alumno)      
+
+        asistencia_real = 0
+        response_asistencia = requests.get(f"http://backend:5000/asistencias/alumno/{padron}/porcentaje")
+        if response_asistencia.status_code == 200:
+            asistencia_real = response_asistencia.json().get("porcentaje", 0)
+
+
         alumno = {
-            "NOMBRE": data_alumno.get("NOMBRE") or data_alumno.get("nombre"),
-            "APELLIDO": data_alumno.get("APELLIDO") or data_alumno.get("apellido"),
-            "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail"),
+            "NOMBRE": data_alumno.get("NOMBRE") or data_alumno.get("nombre", ""),
+            "APELLIDO": data_alumno.get("APELLIDO") or data_alumno.get("apellido", ""),
+            "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail", ""),
             "PADRON": data_alumno.get("PADRON") or data_alumno.get("padron", padron),
-            "ASISTENCIAS": data_alumno.get("ASISTENCIAS") or data_alumno.get("asistencias", 0),
-            "PROMEDIO": data_alumno.get("PROMEDIO") or data_alumno.get("promedio", 0),
-            "TRABAJOS": data_alumno.get("TRABAJOS") or data_alumno.get("trabajos", 0),
-            
-            # Le asignamos la lista que responda nuestra API de grupos
+            "ASISTENCIAS": asistencia_real,
+            "CURSO": curso_nombre,
+            "PROMEDIO": promedio,
+            "EVALUACION": evaluaciones_alumno,
             "GRUPOS": grupos_alumno, 
-            
-            "NOTAS": data_alumno.get("NOTAS") or data_alumno.get("notas", [])
+            "NOTAS": notas_alumno,
+            "EVALUACIONES_RENDIDAS": evaluaciones_rendidas,
+            "TOTAL_EVALUACIONES": total_evaluaciones,
+            "PORCENTAJE_EVALUACIONES": porcentaje,
         }
-    except Exception:
+
+    except Exception as e:
+        print("ERROR EN RUTA PROFILE:", e)
+        import traceback
+        traceback.print_exc()
+        
         alumno = {
             "NOMBRE": "", "APELLIDO": "", "MAIL": "", "PADRON": padron,
-            "ASISTENCIAS": 0, "PROMEDIO": 0, "TRABAJOS": 0, "GRUPOS": [], "NOTAS": []
+            "ASISTENCIAS": 0, "PROMEDIO": 0, "GRUPOS": [], "NOTAS": [],
+            "EVALUACIONES_RENDIDAS": 0, "TOTAL_EVALUACIONES": 0, "PORCENTAJE_EVALUACIONES": 0
         }
         
     return render_template("alumno.html", alumno=alumno, nombre_profesor=nombre)

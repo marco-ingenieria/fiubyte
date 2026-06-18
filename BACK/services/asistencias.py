@@ -131,3 +131,56 @@ def enviar_mails_asistencia(clase_id, id_curso=None, registro_base_url=None):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
+
+def obtener_porcentaje_asistencia_alumno(padron):
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("SELECT ID_CURSO FROM ALUMNOS WHERE PADRON = %s AND ELIMINADO = 0", [padron])
+        alumno_data = cursor.fetchone()
+        
+        if not alumno_data:
+            return construir_error(404, "Alumno no encontrado")
+            
+        id_curso = alumno_data["ID_CURSO"]
+
+        query_clases_curso = """
+            SELECT COUNT(DISTINCT C.ID) as total_clases
+            FROM CLASES C
+            INNER JOIN ASISTENCIAS A ON C.ID = A.ID_CLASE
+            INNER JOIN ALUMNOS AL ON A.PADRON_ALUMNO = AL.PADRON
+            WHERE AL.ID_CURSO = %s AND C.ELIMINADO = 0 AND A.ELIMINADO = 0
+        """
+        cursor.execute(query_clases_curso, [id_curso])
+        total_clases = cursor.fetchone()["total_clases"]
+
+        if total_clases == 0:
+            return jsonify({"porcentaje": 0, "asistidas": 0, "totales": 0}), 200
+
+        query_asistidas = """
+            SELECT COUNT(DISTINCT ID_CLASE) as asistidas 
+            FROM ASISTENCIAS 
+            WHERE PADRON_ALUMNO = %s AND ELIMINADO = 0
+        """
+        cursor.execute(query_asistidas, [padron])
+        asistidas = cursor.fetchone()["asistidas"]
+
+        porcentaje = round((asistidas / total_clases) * 100, 2)
+
+        return jsonify({
+            "porcentaje": porcentaje,
+            "asistidas": asistidas,
+            "totales": total_clases
+        }), 200
+
+    except Exception as e:
+        traceback.print_exc()
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
