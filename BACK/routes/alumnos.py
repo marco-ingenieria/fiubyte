@@ -34,12 +34,14 @@ def get_alumnos_pdf():
     nombre      = request.args.get('nombre') is not None
     apellido    = request.args.get('apellido') is not None
     email       = request.args.get('email') is not None
+    aprobo      = request.args.get('aprobo') is not None
+    abandono    = request.args.get('abandono') is not None
     id_curso    = request.args.get('id_curso') is not None
     
     if not padron and not nombre and not apellido and not email:
         return construir_error(400, "Datos vacíos")
 
-    pdf = listar_alumnos_pdf(padron, nombre, apellido, email, id_curso)
+    pdf = listar_alumnos_pdf(padron, nombre, apellido, email, aprobo, abandono, id_curso)
 
     return pdf
 
@@ -63,7 +65,7 @@ def post_alumno():
     apellido    = body.get('apellido')
     email       = body.get('email')
     id_curso       = body.get('id_curso')
-    #abandono es 0 por default, no entra en POST
+    #abandono es 0 por default, no entra en POST. Mismo para aprobo
 
     if len(body) == 0:
         return construir_error(400, "Datos vacíos")
