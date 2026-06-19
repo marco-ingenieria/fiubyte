@@ -60,16 +60,6 @@ body {
     transform: translateY(-2px);
 }
 
-#contenedor-principal p {
-    margin-bottom: 35px;
-
-    color: var(--texto-mutado);
-
-    font-size: 16px;
-
-    font-weight: 500;
-}
-
 #menu-superior {
     background: rgba(255, 255, 255, 0.7);
 
@@ -99,19 +89,6 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-
-#contenedor-principal {
-    flex: 1;
-
-    max-width: 1500px;
-    width: 100%;
-
-    margin: 0 auto;
-
-    padding: 50px 20px;
-}
-
-
 
 #inicio-bienvenida {
     position: relative;
@@ -236,6 +213,7 @@ body {
     max-width: 700px;
     margin: 0 auto 40px auto;
     line-height: 1.7;
+    color: var(--texto-mutado);
 }
 
 #panel-info {
