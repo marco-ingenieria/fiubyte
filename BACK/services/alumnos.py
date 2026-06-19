@@ -246,18 +246,19 @@ def crear_alumnos_csv(csv):
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         datos_alumnos = []
-        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ABANDONO) VALUES (%s, %s, %s, %s, 0)"
+        create_stmt = "INSERT INTO ALUMNOS (PADRON, NOMBRE, APELLIDO, MAIL, ID_CURSO, ABANDONO) VALUES (%s, %s, %s, %s, %s, 0)"
         
         for fila_bytes in csv:
             try:
                 fila = fila_bytes.decode("utf-8")
 
-                padron_raw, nombre_raw, apellido_raw, email_raw = tuple(fila.split(","))
+                padron_raw, nombre_raw, apellido_raw, email_raw, id_curso_raw = tuple(fila.split(","))
                 padron = int(padron_raw)
                 nombre = nombre_raw.strip()
                 apellido = apellido_raw.strip()
                 email = email_raw.strip()
-                datos_alumnos.append([padron, nombre, apellido, email])
+                id_curso = id_curso_raw.strip()
+                datos_alumnos.append([padron, nombre, apellido, email, id_curso])
             except ValueError:
                 continue
             
@@ -280,7 +281,7 @@ def crear_alumnos_csv(csv):
         if connection and connection.is_connected():
             connection.close()
 
-def listar_alumnos_pdf(padron, nombre, apellido, email):
+def listar_alumnos_pdf(padron, nombre, apellido, email, id_curso):
     connection = None
     cursor = None
     try:
@@ -297,10 +298,12 @@ def listar_alumnos_pdf(padron, nombre, apellido, email):
             columnas_seleccionadas.append("APELLIDO")
         if email:
             columnas_seleccionadas.append("MAIL")
+        if id_curso:
+            columnas_seleccionadas.append("ID_CURSO")
         
         string_columnas = ", ".join(columnas_seleccionadas)
 
-        select_stmt = f"SELECT {string_columnas} FROM ALUMNOS WHERE ELIMINADO = 0 ORDER BY PADRON"
+        select_stmt = f"SELECT {string_columnas} FROM ALUMNOS WHERE ELIMINADO = 0 ORDER BY ID_CURSO, PADRON"
         cursor.execute(select_stmt)
 
         encabezado = columnas_seleccionadas

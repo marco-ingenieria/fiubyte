@@ -8,7 +8,7 @@ def listar_notas(limit, offset):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM NOTAS WHERE ELIMINADO = 0 LIMIT %s OFFSET %s"
+        select_stmt = " SELECT n.ID, n.PADRON_ALUMNO,n.ID_EVALUACION, n.NOTA,e.NOMBRE AS NOMBRE_EVALUACION FROM NOTAS n JOIN EVALUACIONES e ON e.ID = n.ID_EVALUACION WHERE n.ELIMINADO = 0 LIMIT %s OFFSET %s "
         cursor.execute(select_stmt, [limit, offset])
 
         notas = cursor.fetchall()
@@ -28,7 +28,7 @@ def listar_notas_padron(limit, offset, padron):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM NOTAS WHERE PADRON_ALUMNO = %s AND ELIMINADO = 0 LIMIT %s OFFSET %s"
+        select_stmt = "SELECT n.ID,n.PADRON_ALUMNO,n.ID_EVALUACION,n.NOTA,e.NOMBRE AS NOMBRE_EVALUACION FROM NOTAS n JOIN EVALUACIONES e ON e.ID = n.ID_EVALUACION WHERE n.PADRON_ALUMNO = %s AND n.ELIMINADO = 0 LIMIT %s OFFSET %s "
         cursor.execute(select_stmt, [padron, limit, offset])
 
         notas = cursor.fetchall()
@@ -48,7 +48,7 @@ def listar_notas_evaluacion(limit, offset, id_evaluacion):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        select_stmt = "SELECT * FROM NOTAS WHERE ID_EVALUACION = %s AND ELIMINADO = 0 LIMIT %s OFFSET %s"
+        select_stmt = "SELECT n.ID,n.PADRON_ALUMNO,n.ID_EVALUACION,n.NOTA,e.NOMBRE AS NOMBRE_EVALUACION FROM NOTAS n JOIN EVALUACIONES e ON e.ID = n.ID_EVALUACION WHERE n.ID_EVALUACION = %s AND n.ELIMINADO = 0 LIMIT %s OFFSET %s "
         cursor.execute(select_stmt, [id_evaluacion, limit, offset])
 
         notas = cursor.fetchall()

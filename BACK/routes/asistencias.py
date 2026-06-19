@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
-from services.asistencias import (enviar_mails_asistencia, listar_asistencias, crear_asistencia)
+from services.asistencias import (enviar_mails_asistencia, listar_asistencias, crear_asistencia,obtener_porcentaje_asistencia_alumno)
 from utils import (construir_error)
 
 asistencias_bp = Blueprint('asistencias', __name__)
@@ -38,7 +38,6 @@ def get_mail_asistencia(clase_id):
 
     return enviar_mails_asistencia(clase_id, id_curso)
 
-#GET para que se pueda acceder directamente desde el link del email
 @asistencias_bp.route('/registro/<int:clase_id>', methods=['GET'])
 def get_registrar_asistencia(clase_id):
     padron = request.args.get('padron', type=int)
@@ -47,3 +46,7 @@ def get_registrar_asistencia(clase_id):
         return construir_error(400, "Falta padrón")
 
     return crear_asistencia(clase_id, padron)
+
+@asistencias_bp.route('/alumno/<int:padron>/porcentaje', methods=['GET'])
+def get_porcentaje_alumno(padron):
+    return obtener_porcentaje_asistencia_alumno(padron)

@@ -10,9 +10,22 @@ def listar_asistencias(limit, offset, base_url, clase_id):
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
         select_stmt = """
-        SELECT PADRON, NOMBRE, ID
-        FROM ALUMNOS LEFT JOIN ASISTENCIAS ON PADRON_ALUMNO = PADRON AND ASISTENCIAS.ELIMINADO = 0 AND ID_CLASE = %s
-        WHERE ALUMNOS.ELIMINADO = 0 ORDER BY PADRON LIMIT %s OFFSET %s
+        SELECT
+            ALUMNOS.PADRON,
+            ALUMNOS.NOMBRE,
+            ALUMNOS.APELLIDO,
+            ALUMNOS.MAIL,
+            ASISTENCIAS.ID AS ID_ASISTENCIA,
+            ASISTENCIAS.FECHA_CREACION AS FECHA_ASISTENCIA,
+            CASE WHEN ASISTENCIAS.ID IS NULL THEN 0 ELSE 1 END AS ASISTIO
+        FROM ALUMNOS
+        LEFT JOIN ASISTENCIAS
+            ON PADRON_ALUMNO = PADRON
+            AND ASISTENCIAS.ELIMINADO = 0
+            AND ID_CLASE = %s
+        WHERE ALUMNOS.ELIMINADO = 0
+        ORDER BY ASISTIO DESC, PADRON
+        LIMIT %s OFFSET %s
         """
         cursor.execute(select_stmt, [clase_id, limit, offset])
 
@@ -39,13 +52,25 @@ def crear_asistencia(clase_id, padron):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO ASISTENCIAS (ID_CLASE, PADRON_ALUMNO) VALUES (%s, %s)"
+        cursor.execute("SELECT * FROM CLASES WHERE ID = %s AND ELIMINADO = 0", [clase_id])
+        if not cursor.fetchone():
+            return construir_error(404, "La clase no existe")
+
+        cursor.execute("SELECT * FROM ALUMNOS WHERE PADRON = %s AND ELIMINADO = 0", [padron])
+        if not cursor.fetchone():
+            return construir_error(404, "El alumno no existe")
+
+        create_stmt = """
+        INSERT INTO ASISTENCIAS (ID_CLASE, PADRON_ALUMNO)
+        VALUES (%s, %s)
+        ON DUPLICATE KEY UPDATE ELIMINADO = 0
+        """
         cursor.execute(create_stmt, [clase_id, padron])
 
         id = cursor.lastrowid
         
         connection.commit()
-        return (jsonify({"id": id}), 201)
+        return (jsonify({"id": id, "message": "Asistencia registrada"}), 201)
     except Exception as e:
         traceback.print_exc()
 
@@ -56,7 +81,7 @@ def crear_asistencia(clase_id, padron):
         if connection and connection.is_connected():
             connection.close()
 
-def enviar_mails_asistencia(clase_id, id_curso=None):
+def enviar_mails_asistencia(clase_id, id_curso=None, registro_base_url=None):
     connection = None
     cursor = None
     try:
@@ -82,19 +107,77 @@ def enviar_mails_asistencia(clase_id, id_curso=None):
         if not clase:
             return construir_error(404, "La clase no existe")
 
+        enviados = 0
         for alumno in alumnos:
             mail = alumno.get("MAIL")
             padron = alumno.get("PADRON")
             if not mail or not padron:
                 continue
-            url = url_for('asistencias.get_registrar_asistencia', clase_id=clase_id, padron=padron, _external=True)
+            if registro_base_url:
+                url = f"{registro_base_url.rstrip('/')}/asistencias/registro/{clase_id}?padron={padron}"
+            else:
+                url = url_for('asistencias.get_registrar_asistencia', clase_id=clase_id, padron=padron, _external=True)
             fecha = clase.get("FECHA", "--/--/----")
             enviar_mail_asistencia(url, fecha, mail)
+            enviados += 1
         
-        return (jsonify({}), 200)
+        return (jsonify({"enviados": enviados}), 200)
     except Exception as e:
         traceback.print_exc()
 
+        return construir_error(500, f"Error inesperado: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+def obtener_porcentaje_asistencia_alumno(padron):
+    connection = None
+    cursor = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("SELECT ID_CURSO FROM ALUMNOS WHERE PADRON = %s AND ELIMINADO = 0", [padron])
+        alumno_data = cursor.fetchone()
+        
+        if not alumno_data:
+            return construir_error(404, "Alumno no encontrado")
+            
+        id_curso = alumno_data["ID_CURSO"]
+
+        query_clases_curso = """
+            SELECT COUNT(DISTINCT C.ID) as total_clases
+            FROM CLASES C
+            INNER JOIN ASISTENCIAS A ON C.ID = A.ID_CLASE
+            INNER JOIN ALUMNOS AL ON A.PADRON_ALUMNO = AL.PADRON
+            WHERE AL.ID_CURSO = %s AND C.ELIMINADO = 0 AND A.ELIMINADO = 0
+        """
+        cursor.execute(query_clases_curso, [id_curso])
+        total_clases = cursor.fetchone()["total_clases"]
+
+        if total_clases == 0:
+            return jsonify({"porcentaje": 0, "asistidas": 0, "totales": 0}), 200
+
+        query_asistidas = """
+            SELECT COUNT(DISTINCT ID_CLASE) as asistidas 
+            FROM ASISTENCIAS 
+            WHERE PADRON_ALUMNO = %s AND ELIMINADO = 0
+        """
+        cursor.execute(query_asistidas, [padron])
+        asistidas = cursor.fetchone()["asistidas"]
+
+        porcentaje = round((asistidas / total_clases) * 100, 2)
+
+        return jsonify({
+            "porcentaje": porcentaje,
+            "asistidas": asistidas,
+            "totales": total_clases
+        }), 200
+
+    except Exception as e:
+        traceback.print_exc()
         return construir_error(500, f"Error inesperado: {e}")
     finally:
         if cursor:

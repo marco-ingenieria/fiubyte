@@ -86,34 +86,78 @@ def seccion_historiales():
 @app.route("/alumno/<int:padron>")
 def perfil_alumno(padron):
     nombre = request.args.get('nombre_profesor', '')
-    grupos_alumno=[]
+    grupos_alumno = []
+    evaluaciones_alumno = []
+    notas_alumno = []
+    curso_nombre = None
+    promedio = 0
+    porcentaje = 0
+    total_evaluaciones = 0
+    evaluaciones_rendidas = 0
 
     try:
-        response_alumno= requests.get(f"http://backend:5000/alumnos/{padron}")
-        data_alumno=response_alumno.json()
+        response_alumno = requests.get(f"http://backend:5000/alumnos/{padron}")
+        data_alumno = response_alumno.json() if response_alumno.status_code == 200 else {}
+
+        id_curso = data_alumno.get("ID_CURSO") or data_alumno.get("id_curso")
+
+        if id_curso:
+            response_curso = requests.get(f"http://backend:5000/materias/{id_curso}")
+            if response_curso.status_code == 200:
+                curso_nombre = response_curso.json().get("NOMBRE_MATERIA")
 
         response_grupos = requests.get(f"http://backend:5000/grupos/del-alumno/{padron}")
         if response_grupos.status_code == 200:
             grupos_alumno = response_grupos.json() 
 
+        response_evaluaciones = requests.get(f"http://backend:5000/evaluaciones/del-alumno/{padron}")
+        if response_evaluaciones.status_code == 200:
+            evaluaciones_alumno = response_evaluaciones.json()
+            if not isinstance(evaluaciones_alumno, list):
+                evaluaciones_alumno = []
+        
+        response_notas = requests.get(f"http://backend:5000/notas/", params={"padron": padron})
+        if response_notas.status_code == 200:
+            notas_alumno = response_notas.json().get("listado", [])
+
+        if notas_alumno:
+            total = sum(float(n.get("NOTA", 0)) for n in notas_alumno)
+            promedio = round(total / len(notas_alumno), 2)
+
+        total_evaluaciones = len(evaluaciones_alumno) 
+        evaluaciones_rendidas = len(notas_alumno)      
+
+        asistencia_real = 0
+        response_asistencia = requests.get(f"http://backend:5000/asistencias/alumno/{padron}/porcentaje")
+        if response_asistencia.status_code == 200:
+            asistencia_real = response_asistencia.json().get("porcentaje", 0)
+
+
         alumno = {
-            "NOMBRE": data_alumno.get("NOMBRE") or data_alumno.get("nombre"),
-            "APELLIDO": data_alumno.get("APELLIDO") or data_alumno.get("apellido"),
-            "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail"),
+            "NOMBRE": data_alumno.get("NOMBRE") or data_alumno.get("nombre", ""),
+            "APELLIDO": data_alumno.get("APELLIDO") or data_alumno.get("apellido", ""),
+            "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail", ""),
             "PADRON": data_alumno.get("PADRON") or data_alumno.get("padron", padron),
-            "ASISTENCIAS": data_alumno.get("ASISTENCIAS") or data_alumno.get("asistencias", 0),
-            "PROMEDIO": data_alumno.get("PROMEDIO") or data_alumno.get("promedio", 0),
-            "TRABAJOS": data_alumno.get("TRABAJOS") or data_alumno.get("trabajos", 0),
-            
-            # Le asignamos la lista que responda nuestra API de grupos
+            "ASISTENCIAS": asistencia_real,
+            "CURSO": curso_nombre,
+            "PROMEDIO": promedio,
+            "EVALUACION": evaluaciones_alumno,
             "GRUPOS": grupos_alumno, 
-            
-            "NOTAS": data_alumno.get("NOTAS") or data_alumno.get("notas", [])
+            "NOTAS": notas_alumno,
+            "EVALUACIONES_RENDIDAS": evaluaciones_rendidas,
+            "TOTAL_EVALUACIONES": total_evaluaciones,
+            "PORCENTAJE_EVALUACIONES": porcentaje,
         }
-    except Exception:
+
+    except Exception as e:
+        print("ERROR EN RUTA PROFILE:", e)
+        import traceback
+        traceback.print_exc()
+        
         alumno = {
             "NOMBRE": "", "APELLIDO": "", "MAIL": "", "PADRON": padron,
-            "ASISTENCIAS": 0, "PROMEDIO": 0, "TRABAJOS": 0, "GRUPOS": [], "NOTAS": []
+            "ASISTENCIAS": 0, "PROMEDIO": 0, "GRUPOS": [], "NOTAS": [],
+            "EVALUACIONES_RENDIDAS": 0, "TOTAL_EVALUACIONES": 0, "PORCENTAJE_EVALUACIONES": 0
         }
         
     return render_template("alumno.html", alumno=alumno, nombre_profesor=nombre)
@@ -128,6 +172,8 @@ def mostrar_qr():
     clase_encontrada = None
     cursos = []
     qr_url = None
+    registro_url = None
+    asistieron = []
 
     if request.method == "POST":
         id_clase = request.form.get("id")
@@ -149,6 +195,8 @@ def mostrar_qr():
         response = requests.get(f"http://backend:5000/clases/{id_clase_int}")
         if response.status_code == 200:
             clase_encontrada = response.json().get("clase")
+            if isinstance(clase_encontrada.get("PROFESORES"), str):
+                clase_encontrada["PROFESORES"] = json.loads(clase_encontrada["PROFESORES"])
         else:
             error = "Clase no encontrada"
     except Exception:
@@ -162,20 +210,31 @@ def mostrar_qr():
         cursos = []
 
     if clase_encontrada:
-        qr_data = json.dumps({
-            "clase_id": clase_encontrada.get("ID"),
-            "tema": clase_encontrada.get("TEMA", ""),
-            "fecha": str(clase_encontrada.get("FECHA", "")),
-            "horario": str(clase_encontrada.get("HORARIO", "")),
-        }, default=str)
-        qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + urllib.parse.quote(qr_data)
+        registro_base_url = request.host_url.rstrip("/")
+        registro_url = f"{registro_base_url}/asistencias/registro/{clase_encontrada.get('ID')}"
+        qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + urllib.parse.quote(registro_url)
+
+        try:
+            response = requests.get(
+                f"http://backend:5000/asistencias/{id_clase_int}",
+                params={"limit": 100, "offset": 0},
+                timeout=10
+            )
+            if response.status_code == 200:
+                listado = response.json().get("listado", [])
+                asistieron = [alumno for alumno in listado if alumno.get("ASISTIO")]
+        except Exception:
+            asistieron = []
 
     if request.method == "POST":
         if not curso_id:
             error = "Debe seleccionar un curso para enviar el QR"
         else:
             try:
-                payload = {"id_curso": int(curso_id)}
+                payload = {
+                    "id_curso": int(curso_id),
+                    "registro_base_url": request.host_url.rstrip("/")
+                }
                 response = requests.post(f"http://backend:5000/clases/{id_clase_int}/enviar-qr", json=payload, timeout=30)
                 if response.status_code == 200:
                     success = "QR enviado a los alumnos del curso seleccionado"
@@ -195,10 +254,54 @@ def mostrar_qr():
         success=success,
         cursos=cursos,
         curso_id=curso_id,
-        qr_url=qr_url
+        qr_url=qr_url,
+        registro_url=registro_url,
+        asistieron=asistieron
     )
 
 # 7. Ruta de la sección de Asistencias
+
+ #la idea de dejarla afuera es para q acumule las clses agregadas, si la dejo adentro se reinicia cada vez que se hace un POST
+
+@app.route("/asistencias/registro/<int:clase_id>")
+def registrar_asistencia_qr(clase_id):
+    padron = request.args.get("padron", type=int)
+
+    if padron is None:
+        return f"""
+        <html>
+            <head>
+                <title>Registrar asistencia</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body style="font-family: Arial, sans-serif; max-width: 420px; margin: 40px auto; padding: 0 16px;">
+                <h1>Registrar asistencia</h1>
+                <form method="GET" action="/asistencias/registro/{clase_id}">
+                    <label for="padron">Padrón</label>
+                    <input id="padron" name="padron" type="number" required
+                           style="display:block; width:100%; box-sizing:border-box; margin:8px 0 16px; padding:10px;">
+                    <button type="submit" style="padding:10px 14px;">Registrar</button>
+                </form>
+            </body>
+        </html>
+        """, 200
+
+    try:
+        response = requests.get(
+            f"http://backend:5000/asistencias/registro/{clase_id}",
+            params={"padron": padron},
+            timeout=10
+        )
+        if response.status_code in (200, 201):
+            return "<h1>Asistencia registrada</h1><p>Ya podés cerrar esta página.</p>", 200
+        try:
+            data = response.json()
+            error = data.get("errors", [{}])[0].get("description", "No se pudo registrar la asistencia")
+        except Exception:
+            error = "No se pudo registrar la asistencia"
+        return f"<h1>No se pudo registrar la asistencia</h1><p>{error}</p>", response.status_code
+    except Exception:
+        return "<h1>No se pudo registrar la asistencia</h1><p>No se pudo conectar con el servidor.</p>", 500
 
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
@@ -292,19 +395,28 @@ def seccion_asistencias():
             "docente1": profesores_lista[0] if len(profesores_lista) > 0 else "",
             "docente2": profesores_lista[1] if len(profesores_lista) > 1 else "",
             "docente3": profesores_lista[2] if len(profesores_lista) > 2 else "",
-            "estado": estado
+            "estado": estado,
+            "asistieron": []
         })
-
 
     filtrar_curso = request.args.get("curso_id", "")
     if filtrar_curso and filtrar_curso not in ["None", "", "Todos"]:
         clases = [c for c in clases if c["tema"] == str(filtrar_curso)]
 
+    for clase in clases:
+        try:
+            response = requests.get(
+                f"http://backend:5000/asistencias/{clase['id']}",
+                params={"limit": 100, "offset": 0},
+                timeout=10
+            )
+            if response.status_code == 200:
+                listado = response.json().get("listado", [])
+                clase["asistieron"] = [alumno for alumno in listado if alumno.get("ASISTIO")]
+        except Exception:
+            clase["asistieron"] = []
 
     orden = request.args.get("orden", "asc")
-    print("ARGS:", request.args)
-    print("CURSO:", request.args.get("curso_id"))
-    print("ORDEN:", request.args.get("orden"))
 
     if orden == "asc":
         clases.sort(key=lambda c: c["fecha"])
@@ -687,11 +799,96 @@ def eliminar_usuario():
 def inicio():
     return render_template('inicio.html')
 
+
+def obtener_estadisticas_cursada():
+    """
+    Función auxiliar para obtener los contadores en tiempo real del panel lateral.
+    Filtra las clases ya cursadas (antiguas o de HOY) de forma nativa por fecha.
+    """
+    total_alumnos = 0
+    total_grupos = 0
+    total_clases = 0
+    total_usuarios = 0
+    total_cursos = 0
+
+    hora_local = datetime.utcnow() - timedelta(hours=3)
+    hoy_str = hora_local.strftime("%Y-%m-%d")
+
+    fecha_hoy_formateada = hora_local.strftime("%d/%m/%Y")
+    try:
+        res_alumnos = requests.get("http://backend:5000/alumnos/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_alumnos.status_code == 200:
+            datos = res_alumnos.json()
+            alumnos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_alumnos = sum(1 for al in alumnos_lista if al.get("ABANDONO") == 0)
+    except Exception:
+        total_alumnos = 0
+
+    try:
+        res_clases = requests.get("http://backend:5000/clases/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_clases.status_code == 200:
+            datos = res_clases.json()
+            clases_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            
+            for c in clases_lista:
+                try:
+                    fecha_obj = datetime.strptime(c.get("FECHA", ""), "%a, %d %b %Y %H:%M:%S %Z").date()
+                    fecha_str = fecha_obj.strftime("%Y-%m-%d")
+                    
+                    if fecha_str <= hoy_str:
+                        total_clases += 1
+                except Exception:
+                    total_clases += 1
+    except Exception:
+        total_clases = 0
+
+    try:
+        res_grupos = requests.get("http://backend:5000/grupos/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_grupos.status_code == 200:
+            datos = res_grupos.json()
+            grupos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_grupos = len(grupos_lista)
+    except Exception:
+        total_grupos = 0
+
+    try:
+        res_usuarios = requests.get("http://backend:5000/usuarios/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_usuarios.status_code == 200:
+            datos = res_usuarios.json()
+            usuarios_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_usuarios = len(usuarios_lista)
+    except Exception:
+        total_usuarios = 0
+
+    try:
+        res_cursos = requests.get("http://backend:5000/materias/", params={"limit": 500, "offset": 0}, timeout=2)
+        if res_cursos.status_code == 200:
+            datos = res_cursos.json()
+            cursos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            total_cursos = len(cursos_lista)
+    except Exception:
+        total_cursos = 0
+
+    return total_alumnos, total_grupos, total_clases, total_usuarios, total_cursos,fecha_hoy_formateada
+
 @app.route('/menu')
 def menu_principal():
     nombre = request.args.get('nombre_profesor', '')
     error_busqueda = request.args.get('error_busqueda')
-    return render_template('menu_principal.html',nombre_profesor=nombre, error_busqueda=error_busqueda)
+
+    t_alumnos, t_grupos, t_clases, t_usuarios, t_cursos, f_hoy = obtener_estadisticas_cursada()
+
+    return render_template(
+        'menu_principal.html',
+        nombre_profesor=nombre, 
+        error_busqueda=error_busqueda,
+        total_alumnos=t_alumnos,
+        total_grupos=t_grupos,
+        total_clases=t_clases,
+        total_usuarios=t_usuarios,
+        total_cursos=t_cursos,
+        fecha_actual=f_hoy
+    )
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -704,7 +901,17 @@ def login():
                 "contrasenia": password
             })
             if response.status_code == 200:
-                return render_template("menu_principal.html", nombre_profesor=nombre)
+                t_alumnos, t_grupos, t_clases, t_usuarios, t_cursos, f_hoy = obtener_estadisticas_cursada()
+                return render_template(
+                    'menu_principal.html',
+                    nombre_profesor=nombre,
+                    total_alumnos=t_alumnos,
+                    total_grupos=t_grupos,
+                    total_clases=t_clases,
+                    total_usuarios=t_usuarios,
+                    total_cursos=t_cursos,
+                    fecha_actual=f_hoy
+                )
             else:
                 return render_template("login.html", error="Usuario o contraseña incorrectos")
         except Exception as e:
@@ -715,7 +922,8 @@ def login():
 def ver_grupo(id):
     nombre = request.args.get('nombre_profesor', '')
     lista_alumnos = [] 
-    if request.method == "POST":   
+    eliminar_alumno = None
+    if request.method == "POST":
         eliminar_alumno= request.form.get('eliminar')
         if eliminar_alumno:
             try:
