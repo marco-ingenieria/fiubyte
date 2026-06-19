@@ -14,9 +14,7 @@
             <input id="historial-usuario-id" name="id" type="number" min="1" placeholder="ID de usuario" value="{% if usuario_id %}{{ usuario_id }}{% endif %}">
             <button type="submit">Buscar</button>
         </form>
-        {% if not historial_global %}
-            <a href="/historiales?nombre_profesor={{ nombre_profesor }}">Ver historiales globales</a>
-        {% endif %}
+
     </div>
 
     {% if error %}

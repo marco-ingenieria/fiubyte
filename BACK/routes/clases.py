@@ -87,7 +87,9 @@ def post_enviar_qr(id):
     if not isinstance(id_curso, int) or id_curso <= 0:
         return construir_error(400, "id_curso inválido")
 
-    return enviar_mails_asistencia(id, id_curso)
+    registro_base_url = body.get('registro_base_url')
+
+    return enviar_mails_asistencia(id, id_curso, registro_base_url)
 
 
 @clases_bp.route('/<int:id>', methods=['DELETE'])

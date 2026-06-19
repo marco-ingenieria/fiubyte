@@ -304,6 +304,33 @@ button[id^="btn-qr"]:active{
     line-height: 1.7;
 }
 
+#contenedor-clases h4{
+    margin: 14px 0 8px;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+#contenedor-clases table{
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+#contenedor-clases th,
+#contenedor-clases td{
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+    text-align: left;
+    white-space: nowrap;
+}
+
+#contenedor-clases th{
+    font-weight: 800;
+    color: #334155;
+}
+
 #modal-overlay {
     position: fixed;
     top: 0;

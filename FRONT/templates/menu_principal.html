@@ -5,102 +5,86 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/menu.css') }}">
 
-<h1>Bienvenido, Profesor</h1>
+<div id="pantalla-dashboard">
 
-<p>Seleccione una opción para gestionar la materia:</p>
+    <main id="seccion-principal">
+        <h1>Bienvenido, Profesor</h1>
+        <p>Seleccione una opción para gestionar la materia:</p>
 
-<form id="buscador-secciones" action="{{ url_for('buscar_seccion') }}" method="GET">
+        <form id="buscador-secciones" action="{{ url_for('buscar_seccion') }}" method="GET">
+            <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+            <input id="entrada-busqueda" name="busqueda" placeholder="Buscar sección...">
+        </form>
 
-    <input
-        type="hidden"
-        name="nombre_profesor"
-        value="{{ nombre_profesor }}">
-        
-    <input 
-        id="entrada-busqueda"
-        name="busqueda"
-        placeholder="Buscar sección..." >
+        {% if error_busqueda %}
+        <p id="mensaje-error">La sección ingresada no existe.</p>
+        {% endif %}
 
-</form>
+        <div id="contenedor-tarjetas">
+            <div>
+                <h2>👥 Usuarios</h2>
+                <p>Gestion de usuarios del sistema y registros.</p>
+                <a href="{{ url_for('seccion_usuarios', nombre_profesor=nombre_profesor) }}">Usuarios</a>
+            </div>
 
-{% if error_busqueda %}
-<p id="mensaje-error"> La sección ingresada no existe. </p>
-{% endif %}
+            <div>
+                <h2>🎓 Alumnos</h2>
+                <p>Control de estudiantes y sus datos.</p>
+                <a href="{{ url_for('seccion_alumnos', nombre_profesor=nombre_profesor) }}">Alumnos</a>
+            </div>
 
+            <div>
+                <h2>👨‍👩‍👧‍👦 Grupos</h2>
+                <p>Control de equipos y participantes.</p>
+                <a href="{{ url_for('seccion_grupos', nombre_profesor=nombre_profesor) }}">Grupos</a>
+            </div>
 
-<div id="contenedor-tarjetas">
+            <div>
+                <h2>📝 Evaluaciones</h2>
+                <p>Control de examenes y resultados.</p>
+                <a href="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">Evaluaciones</a>
+            </div>
 
-    <div>
-        <h2>👥 Usuarios</h2>
+            <div>
+                <h2>📊 Notas</h2>
+                <p>Control de calificaciones y estadísticas.</p>
+                <a href="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}">Notas</a>
+            </div>
 
-        <p>
-            Gestion de usuarios del sistema y registros.
-        </p>
-        <a href="{{ url_for('seccion_usuarios', nombre_profesor=nombre_profesor) }}">
-            Usuarios
-        </a>
-    </div>
+            <div>
+                <h2>✅ Asistencias</h2>
+                <p>Control de asistencias y clases.</p>
+                <a href="{{ url_for('seccion_asistencias', nombre_profesor=nombre_profesor) }}">Asistencias</a>    
+            </div>
 
-    <div>
-        <h2>🎓 Alumnos</h2>
-        <p>
-            Control de estudiantes y sus datos.
-        </p>
-        <a href="{{ url_for('seccion_alumnos', nombre_profesor=nombre_profesor) }}">
-            Alumnos
-        </a>
-    </div>
+            <div>
+                <h2>📚 Cursos</h2>
+                <p>Gestión de materias, cuatrimestres y asignación académica.</p>
+                <a href="{{ url_for('seccion_materias', nombre_profesor=nombre_profesor) }}">Cursos</a>    
+            </div>
+        </div>
+    </main>
 
-    <div>
-        <h2>👨‍👩‍👧‍👦 Grupos</h2>
+    <aside id="panel-utilidades">
+        <div id="bloque-metricas">
+            <h3>📊 Resumen de Cursada</h3>
+            <p id="fecha-panel">Hoy: {{ fecha_actual|default('--/--/----') }}</p>
+            <p><strong>Cursos Asignados:</strong> {{ total_cursos|default(0) }}</p>
+            <p><strong>Alumnos Activos:</strong> {{ total_alumnos|default(0) }}</p>
+            <p><strong>Grupos Formados:</strong> {{ total_grupos|default(0) }}</p>
+            <p><strong>Clases Dictadas:</strong> {{ total_clases|default(0) }}</p>
+            <p><strong>Usuarios Sistema:</strong> {{ total_usuarios|default(0) }}</p>
+        </div>
+        <div id="sub-navegacion">
+            <h3>Links de Cátedra:</h3>
+            <a href="https://campusgrado.fi.uba.ar/" target="_blank" rel="noopener noreferrer">Campus de Grado</a>
+            <a href="https://guaraniautogestion.fi.uba.ar" target="_blank" rel="noopener noreferrer">SIU Guaraní</a>
+            <a href="https://fi.uba.ar" target="_blank" rel="noopener noreferrer">Sitio FIUBA</a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer">Repositorio Cátedra</a>
+        </div>
 
-        <p>
-            Control de equipos y participantes.
-        </p>
+    </aside>
 
-        <a href="{{ url_for('seccion_grupos', nombre_profesor=nombre_profesor) }}">
-            Grupos
-        </a>
-    </div>
-
-    <div>
-        <h2>📝 Evaluaciones</h2>
-        <p>
-            Control de examenes y resultados.
-        </p>
-        <a href="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
-            Evaluaciones
-        </a>
-    </div>
-
-    <div>
-        <h2>📊 Notas</h2>
-        <p>
-            Control de calificaciones y estadísticas.
-        </p>
-        <a href="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}">
-            Notas
-        </a>
-    </div>
-
-    <div>
-        <h2>✅ Asistencias</h2>
-        <p>
-            Control de asistencias y clases.
-        </p>
-        <a href="{{ url_for('seccion_asistencias', nombre_profesor=nombre_profesor) }}">
-            Asistencias
-        </a>    
-    </div>
-
-    <div>
-        <h2>📚 Cursos</h2>
-        <p>
-            Gestión de materias, cuatrimestres y asignación académica.
-        </p>
-        <a href="{{ url_for('seccion_materias', nombre_profesor=nombre_profesor) }}">
-            Cursos
-        </a>    
-    </div>
+</div>
 
 {% endblock %}

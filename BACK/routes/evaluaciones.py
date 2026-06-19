@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
-from services.evaluaciones import (listar_evaluaciones, buscar_evaluacion, crear_evaluacion, actualizar_evaluacion, eliminar_evaluacion, eliminar_evaluacion_permanente)
+from services.evaluaciones import (listar_evaluaciones,listar_evaluaciones_alumno, buscar_evaluacion, crear_evaluacion, actualizar_evaluacion, eliminar_evaluacion, eliminar_evaluacion_permanente)
 from utils import (construir_error)
 from constants import (TIPOS_EVAL)
 
@@ -79,3 +79,7 @@ def delete_evaluacion_virtual(id):
 @evaluaciones_bp.route('/perma/<int:id>', methods=['DELETE'])
 def delete_evaluacion(id):
     return eliminar_evaluacion_permanente(id)
+
+@evaluaciones_bp.route('/del-alumno/<int:padron>', methods=['GET'])
+def get_evaluaciones_alumno(padron):
+    return listar_evaluaciones_alumno(padron)
