@@ -937,6 +937,7 @@ def ver_grupo(id):
     except Exception as e:
         print('Hubo un error al obtener los alumnos del grupo')
     return render_template('detalle_grupo.html', integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
+
 # 9. ruta para listado de cursos y detalle de cada curso 
 @app.route('/cursos', methods=["POST", "GET"])
 def seccion_cursos():

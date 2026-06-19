@@ -1,64 +1,118 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Panel Docente</title>
 
-{% block title %}Inicio - Panel Docente{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/inicio.css') }}">
+</head>
 
-{% block content %}
+<body>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style/inicio.css') }}">
+    <div id="menu-superior">
+        <strong>Panel Docente</strong>
+    </div>
 
-<div id="inicio-bienvenida">
-    
-    <main id="seccion-hero">
-        <h1>Sistema Universitario</h1>
-        <p id="descripcion-inicio">
-            Plataforma académica orientada a la gestión docente, administración de alumnos y seguimiento de cursadas en tiempo real.
+    <div id="contenedor-principal">
+
+        <div id="inicio-bienvenida">
+
+            <main id="seccion-hero">
+                <h1>Sistema Universitario</h1>
+
+                <p id="descripcion-inicio">
+                    Plataforma académica orientada a la gestión docente,
+                    administración de alumnos y seguimiento de cursadas en tiempo real.
+                </p>
+
+                <a id="boton-login" href="{{ url_for('login') }}">
+                    Iniciar Sesión
+                </a>
+            </main>
+
+            <div id="panel-info">
+
+                <h2>Funcionalidades principales</h2>
+
+                <div id="grilla-caracteristicas">
+
+                    <div id="item-alumnos">
+                        <strong>👤 Gestión de Alumnos</strong>
+                        <p>
+                            Administración de padrones, datos de contacto y
+                            estados de cursada por aula.
+                        </p>
+                    </div>
+
+                    <div id="item-notas">
+                        <strong>📝 Notas y Evaluaciones</strong>
+                        <p>
+                            Seguimiento de calificaciones, promedios e
+                            instancias de exámenes parciales.
+                        </p>
+                    </div>
+
+                    <div id="item-asistencia">
+                        <strong>📅 Control de Asistencias</strong>
+                        <p>
+                            Monitoreo diario de presentismo con herramientas
+                            dinámicas de códigos QR.
+                        </p>
+                    </div>
+
+                    <div id="item-ayudantes">
+                        <strong>🎓 Equipo de Cátedra</strong>
+                        <p>
+                            Asignación de comisiones, control de ayudantes de
+                            segunda y docentes.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div id="enlaces-uba">
+
+                    <h3>Portales Institucionales</h3>
+
+                    <div id="contenedor-enlaces">
+
+                        <a id="link-campus"
+                           href="https://campusgrado.fi.uba.ar/"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            🌐 Campus Grado FIUBA
+                        </a>
+
+                        <a id="link-guarani"
+                           href="https://guaraniautogestion.fi.uba.ar/g3w/acceso"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            🎓 SIU Guaraní
+                        </a>
+
+                        <a id="link-web"
+                           href="https://fi.uba.ar"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            🏛️ Sitio Web FIUBA
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        <p>2026 - Introducción al Desarrollo de Software - Grupo 19</p>
+        <p id="texto-footer">
+            Facultad de Ingeniería - UBA
         </p>
-        <a id="boton-login" href="{{ url_for('login') }}">
-            Iniciar Sesión
-        </a>
-    </main>
+    </footer>
 
-    <div id="panel-info">
-        <h2>Funcionalidades principales</h2>
-        
-        <div id="grilla-caracteristicas">
-            <div id="item-alumnos">
-                <strong>👤 Gestión de Alumnos</strong>
-                <p>Administración de padrones, datos de contacto y estados de cursada por aula.</p>
-            </div>
-            
-            <div id="item-notas">
-                <strong>📝 Notas y Evaluaciones</strong>
-                <p>Seguimiento de calificaciones, promedios e instancias de exámenes parciales.</p>
-            </div>
-            
-            <div id="item-asistencia">
-                <strong>📅 Control de Asistencias</strong>
-                <p>Monitoreo diario de presentismo con herramientas dinámicas de códigos QR.</p>
-            </div>
-            
-            <div id="item-ayudantes">
-                <strong>🎓 Equipo de Cátedra</strong>
-                <p>Asignación de comisiones, control de ayudantes de segunda y docentes.</p>
-            </div>
-        </div>
-
-        <div id="enlaces-uba">
-            <h3>Portales Institucionales</h3>
-            <div id="contenedor-enlaces">
-                <a id="link-campus" href="https://campusgrado.fi.uba.ar/" target="_blank" rel="noopener noreferrer">
-                    🌐 Campus Grado FIUBA
-                </a>
-                <a id="link-guarani" href="https://guaraniautogestion.fi.uba.ar/g3w/acceso" target="_blank" rel="noopener noreferrer">
-                    🎓 SIU Guaraní
-                </a>
-                <a id="link-web" href="https://fi.uba.ar" target="_blank" rel="noopener noreferrer">
-                    🏛️ Sitio Web FIUBA
-                </a>
-            </div>
-        </div>
-    </div> 
-
-</div>
-
-{% endblock %}
+</body>
+</html>
