@@ -1,0 +1,71 @@
+{% extends 'base_sistema.html' %} {% block title %}Cursos - Panel Docente{% endblock %} {% block content %} {% if error_asignar %}
+<script>
+    alert("{{ error_asignar }}");
+</script>
+{% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/cursos.css') }}">
+<main>
+    <h1>Listado de Cursos</h1>
+    <p>Seleccione un curso para ver los integrantes</p>
+    <!-- Botones para eliminar, crear cursos-->
+    <div id="contenedor-botones-cursos">
+        <button id="boton-eliminar" type="button" onclick="document.getElementById('eliminar-curso').showModal()">Eliminar curso</button>
+        <button id="boton-crear" type="button" onclick="document.getElementById('crear-curso').showModal()">Crear nuevo Curso </button>
+    </div>
+    <dialog id="crear-curso">
+        <h3>Crear nuevo curso</h3>
+        <form id="form-crear" method="POST" action="{{url_for('seccion_cursos')}}">
+            <label for="crear">Nombre del Nuevo Curso:</label>
+            <input type="text" id="nombre-crear" name="crear-curso">
+            <label for="cuatrimestre">Cuatrimestre</label>
+            <input type="text" id="cuatrimestre" name="cuatrimestre-crear" min="1" max="2">
+            <label for="anio-crear">Año:</label>
+            <input type="number" id="anio-crear" name="anio-crear">
+            <div id="botones-crear">
+                <button type="submit" id="boton-guardar-crear">Guardar</button>
+                <button type="button" id="boton-cancelar-crear" onclick="document.getElementById('crear-curso').close()">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="eliminar-curso">
+        <h3> Eliminar Curso</h3>
+        <form id="form-eliminar" method="POST" action="{{ url_for('seccion_cursos', nombre_profesor=request.args.get('nombre_profesor', '')) }}">
+            <label for="eliminar">Introduzca el id del curso:</label>
+            <input type="number" id="id-eliminar" name="eliminar-curso">
+            <div id="botones-eliminar">
+                <button type="submit" id="boton-eliminar-curso">Eliminar</button>
+                <button type="button" id="boton-cancelar-curso" onclick="document.getElementById('eliminar-curso').close()">Cancelar</button>
+            </div>
+        </form>
+        <!-- tabla de cursos -->
+    </dialog>
+    <table id="tabla-cursos">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre de la Materia</th>
+                <th>Cuatrimestre</th>
+                <th>Año</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for curso in cursos%}{% set cursoUrl = url_for('ver_curso', id=curso['ID'], nombre_profesor=request.args.get('nombre_profesor', '')) %}
+            <tr>
+                <td>
+                    {{curso['ID']}}
+                </td>
+                <td>
+                    {{curso['NOMBRE_MATERIA']}}
+                </td>
+                <td>
+                    {{curso['CUATRIMESTRE']}}
+                </td>
+                <td>
+                    {{curso['ANIO']}}
+                </td>
+                {% endfor %}
+        </tbody>
+    </table>
+
+</main>
+{% endblock %}

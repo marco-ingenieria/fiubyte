@@ -1,0 +1,189 @@
+#contenedor-botones-cursos {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+#boton-crear,
+#boton-eliminar {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#boton-crear:hover,
+#boton-eliminar:hover {
+    background: var(--color-primario-hover);
+}
+
+#tabla-cursos {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--sombra-suave);
+    border-collapse: collapse;
+}
+
+#tabla-cursos td,
+#tabla-cursos th {
+    padding: 16px 20px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--texto-oscuro);
+    vertical-align: middle;
+}
+
+#tabla-cursos th {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#tabla-cursos tr:hover {
+    background: rgba(79, 70, 229, 0.03);
+    cursor: pointer;
+}
+
+#tabla-cursos a {
+    color: var(--color-primario);
+    text-decoration: none;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+}
+
+#tabla-cursos form {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+#tabla-cursos input[type="number"] {
+    padding: 4px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: #f8fafc;
+    width: 200px;
+    outline: none;
+}
+
+#tabla-cursos button {
+    padding: 5px 12px;
+    border-radius: 6px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+#tabla-cursos button:hover {
+    background: var(--color-primario-hover);
+}
+
+#crear-curso,
+#eliminar-curso {
+    border: none;
+    border-radius: 20px;
+    padding: 35px;
+    width: 350px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+    margin: auto;
+}
+
+#crear-curso::backdrop,
+#eliminar-curso::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+#crear-curso h3,
+#eliminar-curso h3 {
+    margin-top: 0;
+    color: var(--texto-oscuro);
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+#form-crear,
+#form-eliminar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#form-crear label,
+#form-eliminar label {
+    font-size: 0.85rem;
+    color: #64748b;
+    text-align: left;
+}
+
+#nombre-crear,
+#cuatrimestre,
+#anio-crear,
+#id-eliminar {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#botones-crear,
+#botones-eliminar {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#boton-guardar-crear,
+#boton-eliminar-curso {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: background 0.3s ease;
+}
+
+#boton-guardar-crear:hover,
+#boton-eliminar-curso:hover {
+    background: var(--color-primario-hover);
+}
+
+#boton-cancelar-crear,
+#boton-cancelar-curso {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    color: var(--texto-oscuro);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#boton-cancelar-crear:hover,
+#boton-cancelar-curso:hover {
+    background: #cbd5e1;
+}

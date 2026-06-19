@@ -35,10 +35,6 @@ def buscar_seccion():
 
     return redirect(url_for('menu_principal', nombre_profesor=nombre, error_busqueda=True))
 
-@app.route("/cursos")
-def seccion_materias():
-    return 
-
 # 8. Ruta para mostrar el perfil del alumno
 
 @app.route("/historial")
@@ -532,19 +528,18 @@ def seccion_grupos():
     return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos)
 
 @app.route('/grupo-detalle')
-def detalle_grupo_especifico():
-    nombre_profesor = request.args.get('nombre_profesor', '')
+def detalle_grupo():
+    nombre_profesor = request.args.get('nombre_profesor')
     
-    id_grupo = request.args.get('id', '')
+    id_grupo = request.args.get('id')
 
     grupo_simulado = {
         "nombre": id_grupo if id_grupo else "Grupo Sin Nombre",
         "materia": "Diseño de Sistemas",
         "integrantes": ["Juan Pérez", "Ana Gómez", "Lucas Díaz"]
     }
-
     return render_template(
-        'grupo_individual.html', # Esta es la nueva plantilla física para la hoja del grupo
+        'grupo_individual.html', 
         nombre_profesor=nombre_profesor,
         grupo=grupo_simulado
     )
@@ -574,7 +569,6 @@ def seccion_alumnos():
     eliminar_alumno = request.form.get('eliminar_alumno')
     
     if crear_alumno:
-        
         print("FORM COMPLETO:", dict(request.form), flush=True)
         try:
             requests.post("http://backend:5000/alumnos/", json={
@@ -582,11 +576,9 @@ def seccion_alumnos():
                 "apellido": request.form.get('apellido'),
                 "email": request.form.get('email'),
                 "padron": request.form.get('padron'),
-                "id_curso": request.form.get('id_curso')
             })
         except Exception as e:
             print("Error al crear alumno")
-
     if eliminar_alumno:
         try:
             requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
@@ -728,19 +720,52 @@ def ver_grupo(id):
         if eliminar_alumno:
             try:
                 requests.delete("http://backend:5000/grupos/alumnos",
-    json={"id_grupo": id, "padron_alumno": int(eliminar_alumno)}
-)
+                json={"id_grupo": id, "padron_alumno": int(eliminar_alumno)})
             except Exception as e:
                 print("Error al eliminar alumno del grupo")
-
     try:
         response = requests.get(f"http://backend:5000/grupos/alumnos/{id}")
         lista_alumnos = response.json()
     except Exception as e:
         print('Hubo un error al obtener los alumnos del grupo')
-    return render_template('detalle_grupo.html',eliminar=eliminar_alumno, integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
-@app.route('/listado')
-def seccion_listado():
-    return render_template('listado.html')
+    return render_template('detalle_grupo.html', integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
+# 9. ruta para listado de cursos y detalle de cada curso 
+@app.route('/cursos', methods=["POST", "GET"])
+def seccion_cursos():
+    nombre = request.args.get('nombre_profesor', '')
+    if request.method == "POST":
+        crear_curso = request.form.get('crear-curso')
+        eliminar_curso = request.form.get('eliminar-curso')
+        if eliminar_curso:
+            try:
+                requests.delete(f"http://backend:5000/materias/{eliminar_curso}")
+            except Exception as e:
+                print("Error al eliminar curso")
+        elif crear_curso:
+            try:
+                requests.post("http://backend:5000/materias/", json={
+                    "nombre_materia": crear_curso,
+                    "cuatrimestre":int(request.form.get('cuatrimestre-crear')),
+                    "anio":int(request.form.get('anio-crear',2026))})
+            except Exception as e:
+                print("Error al crear curso")
+    try:
+        response = requests.get("http://backend:5000/materias/", params={"limit": 30, "offset": 0})
+        cursos = response.json().get("listado", [])
+    except Exception as e:
+        cursos = []
+        print("Hubo un error al obtener los cursos")
+    return render_template('cursos.html', nombre_profesor=nombre, cursos=cursos)
+
+@app.route('/curso/<int:id>', methods=["GET", "POST"])
+def ver_curso(id):
+    nombre = request.args.get('nombre_profesor', '')
+    try:
+        response = requests.get(f"http://backend:5000/materias/{id}")
+        curso = response.json().get("materia", {})
+    except Exception as e:
+        curso = {}
+    return render_template('detalle_curso.html', curso=curso, nombre_profesor=nombre, ID=id)
+
 if __name__ == '__main__':
     app.run(debug=True)
