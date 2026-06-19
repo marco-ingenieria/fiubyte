@@ -33,6 +33,9 @@ def buscar_seccion():
     if texto.startswith('asistencia'):
         return redirect(url_for('seccion_asistencias',nombre_profesor=nombre))
 
+    if texto.startswith('curso'):
+        return redirect(url_for('seccion_cursos',nombre_profesor=nombre))
+
     return redirect(url_for('menu_principal', nombre_profesor=nombre, error_busqueda=True))
 
 # 8. Ruta para mostrar el perfil del alumno
@@ -819,8 +822,11 @@ def obtener_estadisticas_cursada():
         res_alumnos = requests.get("http://backend:5000/alumnos/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_alumnos.status_code == 200:
             datos = res_alumnos.json()
-            alumnos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
-            total_alumnos = sum(1 for al in alumnos_lista if al.get("ABANDONO") == 0)
+            alumnos_lista = datos.get("listado", [])
+            total_alumnos = 0
+            for al in alumnos_lista:
+                if al.get("ABANDONO") == 0:
+                    total_alumnos += 1
     except Exception:
         total_alumnos = 0
 
@@ -828,8 +834,7 @@ def obtener_estadisticas_cursada():
         res_clases = requests.get("http://backend:5000/clases/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_clases.status_code == 200:
             datos = res_clases.json()
-            clases_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
-            
+            clases_lista = datos.get("listado", []) 
             for c in clases_lista:
                 try:
                     fecha_obj = datetime.strptime(c.get("FECHA", ""), "%a, %d %b %Y %H:%M:%S %Z").date()
@@ -846,7 +851,7 @@ def obtener_estadisticas_cursada():
         res_grupos = requests.get("http://backend:5000/grupos/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_grupos.status_code == 200:
             datos = res_grupos.json()
-            grupos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            grupos_lista = datos.get("listado", []) 
             total_grupos = len(grupos_lista)
     except Exception:
         total_grupos = 0
@@ -855,7 +860,7 @@ def obtener_estadisticas_cursada():
         res_usuarios = requests.get("http://backend:5000/usuarios/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_usuarios.status_code == 200:
             datos = res_usuarios.json()
-            usuarios_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            usuarios_lista = datos.get("listado", []) 
             total_usuarios = len(usuarios_lista)
     except Exception:
         total_usuarios = 0
@@ -864,7 +869,7 @@ def obtener_estadisticas_cursada():
         res_cursos = requests.get("http://backend:5000/materias/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_cursos.status_code == 200:
             datos = res_cursos.json()
-            cursos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            cursos_lista = datos.get("listado", []) 
             total_cursos = len(cursos_lista)
     except Exception:
         total_cursos = 0
@@ -901,17 +906,10 @@ def login():
                 "contrasenia": password
             })
             if response.status_code == 200:
-                t_alumnos, t_grupos, t_clases, t_usuarios, t_cursos, f_hoy = obtener_estadisticas_cursada()
-                return render_template(
-                    'menu_principal.html',
-                    nombre_profesor=nombre,
-                    total_alumnos=t_alumnos,
-                    total_grupos=t_grupos,
-                    total_clases=t_clases,
-                    total_usuarios=t_usuarios,
-                    total_cursos=t_cursos,
-                    fecha_actual=f_hoy
-                )
+                return redirect(url_for(
+                    'menu_principal',
+                    nombre_profesor=nombre
+                ))
             else:
                 return render_template("login.html", error="Usuario o contraseña incorrectos")
         except Exception as e:
