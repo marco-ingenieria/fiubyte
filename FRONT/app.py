@@ -1,5 +1,5 @@
 from io import BytesIO
-from flask import Flask, render_template, request, url_for, redirect, send_file
+from flask import Flask, render_template, request, url_for, redirect, send_file, session
 import requests
 from datetime import date, datetime, timedelta
 import json
@@ -7,6 +7,7 @@ import urllib.parse
 
 
 app = Flask(__name__)
+app.secret_key = "una-clave-secreta"
 
 @app.route('/buscar')
 def buscar_seccion():
@@ -686,7 +687,10 @@ def seccion_alumnos():
     if crear_alumno:
         print("FORM COMPLETO:", dict(request.form), flush=True)
         try:
-            requests.post("http://backend:5000/alumnos/", json={
+            headers = {"authorization": f"Bearer {session.get('token')}"}
+            requests.post("http://backend:5000/alumnos/",
+                headers=headers,
+                json={
                 "nombre": request.form.get('crear_alumno'),
                 "apellido": request.form.get('apellido'),
                 "email": request.form.get('email'),
@@ -906,6 +910,8 @@ def login():
                 "contrasenia": password
             })
             if response.status_code == 200:
+                data = response.json()
+                session['token'] = data.get('access_token')
                 return redirect(url_for(
                     'menu_principal',
                     nombre_profesor=nombre

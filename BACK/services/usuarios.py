@@ -1,6 +1,7 @@
 from flask import jsonify
 from db.init_db import get_connection
 from utils import (construir_paginacion, construir_error)
+from flask_jwt_extended import create_access_token
 
 
 def listar_usuarios(limit, offset):
@@ -36,7 +37,11 @@ def chequear_usuario(nombre, contrasenia):
         if not usuario:
             return construir_error(401, "Usuario o contraseña incorrectos")
         print(f"Bienvenido {usuario['NOMBRE']}", flush=True)
-        return (jsonify({"usuario": usuario}), 200)
+        
+        token = create_access_token(identity=nombre)
+        
+        return (jsonify({"usuario": usuario,
+                         "access_token": token}), 200)
         
     except Exception as e:
         return construir_error(500, f"Error inesperado: {e}")
