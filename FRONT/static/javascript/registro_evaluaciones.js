@@ -1,18 +1,15 @@
-// 1. ESTADO
 let evals = JSON.parse(localStorage.getItem('evals')) || [];
 let currentPage = 1;
 const PER_PAGE = 4;
 
-const TIPO_LABEL  = { tp: 'TP', parcial: '1ºP', final: 'F', recup: 'R' };
-const INST_LABEL  = { regular: 'Evaluación Regular', recup: 'Instancia de Recuperación' };
+const TIPO_LABEL = { tp: 'TP', parcial: '1ºP', final: 'F', recup: 'R' };
+const INST_LABEL = { regular: 'Evaluación Regular', recup: 'Instancia de Recuperación' };
 
-// 2. UTILIDADES
 function syncStorage() {
   localStorage.setItem('evals', JSON.stringify(evals));
   render();
 }
 
-// 3. LÓGICA DE DATOS
 function saveModal() {
   const nombre = document.getElementById('f-nombre').value.trim();
   const tipo = document.getElementById('f-tipo').value;
@@ -48,7 +45,6 @@ function confirmDelete() {
   closeConfirm();
 }
 
-// 4. RENDER 
 function render() {
   const list = document.getElementById('eval-list');
   list.innerHTML = '';
@@ -69,10 +65,8 @@ function render() {
   });
 }
 
-// 5. NAVEGACIÓN
 function verNotas(id) {
   window.location.href = `/notas.html?id_evaluacion=${id}`;
 }
 
-// Inicialización
 render();
