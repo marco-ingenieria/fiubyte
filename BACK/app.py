@@ -8,7 +8,6 @@ from routes.notas import notas_bp
 from routes.clases import clases_bp
 from routes.materias import materias_bp
 from routes.asistencias import asistencias_bp
-from routes.auth import auth_bp
 from flask_jwt_extended import JWTManager
 from datetime import timedelta
 

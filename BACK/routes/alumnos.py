@@ -56,7 +56,7 @@ def post_alumnos_csv():
     return crear_alumnos_csv(listado_alumnos)
 
 @alumnos_bp.route('/', methods=['POST'])
-@jwt_required()
+#@jwt_required()
 def post_alumno():
     body = request.get_json()
 

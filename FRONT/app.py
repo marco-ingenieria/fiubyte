@@ -688,7 +688,7 @@ def seccion_alumnos():
         print("FORM COMPLETO:", dict(request.form), flush=True)
         try:
             headers = {"authorization": f"Bearer {session.get('token')}"}
-            requests.post("http://backend:5000/alumnos/",
+            response = requests.post("http://backend:5000/alumnos/",
                 headers=headers,
                 json={
                 "nombre": request.form.get('crear_alumno'),
@@ -696,8 +696,10 @@ def seccion_alumnos():
                 "email": request.form.get('email'),
                 "padron": request.form.get('padron'),
             })
+
+            print(response.json(), flush=True)
         except Exception as e:
-            print("Error al crear alumno")
+            print(f"Error al crear alumno {e}", flush=True)
     if eliminar_alumno:
         try:
             requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
