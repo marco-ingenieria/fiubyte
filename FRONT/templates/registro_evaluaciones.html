@@ -1,126 +1,73 @@
 {%- extends 'base_sistema.html' -%}
 
-{%- block title -%}Evaluaciones – Panel Docente{%- endblock -%}
+{%- block title -%}Evaluaciones - Panel Docente{%- endblock -%}
 
 {%- block content -%}
+
   <link rel="stylesheet" href="{{ url_for('static', filename='style/registro_evaluaciones.css') }}">
 
   <div id="main-evaluaciones">
-
     <div id="page-header">
       <div id="page-header-left">
         <h1>Evaluaciones</h1>
         <p>Gestión de instancias de evaluación del curso · Ciclo 2026 </p>
       </div>
-      <button id="btn-crear" onclick="openModal()">
-        <span>+</span> Agregar Evaluación
-      </button>
+      <button id="btn-crear" onclick="openModal()"><span>+</span> Agregar Evaluación</button>
     </div>
 
-    <div id="tabs">
-      <button onclick="switchTab(this,'tipos')" data-active="true">Tipos de Evaluación</button>
-    </div>
+    <div id="tabs"><button data-active="true">Tipos de Evaluación</button></div>
 
     <div id="filter-bar">
-      <input id="search-input" placeholder="🔍  Buscar evaluación..." oninput="filterCards()">
-      
+      <input id="search-input" placeholder="🔍 Buscar evaluación..." oninput="filterCards()">
       <select onchange="filterCards()" id="filter-tipo">
         <option value="">Todos los tipos</option>
         <option value="tp">Trabajos Prácticos</option>
         <option value="parcial">Parciales</option>
         <option value="final">Finales</option>
-        <option value="recup">Recuperatorios</option>
-      </select>
-      
-      <select onchange="filterCards()" id="filter-estado">
-        <option value="">Todos los estados</option>
-        <option value="ok">En tiempo</option>
-        <option value="warn">Próximo</option>
-        <option value="late">Vencido</option>
       </select>
     </div>
 
     <div id="eval-list"></div>
-    
+
     <div id="empty-state">
-      <div>📋</div>
-      <h3>Sin resultados</h3>
-      <p>No se encontraron evaluaciones con ese criterio.</p>
+      <p> ❌ No se encontraron evaluaciones.</p>
     </div>
-
-    <div id="pagination">
-      <span id="page-info"></span>
-      <div id="page-buttons"></div>
-    </div>
-
   </div>
 
   <div id="modal-overlay" onclick="closeModalOutside(event)">
     <div id="modal">
-      
       <div id="modal-header">
         <h2 id="modal-title">Nueva Evaluación</h2>
-        <button id="modal-close" onclick="closeModal()">✕</button>
       </div>
-      
       <div id="modal-body">
-        <div data-form-row="single">
-          <label>Nombre</label>
-          <input id="f-nombre" type="text" placeholder="Ej: 1er Parcial – 2026">
-        </div>
-        
-        <div data-form-row="double">
-          <div>
-            <label>Tipo</label>
-            <select id="f-tipo">
-              <option value="tp">Trabajo Práctico</option>
-              <option value="parcial">Parcial</option>
-              <option value="final">Final</option>
-              <option value="recup">Recuperatorio</option>
-            </select>
-          </div>
-          <div>
-            <label>Instancia</label>
-            <select id="f-instancia">
-              <option value="regular">Evaluación Regular</option>
-              <option value="recup">Instancia de Recuperación</option>
-            </select>
-          </div>
-        </div>
-        
-        <div data-form-row="double">
-          <div>
-            <label>Fecha de Evaluación</label>
-            <input id="f-fecha" type="date">
-          </div>
-        </div>
-        
-        <div data-form-row="single">
-          <label>Observaciones</label>
-          <textarea id="f-obs" placeholder="Notas adicionales..."></textarea>
-        </div>
+        <label>Nombre</label>
+        <input id="f-nombre" type="text" placeholder="Ej: 1er Parcial – 2026">
+
+        <label>Tipo</label>
+        <select id="f-tipo">
+          <option value="tp">Trabajo Práctico</option>
+          <option value="parcial">Parcial</option>
+          <option value="final">Final</option>
+        </select>
+
+        <label>Instancia</label>
+        <select id="f-instancia">
+          <option value="regular">Evaluación</option>
+          <option value="recup">Recuperatorio</option>
+        </select>
+
+        <label>Fecha de Evaluación</label>
+        <input id="f-fecha" type="date">
+
+        <label>Observaciones</label>
+        <textarea id="f-obs" placeholder="Nota adicionales..."></textarea>
       </div>
-      
       <div id="modal-footer">
         <button onclick="closeModal()">Cancelar</button>
-        <button onclick="saveEval()">💾 Guardar</button>
+        <button onclick="saveModal()">✅ Guardar</button>
       </div>
     </div>
   </div>
-
-  <div id="confirm-overlay">
-    <div id="confirm-box">
-      <div>🗑️</div>
-      <h3>¿Eliminar evaluación?</h3>
-      <p id="confirm-text">Esta acción no se puede deshacer.</p>
-      <div data-confirm-actions="row">
-        <button onclick="closeConfirm()">Cancelar</button>
-        <button onclick="confirmDelete()">Eliminar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast"></div>
 
   <script src="{{ url_for('static', filename='javascript/registro_evaluaciones.js') }}"></script>
 {%- endblock -%}
