@@ -110,15 +110,36 @@ span[data-deadline] { padding: 4px 12px; border-radius: 50px; font-size: 12px; f
 #modal-overlay[data-state="open"], #confirm-overlay[data-state="open"] { display: flex; }
 #modal, #confirm-box { background: white; border-radius: 24px; width: 100%; max-width: 540px; padding: 30px; }
 
+#modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px; 
+}
+
+#modal-body {
+  display: flex;
+  flex-direction: column;
+}
+
 #modal-body label { 
   display: block; font-size: 11px; font-weight: 700; 
-  color: var(--texto-mutado); /* Corregido */
-  text-transform: uppercase; margin-bottom: 6px; 
+  color: var(--texto-mutado);
+  text-transform: uppercase; 
+  margin-top: 12px;
+  margin-bottom: 6px; 
 }
 
 #modal-body input, #modal-body select, #modal-body textarea { 
   width: 100%; padding: 11px; border: 1.5px solid #e2e8f0; border-radius: 10px; 
-  font-family: inherit; outline: none; margin-bottom: 14px;
+  font-family: inherit; outline: none; box-sizing: border-box;
+}
+
+#modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
 }
 
 /* --- Responsive --- */
