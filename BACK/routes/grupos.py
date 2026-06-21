@@ -11,7 +11,7 @@ import json
 grupos_bp = Blueprint('grupos', __name__)
 
 @grupos_bp.route("/", methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_grupos():
 
     base_url = request.base_url
