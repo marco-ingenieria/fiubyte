@@ -25,11 +25,13 @@
 
         <form id="form-pdf-alumnos" method="GET" action="/descargar_pdf_alumnos?nombre_profesor={{ nombre_profesor }}">
             <div>
-                <label><input type="checkbox" name="columnas" value="padron"> Padrón</label>
-                <label><input type="checkbox" name="columnas" value="nombre"> Nombre</label>
-                <label><input type="checkbox" name="columnas" value="apellido"> Apellido</label>
-                <label><input type="checkbox" name="columnas" value="email"> Email</label>
-                <label><input type="checkbox" name="columnas" value="id_curso"> Curso</label>
+                <label><input type="checkbox" name="columnas" value="padron">Padrón</label>
+                <label><input type="checkbox" name="columnas" value="nombre">Nombre</label>
+                <label><input type="checkbox" name="columnas" value="apellido">Apellido</label>
+                <label><input type="checkbox" name="columnas" value="email">Email</label>
+                <label><input type="checkbox" name="columnas" value="aprobo">Aprobación</label>
+                <label><input type="checkbox" name="columnas" value="abandono">Abandono</label>
+                <label><input type="checkbox" name="columnas" value="id_curso">Curso</label>
             </div>
             <div>
                 <button type="submit" id="btn-pdf-submit">Descargar</button>
@@ -98,6 +100,7 @@
             <th>Padron</th>
             <th>Curso</th>
             <th>Estado</th>
+            <th>Aprobación</th>
         </tr>
     </thead>
     <tbody>
@@ -114,6 +117,12 @@
             <td>Abandonó</td>
             {% else %}
             <td>Cursando</td>
+            {% endif %}
+
+            {% if alumno.APROBO %}
+            <td>Aprobó</td>
+            {% else %}
+            <td>No aprobó</td>
             {% endif %}
 
         </tr>
