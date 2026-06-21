@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.alumnos import (listar_alumnos, listar_alumno_curso, buscar_alumno, crear_alumno, actualizar_alumno, 
                               eliminar_alumno, eliminar_alumno_permanente, crear_alumnos_csv, listar_alumnos_pdf)
 from utils import (construir_error)
+from services.historial import registrar
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
@@ -49,6 +50,7 @@ def get_alumnos_pdf():
 
 @alumnos_bp.route('/csv', methods=['POST'])
 @jwt_required()
+@registrar("Creado alumnos desde csv")
 def post_alumnos_csv():
     listado_alumnos = request.files.get('alumnos')
     if not listado_alumnos:
@@ -58,8 +60,10 @@ def post_alumnos_csv():
     
     return crear_alumnos_csv(listado_alumnos)
 
+
 @alumnos_bp.route('/', methods=['POST'])
 @jwt_required()
+@registrar("Creado un alumno")
 def post_alumno():
     body = request.get_json()
 
@@ -80,6 +84,7 @@ def post_alumno():
 
 @alumnos_bp.route('/<int:id>', methods=['PATCH'])
 @jwt_required()
+@registrar("Actualizado un alumno")
 def patch_alumno(id):
     body = request.get_json()
 
@@ -91,11 +96,13 @@ def patch_alumno(id):
 
 @alumnos_bp.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
+@registrar("Desactivado un alumno")
 def delete_alumno_virtual(id):
     return eliminar_alumno(id)
 
 @alumnos_bp.route('/perma/<int:id>', methods=['DELETE'])
 @jwt_required()
+@registrar("Eliminado un alumno")
 def delete_alumno(id):
     return eliminar_alumno_permanente(id)
 

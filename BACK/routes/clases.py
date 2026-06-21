@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.clases import (listar_clases, buscar_clase, crear_clase, actualizar_clase, eliminar_clase, eliminar_clase_permanente)
 from services.asistencias import enviar_mails_asistencia
 from utils import (construir_error, validar_fecha)
+from services.historial import registrar
 
 clases_bp = Blueprint('clases', __name__)
 
@@ -36,6 +37,7 @@ def get_clase(id):
 
 @clases_bp.route('/', methods=['POST'])
 @jwt_required()
+@registrar("Creado una clase")
 def post_clase():
     body = request.get_json(silent=True)
     if not body:
@@ -63,6 +65,7 @@ def post_clase():
 
 @clases_bp.route('/<int:id>', methods=['PATCH'])
 @jwt_required()
+@registrar("Actualizado una clase")
 def patch_clase(id):
     body = request.get_json()
 
@@ -82,6 +85,7 @@ def patch_clase(id):
 
 @clases_bp.route('/<int:id>/enviar-qr', methods=['POST'])
 @jwt_required()
+@registrar("Enviado QR")
 def post_enviar_qr(id):
     body = request.get_json(silent=True)
     if not body:
@@ -98,6 +102,7 @@ def post_enviar_qr(id):
 
 @clases_bp.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
+@registrar("Desactivado una clase")
 def delete_clase_virtual(id):
     return eliminar_clase(id)
 
@@ -105,5 +110,6 @@ def delete_clase_virtual(id):
 
 @clases_bp.route('/perma/<int:id>', methods=['DELETE'])
 @jwt_required()
+@registrar("Eliminado una clase")
 def delete_clase(id):
     return eliminar_clase_permanente(id)

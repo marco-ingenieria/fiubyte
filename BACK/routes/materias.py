@@ -4,6 +4,7 @@ from services.materias import (listar_materias, crear_materia, obtener_materia,
 from utils import construir_error
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from services.historial import registrar
 
 materias_bp = Blueprint('materias', __name__)
 
@@ -38,6 +39,7 @@ def get_estadisticas_materia_pdf():
 
 @materias_bp.route("/", methods=['POST'])
 @jwt_required()
+@registrar("Creado un curso")
 def post_materia():
 
     data=request.get_json()
@@ -58,6 +60,7 @@ def post_materia():
 
 @materias_bp.route("/<int:id>", methods=['PATCH'])
 @jwt_required()
+@registrar("Actualizado un curso")
 def patch_materia(id):
 
     if id <= 0:
@@ -72,6 +75,7 @@ def patch_materia(id):
 
 @materias_bp.route("/<int:id>", methods=['DELETE'])
 @jwt_required()
+@registrar("Desactivado un curso")
 def delete_materia(id):
     if id <= 0:
         return construir_error(400, "id_grupo debe ser un número entero positivo")
