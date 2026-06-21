@@ -1,0 +1,132 @@
+#qr-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+#qr-clase-panel {
+  background: var(--blanco-vidrio);
+  border: 1px solid var(--borde-vidrio);
+  border-radius: 16px;
+  box-shadow: var(--sombra-suave);
+  padding: 18px 20px;
+  backdrop-filter: blur(8px);
+}
+
+#qr-clase-panel p {
+  margin-bottom: 10px;
+  color: var(--texto-mutado);
+}
+
+#qr-clase-panel p strong {
+  color: var(--texto-oscuro);
+}
+
+#qr-media-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  #qr-media-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+#qr-imagen-box {
+  background: var(--blanco-vidrio);
+  border: 1px solid var(--borde-vidrio);
+  border-radius: 16px;
+  box-shadow: var(--sombra-suave);
+  padding: 18px 20px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#qr-imagen {
+  width: 400px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.7);
+}
+
+@media (max-width: 520px) {
+  #qr-imagen {
+    width: 100%;
+  }
+}
+
+#qr-imagen-box a {
+  color: var(--color-primario);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+#qr-imagen-box a:hover {
+  text-decoration: underline;
+}
+
+#qr-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+#qr-form label {
+  font-weight: 700;
+  color: var(--texto-oscuro);
+}
+
+#qr-form select {
+  min-width: 360px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.7);
+  color: var(--texto-oscuro);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+@media (max-width: 520px) {
+  #qr-form select {
+    min-width: 100%;
+  }
+}
+
+#qr-form button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: white;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.25);
+  transition: all 0.25s ease;
+}
+
+#qr-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.35);
+}
+
+#qr-section {
+  margin-top: 10px;
+}
+
+#qr-section h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+

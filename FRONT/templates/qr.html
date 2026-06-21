@@ -1,82 +1,95 @@
 {% extends "base_sistema.html" %}
 
 {% block content %}
-<h1>QR de asistencia</h1>
-{% if error %}
-    <p style="color:#c00;">⚠️ {{ error }}</p>
-{% endif %}
-{% if success %}
-    <p style="color:#080;">✅ {{ success }}</p>
-{% endif %}
-<div style="display: flex; align-items: center; gap: 2rem;">
-    {% if clase %}
-    <div style="margin-bottom:1rem;">
+<link rel="stylesheet" href="{{ url_for('static', filename='style/qr.css') }}">
+
+<div id="qr-contenido">
+  <h1>QR de asistencia</h1>
+
+  {% if error %}
+    <p style="color:#c00; font-weight:800;">⚠️ {{ error }}</p>
+  {% endif %}
+  {% if success %}
+    <p style="color:#080; font-weight:800;">✅ {{ success }}</p>
+  {% endif %}
+
+    <div id="qr-media-row">
+      <div id="qr-clase-panel">
         <p><strong>Fecha:</strong> {{ clase.FECHA }}</p>
         <p><strong>Tema:</strong> {{ clase.TEMA }}</p>
         <p><strong>Horario:</strong> {{ clase.HORARIO }}</p>
+
+
         {% if clase.PROFESORES %}
-            {% set profesores = clase.PROFESORES %}
-            {% for prof in profesores %}
-                <p><strong>Docente {{ loop.index }}:</strong> {{ prof }}</p>
-            {% endfor %}
+          {% set profesores = clase.PROFESORES %}
+          {% for prof in profesores %}
+            <p><strong>Docente {{ loop.index }}:</strong> {{ prof }}</p>
+          {% endfor %}
         {% endif %}
+      </div>
+
+      {% if qr_url %}
+        <div id="qr-imagen-box">
+          <img id="qr-imagen" src="{{ qr_url }}" alt="QR de asistencia">
+          {% if registro_url %}
+            <p>
+              Link del QR:
+              <a href="{{ registro_url }}" target="_blank" rel="noopener noreferrer">{{ registro_url }}</a>
+            </p>
+          {% endif %}
+        </div>
+      {% endif %}
     </div>
 
-    {% if qr_url %}
-        <div style="margin-bottom:1.5rem;">
-            <img src="{{ qr_url }}" alt="QR de asistencia" style="max-width:100%; border:1px solid #ccc;">
-            {% if registro_url %}
-                <p>
-                    Link del QR:
-                    <a href="{{ registro_url }}">{{ registro_url }}</a>
-                </p>
-            {% endif %}
-        </div>
-    {% endif %}
-</div>
-    <form action="/qr" method="POST">
-        <input type="hidden" name="id" value="{{ clase.ID }}">
-        <label for="curso_id">Seleccionar curso para enviar el QR:</label>
-        <select id="curso_id" name="curso_id" required>
-            <option value="">-- Elegir curso --</option>
-            {% for curso in cursos %}
-                <option value="{{ curso.ID }}" {% if curso_id == curso.ID|string %}selected{% endif %}>
-                    {{ curso.NOMBRE_MATERIA }} - {{ curso.CUATRIMESTRE }}° cuatrimestre {{ curso.ANIO }}
-                </option>
-            {% endfor %}
-        </select>
-        <button type="submit" style="margin-top:1rem;">Enviar QR por mail a los alumnos</button>
+
+
+    <form id="qr-form" action="/qr" method="POST">
+      <input type="hidden" name="id" value="{{ clase.ID }}">
+
+      <label for="curso_id">Seleccionar curso</label>
+      <select id="curso_id" name="curso_id" required>
+        <option value="">-- Elegir curso --</option>
+        {% for curso in cursos %}
+          <option value="{{ curso.ID }}" {% if curso_id == curso.ID|string %}selected{% endif %}>
+            {{ curso.NOMBRE_MATERIA }} - {{ curso.CUATRIMESTRE }}° cuatrimestre {{ curso.ANIO }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <button type="submit">Enviar QR por mail a los alumnos</button>
     </form>
 
-    <section style="margin-top:2rem;">
-        <h2>Alumnos que marcaron asistencia</h2>
-        {% if asistieron %}
-            <table style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr>
-                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Padrón</th>
-                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Nombre</th>
-                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Apellido</th>
-                        <th style="text-align:left; border-bottom:1px solid #ccc; padding:8px;">Registro</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for alumno in asistieron %}
-                        <tr>
-                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.PADRON }}</td>
-                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.NOMBRE }}</td>
-                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.APELLIDO }}</td>
-                            <td style="border-bottom:1px solid #eee; padding:8px;">{{ alumno.FECHA_ASISTENCIA }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No hay asistencias registradas para esta clase.</p>
-        {% endif %}
-    </section>
-{% else %}
-    <p>No hay datos de clase para mostrar.</p>
-{% endif %}
 
+    <section id="qr-section">
+      <h2>Alumnos que marcaron asistencia</h2>
+      {% if asistieron %}
+        <table>
+          <thead>
+            <tr>
+              <th>Padrón</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for alumno in asistieron %}
+              <tr>
+                <td>{{ alumno.PADRON }}</td>
+                <td>{{ alumno.NOMBRE }}</td>
+                <td>{{ alumno.APELLIDO }}</td>
+                <td>{{ alumno.FECHA_ASISTENCIA }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No hay asistencias registradas para esta clase.</p>
+      {% endif %}
+    </section>
+
+{% if not asistieron and not qr_url %}
+  <p>No hay datos de clase para mostrar.</p>
+{% endif %}
 {% endblock %}
+

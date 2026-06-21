@@ -3,31 +3,34 @@
 {% block title %}{% if historial_global %}Historiales - Panel Docente{% else %}Historial de Usuario - Panel Docente{% endif %}{% endblock %}
 
 {% block content %}
-<main>
+<link rel="stylesheet" href="{{ url_for('static', filename='style/historial.css') }}">
+
+<main id="historial-main">
     <h1>{% if historial_global %}Historiales generales{% else %}Historial de Usuario{% endif %}</h1>
     <p>{% if historial_global %}Registro completo de actividades del sistema.{% else %}Registros asociados al usuario seleccionado.{% endif %}</p>
 
-    <div style="margin-bottom: 1rem; display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
-        <form action="{{ url_for('seccion_historial') }}" method="GET" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+    <div id="historial-buscador">
+        <form action="{{ url_for('seccion_historial') }}" method="GET">
             <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
-            <label for="historial-usuario-id">Buscar historial de usuario ID:</label>
+
+            <label for="historial-usuario-id">Usuario ID</label>
             <input id="historial-usuario-id" name="id" type="number" min="1" placeholder="ID de usuario" value="{% if usuario_id %}{{ usuario_id }}{% endif %}">
+
             <button type="submit">Buscar</button>
         </form>
-
     </div>
 
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p id="historial-error">{{ error }}</p>
     {% endif %}
 
-    <div style="margin-bottom: 1rem;">
+    <div id="historial-links">
         {% if historial_global %}
-            <a href="/menu?nombre_profesor={{ nombre_profesor }}">Volver al Menú</a>
+            <a class="historial-link" href="/menu?nombre_profesor={{ nombre_profesor }}">Volver al Menú</a>
         {% else %}
-            <a href="/usuarios?nombre_profesor={{ nombre_profesor }}">Volver a Usuarios</a>
-            &nbsp;|&nbsp;
-            <a href="/historiales?nombre_profesor={{ nombre_profesor }}">Ver todos los historiales</a>
+            <a class="historial-link" href="/usuarios?nombre_profesor={{ nombre_profesor }}">Volver a Usuarios</a>
+            <span class="historial-sep">|</span>
+            <a class="historial-link" href="/historiales?nombre_profesor={{ nombre_profesor }}">Ver todos los historiales</a>
         {% endif %}
     </div>
 
@@ -50,7 +53,7 @@
                 <td>{{ item.ID_USUARIO }}</td>
                 {% if historial_global %}
                     <td>
-                        <a href="{{ url_for('seccion_historial', nombre_profesor=nombre_profesor, id=item.ID_USUARIO) }}">Ver historial</a>
+                        <a class="historial-link" href="{{ url_for('seccion_historial', nombre_profesor=nombre_profesor, id=item.ID_USUARIO) }}">Ver historial</a>
                     </td>
                 {% endif %}
             </tr>
