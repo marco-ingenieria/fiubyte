@@ -524,91 +524,9 @@ def eliminar_clase(id):
                             curso_id=curso_id_actual, 
                             orden=orden_actual))
 
-# 6. Ruta de la sección de Notas
-
-@app.route('/notas', methods=['GET', 'POST'])
-def seccion_notas():
-    nombre = request.args.get('nombre_profesor', '')
-    id_evaluacion = request.args.get('id_evaluacion', type=int)
-    error = None
-
-    # Guardar una nota
-    if request.method == "POST":
-        id_evaluacion = request.form.get('id_evaluacion')
-        try:
-            requests.post("http://backend:5000/notas/", json={
-                "padron": request.form.get('padron'),
-                "id_evaluacion": id_evaluacion,
-                "nota": request.form.get('nota')
-            })
-        except Exception as e:
-            print("Error al guardar nota")
-
-    evaluacion = None
-    alumnos = []
-    notas_por_padron = {}
-
-    if id_evaluacion:
-        # 1. Datos de la evaluación (para saber su curso y nombre)
-        try:
-            resp_eval = requests.get(f"http://backend:5000/evaluaciones/{id_evaluacion}")
-            if resp_eval.status_code == 200:
-                evaluacion = resp_eval.json().get("evaluacion")
-        except Exception as e:
-            evaluacion = None
-
-        # 2. Alumnos del curso de esa evaluación
-        if evaluacion:
-            id_curso = evaluacion.get("ID_MATERIA")
-            try:
-                resp_al = requests.get(f"http://backend:5000/alumnos/curso/{id_curso}", params={"limit": 200, "offset": 0})
-                alumnos = resp_al.json().get("listado", [])
-            except Exception as e:
-                alumnos = []
-
-        # 3. Notas ya cargadas para esta evaluación
-        try:
-            resp_notas = requests.get("http://backend:5000/notas/", params={"id_evaluacion": id_evaluacion, "limit": 200, "offset": 0})
-            notas_listado = resp_notas.json().get("listado", [])
-            for n in notas_listado:
-                notas_por_padron[str(n.get("PADRON_ALUMNO"))] = n.get("NOTA")
-        except Exception as e:
-            notas_por_padron = {}
-
-    return render_template('notas.html',
-                           nombre_profesor=nombre,
-                           evaluacion=evaluacion,
-                           id_evaluacion=id_evaluacion,
-                           alumnos=alumnos,
-                           notas_por_padron=notas_por_padron,
-                           error=error)
 
 
-@app.route('/api/notas', methods=['GET'])
-def api_get_notas():
-    id_evaluacion = request.args.get('id_evaluacion', type=int)
-    padron        = request.args.get('padron', type=int)
-    params = {'limit': 100, 'offset': 0}
-    if id_evaluacion:
-        params['id_evaluacion'] = id_evaluacion
-    if padron:
-        params['padron'] = padron
-    try:
-        r = requests.get('http://backend:5000/notas/', params=params)
-        return r.json(), r.status_code
-    except Exception:
-        return {'error': 'No se pudo conectar al backend'}, 500
-        
-@app.route('/api/notas', methods=['POST'])
-def api_crear_nota():
-    try:
-        r = requests.post('http://backend:5000/notas/',
-                          json=request.get_json())
-        return r.json(), r.status_code
-    except Exception:
-        return {'error': 'No se pudo conectar al backend'}, 500
-        
-# 5. Ruta de la sección de Evaluaciones
+# EVALUACIONES
 @app.route('/evaluaciones', methods=['GET', 'POST'])
 def seccion_evaluaciones():
     nombre = request.args.get('nombre_profesor', '')
@@ -617,7 +535,6 @@ def seccion_evaluaciones():
     if request.method == "POST":
         crear = request.form.get('crear_evaluacion')
         eliminar = request.form.get('eliminar_evaluacion')
-
         if crear:
             try:
                 requests.post("http://backend:5000/evaluaciones/", json={
@@ -625,74 +542,61 @@ def seccion_evaluaciones():
                     "tipo": request.form.get('tipo'),
                     "id_materia": request.form.get('id_materia')
                 })
-            except Exception as e:
-                print("Error al crear evaluación")
-
-        if eliminar:
+            except Exception:
+                error = "Error al crear evaluación"
+        elif eliminar:
             try:
                 requests.delete(f"http://backend:5000/evaluaciones/{eliminar}")
-            except Exception as e:
-                print("Error al eliminar evaluación")
+            except Exception:
+                error = "Error al eliminar evaluación"
 
-    # Traer cursos para el selector
-    cursos = []
-    try:
-        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
-        cursos = resp_cursos.json().get("listado", [])
-    except Exception as e:
-        cursos = []
+    # Datos para el frontend
+    evaluaciones = requests.get("http://backend:5000/evaluaciones/").json().get("listado", [])
+    cursos = requests.get("http://backend:5000/materias/").json().get("listado", [])
 
-    # Traer evaluaciones
-    evaluaciones = []
-    try:
-        response = requests.get("http://backend:5000/evaluaciones/", params={"limit": 100, "offset": 0})
-        evaluaciones = response.json().get("listado", [])
-    except Exception as e:
-        evaluaciones = []
+    return render_template('registro_evaluaciones.html', 
+                           nombre_profesor=nombre, 
+                           evaluaciones=evaluaciones, 
+                           cursos=cursos, 
+                           error=error)
 
-    return render_template('registro_evaluaciones.html', nombre_profesor=nombre, evaluaciones=evaluaciones, cursos=cursos, error=error)
+# NOTAS
+@app.route('/notas', methods=['GET', 'POST'])
+def seccion_notas():
+    nombre = request.args.get('nombre_profesor', '')
+    id_evaluacion = request.args.get('id_evaluacion', type=int)
+    
+    if request.method == "POST":
+        try:
+            requests.post("http://backend:5000/notas/", json={
+                "padron": request.form.get('padron'),
+                "id_evaluacion": request.form.get('id_evaluacion'),
+                "nota": request.form.get('nota')
+            })
+        except Exception:
+            pass
+        return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre))
 
-# @app.route('/api/evaluaciones', methods=['GET'])
-# def api_get_evaluaciones():
-#     try:
-#         r = requests.get('http://backend:5000/evaluaciones/',
-#                          params={'limit': 100, 'offset': 0})
-#         return r.json(), r.status_code
-#     except Exception:
-#         return {'error': 'No se pudo conectar al backend'}, 500
+    evaluacion = None
+    alumnos = []
+    notas_por_padron = {}
+
+    if id_evaluacion:
+        resp_ev = requests.get(f"http://backend:5000/evaluaciones/{id_evaluacion}")
+        if resp_ev.status_code == 200:
+            evaluacion = resp_ev.json().get("evaluacion")
+            alumnos = requests.get(f"http://backend:5000/alumnos/curso/{evaluacion.get('ID_MATERIA')}").json().get("listado", [])
+            notas_db = requests.get("http://backend:5000/notas/", params={"id_evaluacion": id_evaluacion}).json().get("listado", [])
+            notas_por_padron = {str(n['PADRON_ALUMNO']): n['NOTA'] for n in notas_db}
+
+    return render_template('notas.html', 
+                           nombre_profesor=nombre, 
+                           evaluacion=evaluacion, 
+                           id_evaluacion=id_evaluacion, 
+                           alumnos=alumnos, 
+                           notas_por_padron=notas_por_padron)
 
 
-# @app.route('/api/evaluaciones', methods=['POST'])
-# def api_crear_evaluacion():
-#     try:
-#         r = requests.post('http://backend:5000/evaluaciones/',
-#                           json=request.get_json())
-#         return r.json(), r.status_code
-#     except Exception:
-#         return {'error': 'No se pudo conectar al backend'}, 500
-
-
-# @app.route('/api/evaluaciones/<int:id>', methods=['PATCH'])
-# def api_editar_evaluacion(id):
-#     try:
-#         r = requests.patch(f'http://backend:5000/evaluaciones/{id}',
-#                            json=request.get_json())
-#         return r.json(), r.status_code
-#     except Exception:
-#         return {'error': 'No se pudo conectar al backend'}, 500
-
-
-# @app.route('/api/evaluaciones/<int:id>', methods=['DELETE'])
-# def api_eliminar_evaluacion(id):
-#     try:
-#         r = requests.delete(f'http://backend:5000/evaluaciones/{id}')
-#         # 204 no tiene body
-#         if r.status_code == 204:
-#             return '', 204
-#         return r.json(), r.status_code
-#     except Exception:
-#         return {'error': 'No se pudo conectar al backend'}, 500
-        
 
 @app.route('/grupos', methods=["POST", "GET"])
 def seccion_grupos():
