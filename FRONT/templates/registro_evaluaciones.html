@@ -1,6 +1,7 @@
-{%- extends 'base_sistema.html' -%}
-{%- block title -%}Evaluaciones – Panel Docente{%- endblock -%}
-{%- block content -%}
+{% extends 'base_sistema.html' %}
+{% block title %}Evaluaciones – Panel Docente{% endblock %}
+{% block content %}
+
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style/registro_evaluaciones.css') }}">
 
@@ -11,69 +12,109 @@
             <p>Gestión de instancias de evaluación · Ciclo 2026</p>
         </div>
         <div id="page-header-actions">
-            <button id="btn-crear-tp" onclick="openModal('tp')"><span>+</span> Agregar TP</button>
-            <button id="btn-crear-eval" onclick="openModal('eval')"><span>+</span> Agregar Evaluación</button>
+            <button id="btn-crear-eval" onclick="abrirModalCrear()">
+                <span>+</span> Agregar Evaluación
+            </button>
         </div>
     </div>
 
+      {% if error %}<p id="error-msg">⚠️ {{ error }}</p>{% endif %}
+
     <div id="filter-bar">
-        <input type="text" id="search-input" oninput="filterCards()" placeholder="Buscar por nombre...">
-        <select id="filter-tipo" onchange="filterCards()">
+        <input type="text" id="search-input" oninput="filtrar()" placeholder="Buscar por nombre...">
+        <select id="filter-tipo" onchange="filtrar()">
             <option value="">Todos los tipos</option>
-            <option value="tp-individual">TP Individual</option>
-            <option value="tp-grupal">TP Grupal</option>
-            <option value="parcial">Parcial</option>
-            <option value="final">Final</option>
-            <option value="recup">Recuperatorio</option>
+            <option value="Parcial">Parcial</option>
+            <option value="Oral">Oral</option>
+            <option value="Final">Final</option>
+            <option value="TP">TP</option>
+            <option value="Recuperatorio">Recuperatorio</option>
         </select>
     </div>
 
-    <div id="eval-list"></div>
+
+    <div id="eval-list">
+        {% for ev in evaluaciones %}
+        <div data-tipo="{{ ev.TIPO }}" data-nombre="{{ ev.NOMBRE|lower }}">
+            <div data-avatar="{{ ev.TIPO|lower }}">{{ ev.TIPO[0] }}</div>
+            <div>
+                <h2>{{ ev.NOMBRE }}</h2>
+                <div id="card-tipo">{{ ev.TIPO }}</div>
+                {% if ev.TIPO == 'TP' %}
+                <div id="card-fechas">📅 Inicio: {{ ev.FECHA_INICIO or '—' }} · Entrega: {{ ev.FECHA_ENTREGA or '—' }}</div>
+                {% else %}
+                <div id="card-fechas">📅 Entrega: {{ ev.FECHA_EVALUACION or '—' }}</div>
+                {% endif %}
+            </div>
+            <div id="card-actions">
+                <a href="{{ url_for('seccion_notas', id_evaluacion=ev.ID, nombre_profesor=nombre_profesor) }}">📊 Cargar notas</a>
+                <button type="button" onclick="abrirModalEditar({{ ev.ID }}, {{ ev.NOMBRE|tojson }}, {{ ev.TIPO|tojson }}, {{ ev.ID_MATERIA|tojson }}, {{ (ev.FECHA_EVALUACION or '')|tojson }}, {{ (ev.MODALIDAD or '')|tojson }}, {{ (ev.FECHA_INICIO or '')|tojson }}, {{ (ev.FECHA_ENTREGA or '')|tojson }}, {{ (ev.NOTAS or '')|tojson }})">✏️ Editar</button>
+                <form method="POST" action="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
+                    <input type="hidden" name="eliminar_evaluacion" value="{{ ev.ID }}">
+                    <button type="submit">🗑️</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     <div id="empty-state"><p>📭 No se encontraron evaluaciones.</p></div>
 </div>
 
-<div id="modal-overlay" onclick="closeModalOutside(event)">
+
+
+<div id="modal-overlay" onclick="cerrarSiAfuera(event)">
     <div id="modal">
-        <div id="modal-header">
-            <h2 id="modal-title">Nueva Evaluación</h2>
-        </div>
-        <div id="modal-body">s
-            <label>Nombre</label>
-            <input id="f-nombre" type="text" placeholder="Ej: 1er Parcial o TP - 2026">
-            
-            <label>Tipo</label>
-            <select id="f-tipo" onchange="toggleDateFields()">
-            </select>
+        <div id="modal-header"><h2 id="modal-titulo">Nueva Evaluación</h2></div>
+        <form method="POST" action="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
+            <input type="hidden" name="crear_evaluacion" value="1">
+            <input type="hidden" name="id_editar" id="id_editar" value="">
+            <div id="modal-body">
+                <label>Nombre</label>
+                <input type="text" name="nombre" id="input-nombre" placeholder="Ej: 1er Parcial 2026" required>
 
-            <div id="group-instancia">
-                <label>Instancia</label>
-                <select id="f-instancia">
-                    <option value="regular">Evaluación</option>
-                    <option value="recup">Recuperatorio</option>
+                <label>Tipo</label>
+                <select name="tipo" id="tipo-select" required>
+                    <option value="Parcial">Parcial</option>
+                    <option value="Oral">Oral</option>
+                    <option value="Final">Final</option>
+                    <option value="TP">TP</option>
+                    <option value="Recuperatorio">Recuperatorio</option>
                 </select>
-            </div>
 
-            <div id="group-fecha-unica">
-                <label>Fecha de Evaluación</label>
-                <input id="f-fecha" type="date">
-            </div>
+                <label>Curso</label>
+                <select name="id_materia" required>
+                    {% for curso in cursos %}
+                    <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
+                    {% endfor %}
+                </select>
 
-            <div id="group-fechas-tp">
-                <label>Fecha de Inicio</label>
-                <input id="f-fecha-inicio" type="date">
-                <label>Fecha de Entrega</label>
-                <input id="f-fecha-entrega" type="date">
-            </div>
+                <div id="fecha-general">
+                    <label>Fecha de entrega</label>
+                    <input type="date" name="fecha_evaluacion" id="input-fecha-evaluacion">
+                </div>
 
-            <label>Observaciones</label>
-            <textarea id="f-obs" placeholder="Nota adicionales..."></textarea>
-        </div>
-        <div id="modal-footer">
-            <button onclick="closeModal()">Cancelar</button>
-            <button onclick="saveModal()">Guardar Cambios</button>
-        </div>
+                <div id="tp-extras" style="display: none;">
+                    <label>Modalidad</label>
+                    <select name="modalidad_tp" id="select-modalidad">
+                        <option value="Individual">Individual</option>
+                        <option value="Grupal">Grupal</option>
+                    </select>
+                    <label>Fecha de Inicio</label>
+                    <input type="date" name="fecha_inicio" id="input-fecha-inicio">
+                    <label>Fecha de Entrega</label>
+                    <input type="date" name="fecha_entrega" id="input-fecha-entrega">
+                </div>
+
+                <label>Notas adicionales</label>
+                <textarea name="notas" id="textarea-notas" placeholder="Escribe aquí notas adicionales..." rows="3"></textarea>
+            </div>
+            <div id="modal-footer">
+                <button type="button" onclick="document.getElementById('modal-overlay').removeAttribute('data-state')">Cancelar</button>
+                <button type="submit" id="btn-modal-guardar">Guardar</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='javascript/registro_evaluaciones.js') }}"></script>
-{%- endblock -%}
+{% endblock %}
