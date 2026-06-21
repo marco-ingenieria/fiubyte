@@ -1,5 +1,3 @@
-let deleteId = null;
-
 function openDelete(id, nombre){
     deleteId = id;
     document.getElementById("form-delete").action =
