@@ -695,6 +695,7 @@ def seccion_alumnos():
                 "apellido": request.form.get('apellido'),
                 "email": request.form.get('email'),
                 "padron": request.form.get('padron'),
+                "id_curso": request.form.get('id_curso')
             })
 
             print(response.json(), flush=True)
