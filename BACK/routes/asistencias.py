@@ -20,7 +20,8 @@ def get_asistencias(clase_id):
 
     asistencias = listar_asistencias(limit, offset, base_url, clase_id)
     return asistencias
-'''
+
+#TO DO: seguridad
 @asistencias_bp.route('/mail/<int:clase_id>', methods=['GET', 'POST'])
 def get_mail_asistencia(clase_id):
     id_curso = None
@@ -38,31 +39,7 @@ def get_mail_asistencia(clase_id):
         id_curso = request.args.get('id_curso', type=int)
 
     return enviar_mails_asistencia(clase_id, id_curso)
-'''
 
-@asistencias_bp.route('/mail/<int:clase_id>', methods=['POST'])
-@jwt_required()
-def get_mail_asistencia(clase_id):
-    id_curso = None
-    body = request.get_json(silent=True)
-    if not body or 'id_curso' not in body:
-        return construir_error(400, 'Falta id_curso para el curso')
-    try:
-        id_curso = int(body.get('id_curso'))
-        if id_curso <= 0:
-            return construir_error(400, 'id_curso inválido')
-    except (ValueError, TypeError):
-        return construir_error(400, 'id_curso inválido')
-
-    return enviar_mails_asistencia(clase_id, id_curso)
-
-@asistencias_bp.route('/mail/<int:clase_id>', methods=['GET'])
-def get_mail_asistencia(clase_id):
-    id_curso = None
-    
-    id_curso = request.args.get('id_curso', type=int)
-
-    return enviar_mails_asistencia(clase_id, id_curso)
 
 @asistencias_bp.route('/registro/<int:clase_id>', methods=['GET'])
 def get_registrar_asistencia(clase_id):

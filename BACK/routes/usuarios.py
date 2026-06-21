@@ -13,7 +13,6 @@ def get_usuarios():
     return listar_usuarios(limit, offset)
 
 @usuarios_bp.route('/login', methods=['POST'])
-@jwt_required()
 def post_login():
     body = request.get_json()
     nombre = body.get('nombre')
