@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.evaluaciones import (listar_evaluaciones,listar_evaluaciones_alumno, buscar_evaluacion, crear_evaluacion, actualizar_evaluacion, eliminar_evaluacion, eliminar_evaluacion_permanente)
 from utils import (construir_error)
 from constants import (TIPOS_EVAL)
+from services.historial import registrar
 
 evaluaciones_bp = Blueprint('evaluaciones', __name__)
 
@@ -37,6 +38,7 @@ def get_evaluacion(id):
 
 @evaluaciones_bp.route('/', methods=['POST'])
 @jwt_required()
+@registrar("Creado una evaluación")
 def post_evaluacion():
     body = request.get_json()
 
@@ -58,6 +60,7 @@ def post_evaluacion():
 
 @evaluaciones_bp.route('/<int:id>', methods=['PATCH'])
 @jwt_required()
+@registrar("Actualizado una evaluación")
 def patch_evaluacion(id):
     body = request.get_json()
 
@@ -75,6 +78,7 @@ def patch_evaluacion(id):
 
 @evaluaciones_bp.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
+@registrar("Desactivado una evaluación")
 def delete_evaluacion_virtual(id):
     return eliminar_evaluacion(id)
 
@@ -82,6 +86,7 @@ def delete_evaluacion_virtual(id):
 
 @evaluaciones_bp.route('/perma/<int:id>', methods=['DELETE'])
 @jwt_required()
+@registrar("Eliminado una evaluación")
 def delete_evaluacion(id):
     return eliminar_evaluacion_permanente(id)
 

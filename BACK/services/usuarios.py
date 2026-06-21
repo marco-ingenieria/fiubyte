@@ -38,7 +38,7 @@ def chequear_usuario(nombre, contrasenia):
             return construir_error(401, "Usuario o contraseña incorrectos")
         print(f"Bienvenido {usuario['NOMBRE']}", flush=True)
         
-        token = create_access_token(identity=nombre)
+        token = create_access_token(identity=str(usuario["ID_USUARIO"]))
         
         return (jsonify({"usuario": usuario,
                          "access_token": token}), 200)
