@@ -182,3 +182,41 @@
 #boton-cancelar-grupo:hover {
     background: #cbd5e1;
 }
+
+#id_curso {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    cursor: pointer;
+    color: var(--texto-oscuro);
+    margin-bottom: 16px;
+}
+
+#id_curso:hover {
+    border-color: var(--color-primario);
+}
+
+#mensaje-error {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+#mensaje-exito {
+    color: #16a34a;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}

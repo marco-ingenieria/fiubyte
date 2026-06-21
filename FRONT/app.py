@@ -608,6 +608,8 @@ def seccion_grupos():
     nombre_profesor = request.args.get('nombre_profesor', '')
     padron_asignar = request.form.get('padron_asignar')
     grupo_id = request.form.get('grupo_id')
+    error = None 
+    exito = None
  
     if request.method == "POST":
         crear = request.form.get('crear')
@@ -615,22 +617,34 @@ def seccion_grupos():
 
         if eliminar:
             try:
-                requests.delete(f"http://backend:5000/grupos/{eliminar}")
+                r=requests.delete(f"http://backend:5000/grupos/{eliminar}")
+                if r.status_code == 404:
+                    error = "El grupo no existe"
+                elif r.status_code != 200:
+                    error = "Error al eliminar el grupo"
             except Exception as e:
                 print("Error al eliminar grupo")
         elif crear:
             try:
+                id_curso_grupo = request.form.get('id_curso')
                 requests.post("http://backend:5000/grupos/", json={
-                    "nombre": crear
+                    "nombre": crear,
+                    "id_curso": int(id_curso_grupo) if id_curso_grupo else None
                 })
             except Exception as e:
                 print("Error al crear grupo")
         elif padron_asignar and grupo_id:
             try:
-                requests.post(f"http://backend:5000/grupos/asignar-alumnos", json={
+                r=requests.post("http://backend:5000/grupos/asignar-alumnos/", json={
             "id_grupo": int(grupo_id),
             "padrones_alumnos": [{"padron": int(padron_asignar)}]
                 })
+                if r.status_code == 200:
+                    exito = "Alumno agregado correctamente"
+                elif r.status_code == 500:
+                     error = "El alumno ya está asignado a este grupo"
+                else:
+                    error = r.json().get("errors", [{}])[0].get("description", "Error al asignar alumno")
             except Exception as e:
                 print("Error al asignar alumno ")
 
@@ -640,8 +654,14 @@ def seccion_grupos():
         grupos = response.json().get("listado", [])
     except Exception as e:
         print("Hubo un error")
+    cursos = []
+    try:
+        cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
+        cursos = cursos.json().get("listado", [])
+    except Exception as e:
+        print("Error al obtener cursos")
 
-    return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos)
+    return render_template('grupos.html', nombre_profesor=nombre_profesor, grupos=grupos,cursos=cursos,error_asignar=error,exito=exito)
 
 @app.route('/grupo-detalle')
 def detalle_grupo():
@@ -683,6 +703,7 @@ def seccion_alumnos():
     id_curso = request.args.get('id_curso', '')
     crear_alumno = request.form.get('crear_alumno')
     eliminar_alumno = request.form.get('eliminar_alumno')
+    buscar_padron = request.args.get('buscar_padron', '').strip()
     
     if crear_alumno:
         print("FORM COMPLETO:", dict(request.form), flush=True)
@@ -706,23 +727,30 @@ def seccion_alumnos():
             requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
         except Exception as e:
             print("Error al eliminar alumno")
-
     try:
         resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
         cursos = resp_cursos.json().get("listado", [])
     except Exception as e:
         cursos = []
-
     try:
-        if id_curso:
+        if buscar_padron:
+           
+            response = requests.get("http://backend:5000/alumnos/", params={"limit": 100, "offset": 0})
+        elif id_curso:
             response = requests.get(f"http://backend:5000/alumnos/curso/{id_curso}", params={"limit": 100, "offset": 0})
         else:
             response = requests.get("http://backend:5000/alumnos/", params={"limit": 100, "offset": 0})
+            
         alumnos = response.json().get("listado", [])
     except Exception as e:
         alumnos = []
+    if buscar_padron:
+        alumnos = [
+            a for a in alumnos 
+            if str(a.get('PADRON', '')) == str(buscar_padron)]
 
-    return render_template('alumnos.html', nombre_profesor=nombre, alumnos=alumnos, cursos=cursos, id_curso=id_curso)
+    return render_template(
+        'alumnos.html', nombre_profesor=nombre, alumnos=alumnos, cursos=cursos, id_curso=id_curso,buscar_padron=buscar_padron)   
 
 @app.route('/cargar_csv_alumnos', methods=['POST'])
 def crear_alumnos_csv():
@@ -949,29 +977,36 @@ def ver_grupo(id):
 @app.route('/cursos', methods=["POST", "GET"])
 def seccion_cursos():
     nombre = request.args.get('nombre_profesor', '')
+    error = None 
     if request.method == "POST":
         crear_curso = request.form.get('crear-curso')
         eliminar_curso = request.form.get('eliminar-curso')
         if eliminar_curso:
             try:
-                requests.delete(f"http://backend:5000/materias/{eliminar_curso}")
+                r=requests.delete(f"http://backend:5000/materias/{eliminar_curso}")
+                if r.status_code == 404:
+                    error = "El curso no existe"
+                elif r.status_code != 200:
+                    error = "Error al eliminar el curso"
             except Exception as e:
                 print("Error al eliminar curso")
         elif crear_curso:
             try:
-                requests.post("http://backend:5000/materias/", json={
+                r=requests.post("http://backend:5000/materias/", json={
                     "nombre_materia": crear_curso,
                     "cuatrimestre":int(request.form.get('cuatrimestre-crear')),
                     "anio":int(request.form.get('anio-crear',2026))})
+                if r.status_code != 201:
+                    error = r.json().get("description", "Error al crear el curso")
             except Exception as e:
-                print("Error al crear curso")
+                error="Error al crear curso"
     try:
         response = requests.get("http://backend:5000/materias/", params={"limit": 30, "offset": 0})
         cursos = response.json().get("listado", [])
     except Exception as e:
         cursos = []
         print("Hubo un error al obtener los cursos")
-    return render_template('cursos.html', nombre_profesor=nombre, cursos=cursos)
+    return render_template('cursos.html', nombre_profesor=nombre, cursos=cursos, error_asignar=error)
 
 @app.route('/curso/<int:id>', methods=["GET", "POST"])
 def ver_curso(id):
