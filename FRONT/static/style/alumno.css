@@ -46,17 +46,14 @@
     height: 110px;
     margin: 0 auto 20px auto;
     border-radius: 50%;
-    
-    /* Centrado absoluto de la única letra */
     display: flex;
     justify-content: center;
     align-items: center;
     
-    /* Estilo de la inicial */
     font-size: 48px;
     font-weight: 700;
     color: white;
-    text-transform: uppercase; /* Fuerza que la letra sea mayúscula siempre */
+    text-transform: uppercase; 
     line-height: 1; 
     
     background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));

@@ -95,14 +95,15 @@ def perfil_alumno(padron):
     notas_alumno = []
     curso_nombre = None
     promedio = 0
-    porcentaje = 0
     total_evaluaciones = 0
     evaluaciones_rendidas = 0
 
     try:
         response_alumno = requests.get(f"http://backend:5000/alumnos/{padron}")
-        data_alumno = response_alumno.json() if response_alumno.status_code == 200 else {}
-
+        if response_alumno.status_code == 200:
+            data_alumno = response_alumno.json()
+        else:
+            data_alumno = {}
         id_curso = data_alumno.get("ID_CURSO") or data_alumno.get("id_curso")
 
         if id_curso:
@@ -125,7 +126,11 @@ def perfil_alumno(padron):
             notas_alumno = response_notas.json().get("listado", [])
 
         if notas_alumno:
-            total = sum(float(n.get("NOTA", 0)) for n in notas_alumno)
+            total = 0
+
+            for nota in notas_alumno:
+                total += float(nota.get("NOTA", 0))
+
             promedio = round(total / len(notas_alumno), 2)
 
         total_evaluaciones = len(evaluaciones_alumno) 
@@ -150,7 +155,6 @@ def perfil_alumno(padron):
             "NOTAS": notas_alumno,
             "EVALUACIONES_RENDIDAS": evaluaciones_rendidas,
             "TOTAL_EVALUACIONES": total_evaluaciones,
-            "PORCENTAJE_EVALUACIONES": porcentaje,
         }
 
     except Exception as e:
@@ -161,7 +165,7 @@ def perfil_alumno(padron):
         alumno = {
             "NOMBRE": "", "APELLIDO": "", "MAIL": "", "PADRON": padron,
             "ASISTENCIAS": 0, "PROMEDIO": 0, "GRUPOS": [], "NOTAS": [],
-            "EVALUACIONES_RENDIDAS": 0, "TOTAL_EVALUACIONES": 0, "PORCENTAJE_EVALUACIONES": 0
+            "EVALUACIONES_RENDIDAS": 0, "TOTAL_EVALUACIONES": 0
         }
         
     return render_template("alumno.html", alumno=alumno, nombre_profesor=nombre)

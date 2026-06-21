@@ -43,7 +43,7 @@
     <div id="contenedor-grupos">
         {% if alumno.GRUPOS %}
             {% for grupo in alumno.GRUPOS %}
-                <a href="{{ url_for('ver_grupo', id=grupo['ID'], nombre_profesor=nombre_profesor) }}" class="btn-grupo">
+                <a href="{{ url_for('ver_grupo', id=grupo['ID'], nombre_profesor=nombre_profesor) }}" >
                     Grupo {{ grupo['NOMBRE'] }}
                 </a>
             {% endfor %}

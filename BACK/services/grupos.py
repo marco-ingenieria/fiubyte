@@ -287,7 +287,6 @@ def asignar_tp(id_grupo, id_tp):
         if connection and connection.is_connected():
             connection.close()
 
-#eliminar_alumno
 def alumno_pertenece_a_grupo(cursor, id_grupo, padron_alumno):
     cursor.execute("SELECT * FROM GRUPO_ALUMNO WHERE ID_GRUPO=%s AND PADRON_ALUMNO = %s AND ELIMINADO=0", 
                    [id_grupo, padron_alumno])
@@ -301,11 +300,9 @@ def eliminar_alumno(id_grupo, padron_alumno):
         connection = get_connection()
         cursor = connection.cursor(dictionary = True)
 
-        #existe grupo
         if not existe_en_bd(cursor, "GRUPOS", "ID", id_grupo):
             return construir_error(404, "Grupo no encontrado")
 
-        #existe TP
         if not alumno_pertenece_a_grupo(cursor, id_grupo, padron_alumno):
             return construir_error(404, "El alumno indicado no pertenece al grupo seleccionado")
         
