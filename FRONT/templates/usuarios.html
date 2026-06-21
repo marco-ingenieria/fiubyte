@@ -20,11 +20,30 @@
         <label>Nombre de Usuario:</label>
         <input type="text" name="nombre" placeholder="usuario" required>
         <label>Contraseña:</label>
-        <input type="password" name="contrasenia" placeholder="0123456789" required>
+        <input type="password" id="contrasenia" name="contrasenia" placeholder="0123456789" required minlength="4">
+        <div style="margin-top: 6px;" id="error-contrasenia" class="mensaje-error" hidden></div>
         <div>
-            <button type="submit">Guardar</button>
+            <button type="submit" id="btn-guardar-usuario">Guardar</button>
             <button type="button" onclick="cerrarModal('crear')">Cancelar</button>
         </div>
+        <script>
+            (function() {
+                const input = document.getElementById('contrasenia');
+                const errorBox = document.getElementById('error-contrasenia');
+                const form = document.getElementById('form-crear');
+
+                if (!input || !errorBox || !form) return;
+
+                form.addEventListener('submit', function(e) {
+                    const value = (input.value || '').trim();
+                    if (value.length < 4) {
+                        e.preventDefault();
+                        errorBox.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+                        errorBox.hidden = false;
+                    }
+                });
+            })();
+        </script>
     </form>
 </dialog>
 
