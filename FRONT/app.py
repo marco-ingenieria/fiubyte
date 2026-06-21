@@ -525,10 +525,64 @@ def eliminar_clase(id):
                             orden=orden_actual))
 
 # 6. Ruta de la sección de Notas
-@app.route('/notas')
+
+@app.route('/notas', methods=['GET', 'POST'])
 def seccion_notas():
     nombre = request.args.get('nombre_profesor', '')
-    return render_template('notas.html', nombre_profesor=nombre)
+    id_evaluacion = request.args.get('id_evaluacion', type=int)
+    error = None
+
+    # Guardar una nota
+    if request.method == "POST":
+        id_evaluacion = request.form.get('id_evaluacion')
+        try:
+            requests.post("http://backend:5000/notas/", json={
+                "padron": request.form.get('padron'),
+                "id_evaluacion": id_evaluacion,
+                "nota": request.form.get('nota')
+            })
+        except Exception as e:
+            print("Error al guardar nota")
+
+    evaluacion = None
+    alumnos = []
+    notas_por_padron = {}
+
+    if id_evaluacion:
+        # 1. Datos de la evaluación (para saber su curso y nombre)
+        try:
+            resp_eval = requests.get(f"http://backend:5000/evaluaciones/{id_evaluacion}")
+            if resp_eval.status_code == 200:
+                evaluacion = resp_eval.json().get("evaluacion")
+        except Exception as e:
+            evaluacion = None
+
+        # 2. Alumnos del curso de esa evaluación
+        if evaluacion:
+            id_curso = evaluacion.get("ID_MATERIA")
+            try:
+                resp_al = requests.get(f"http://backend:5000/alumnos/curso/{id_curso}", params={"limit": 200, "offset": 0})
+                alumnos = resp_al.json().get("listado", [])
+            except Exception as e:
+                alumnos = []
+
+        # 3. Notas ya cargadas para esta evaluación
+        try:
+            resp_notas = requests.get("http://backend:5000/notas/", params={"id_evaluacion": id_evaluacion, "limit": 200, "offset": 0})
+            notas_listado = resp_notas.json().get("listado", [])
+            for n in notas_listado:
+                notas_por_padron[str(n.get("PADRON_ALUMNO"))] = n.get("NOTA")
+        except Exception as e:
+            notas_por_padron = {}
+
+    return render_template('notas.html',
+                           nombre_profesor=nombre,
+                           evaluacion=evaluacion,
+                           id_evaluacion=id_evaluacion,
+                           alumnos=alumnos,
+                           notas_por_padron=notas_por_padron,
+                           error=error)
+
 
 @app.route('/api/notas', methods=['GET'])
 def api_get_notas():
