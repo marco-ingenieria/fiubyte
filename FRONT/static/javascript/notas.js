@@ -1,34 +1,22 @@
-// 1. ESTADO
-let alumnos = JSON.parse(localStorage.getItem('notas_eval')) || [];
-let id_evaluacion = new URLSearchParams(window.location.search).get('id_evaluacion');
+function marcarColorNota(input) {
+  const valor = parseFloat(input.value);
 
-// 2. LÓGICA DE NOTAS
-function renderTabla() {
-  const tbody = document.getElementById('tabla-body');
-  tbody.innerHTML = '';
+  input.removeAttribute('data-color');
 
-  // Filtrar notas solo para esta evaluación
-  const notasFiltradas = alumnos.filter(a => a.id_evaluacion == id_evaluacion);
+  if (isNaN(valor)) {
+    return;
+  }
 
-  notasFiltradas.forEach((al, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${al.padron}</td>
-      <td>${al.nombre}</td>
-      <td><input type="number" value="${al.nota}" oninput="actualizarNota(${i}, this.value)"></td>
-    `;
-    tbody.appendChild(tr);
-  });
+  // Color (>= 6)
+  if (valor >= 6) {
+    input.setAttribute('data-color', 'alta');
+  } else if (valor >= 0) {
+    input.setAttribute('data-color', 'baja');
+  }
 }
 
-function actualizarNota(index, nuevaNota) {
-  alumnos[index].nota = nuevaNota;
-  localStorage.setItem('notas_eval', JSON.stringify(alumnos));
-}
 
-function guardarCambios() {
-  alert('✅ Notas guardadas');
-}
-
-// Inicialización
-renderTabla();
+document.addEventListener('DOMContentLoaded', () => {
+  const inputs = document.querySelectorAll('#tabla-body input[type="number"]');
+  inputs.forEach(marcarColorNota);
+});
