@@ -544,52 +544,56 @@ def seccion_evaluaciones():
     error = None
 
     if request.method == "POST":
+        id_editar = request.form.get('id_editar')
         crear = request.form.get('crear_evaluacion')
         eliminar = request.form.get('eliminar_evaluacion')
-        if crear:
-            try:
-                requests.post("http://backend:5000/evaluaciones/", json={
-                    "nombre": request.form.get('nombre'),
-                    "tipo": request.form.get('tipo'),
-                    "id_materia": request.form.get('id_materia')
-                })
-            except Exception:
-                error = "Error al crear evaluación"
-        elif eliminar:
-            try:
-                requests.delete(f"http://backend:5000/evaluaciones/{eliminar}")
-            except Exception:
-                error = "Error al eliminar evaluación"
 
-    evaluaciones = requests.get("http://backend:5000/evaluaciones/").json().get("listado", [])
-    cursos = requests.get("http://backend:5000/materias/").json().get("listado", [])
+        tipo = request.form.get('tipo')
+        body = {
+            "nombre": request.form.get('nombre'),
+            "tipo": tipo,
+            "id_materia": request.form.get('id_materia'),
+            "notas": request.form.get('notas', '')
+        }
 
-    return render_template('registro_evaluaciones.html', 
-                           nombre_profesor=nombre, 
-                           evaluaciones=evaluaciones, 
-                           cursos=cursos, 
-                           error=error)
+        if tipo == 'TP':
+            body.update({"modalidad": request.form.get('modalidad_tp'), "fecha_inicio": request.form.get('fecha_inicio'), "fecha_entrega": request.form.get('fecha_entrega')})
+        else:
+            body["fecha_evaluacion"] = request.form.get('fecha_evaluacion')
+
+        if id_editar:
+            requests.patch(f"http://backend:5000/evaluaciones/{id_editar}", json=body)
+        elif crear:
+            requests.post("http://backend:5000/evaluaciones/", json=body)
+        if eliminar:
+            requests.delete(f"http://backend:5000/evaluaciones/{eliminar}")
+
+    evaluaciones = requests.get("http://backend:5000/evaluaciones/", params={"limit": 100}).json().get("listado", [])
+    cursos = requests.get("http://backend:5000/materias/", params={"limit": 100}).json().get("listado", [])
+    return render_template('registro_evaluaciones.html', nombre_profesor=nombre, evaluaciones=evaluaciones, cursos=cursos, error=error)
 
 # 7. Ruta de la sección de NOTAS
 @app.route('/notas', methods=['GET', 'POST'])
 def seccion_notas():
     nombre = request.args.get('nombre_profesor', '')
     id_evaluacion = request.args.get('id_evaluacion', type=int)
+    guardado = False
     
     if request.method == "POST":
-        try:
-            requests.post("http://backend:5000/notas/", json={
-                "padron": request.form.get('padron'),
-                "id_evaluacion": request.form.get('id_evaluacion'),
-                "nota": request.form.get('nota')
-            })
-        except Exception:
-            pass
-        return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre))
+        padrones = request.form.getlist('padron')
+        notas = request.form.getlist('nota')
+        for p, n in zip(padrones, notas):
+            if n.strip(): # Solo registrar si hay valor
+                requests.post("http://backend:5000/notas/", json={
+                    "padron": p,
+                    "id_evaluacion": id_evaluacion,
+                    "nota": float(n)
+                })
+        return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre, guardado=1))
 
-    evaluacion = None
-    alumnos = []
-    notas_por_padron = {}
+    guardado = request.args.get('guardado') == '1'
+    evaluacion, alumnos, notas_por_padron = None, [], {}
+    aprobados, desaprobados, promedio = 0, 0, 0
 
     if id_evaluacion:
         resp_ev = requests.get(f"http://backend:5000/evaluaciones/{id_evaluacion}")
@@ -598,13 +602,23 @@ def seccion_notas():
             alumnos = requests.get(f"http://backend:5000/alumnos/curso/{evaluacion.get('ID_MATERIA')}").json().get("listado", [])
             notas_db = requests.get("http://backend:5000/notas/", params={"id_evaluacion": id_evaluacion}).json().get("listado", [])
             notas_por_padron = {str(n['PADRON_ALUMNO']): n['NOTA'] for n in notas_db}
+            
+            valores = [float(n['NOTA']) for n in notas_db if n['NOTA'] not in (None, '')]
+            if valores:
+                aprobados = len([n for n in valores if n >= 6])
+                desaprobados = len([n for n in valores if n < 6])
+                promedio = round(sum(valores) / len(valores), 2)
 
     return render_template('notas.html', 
                            nombre_profesor=nombre, 
                            evaluacion=evaluacion, 
                            id_evaluacion=id_evaluacion, 
                            alumnos=alumnos, 
-                           notas_por_padron=notas_por_padron)
+                           notas_por_padron=notas_por_padron,
+                           aprobados=aprobados,
+                           desaprobados=desaprobados,
+                           promedio=promedio,
+                           guardado=guardado)
 
 
 @app.route('/grupos', methods=["POST", "GET"])
