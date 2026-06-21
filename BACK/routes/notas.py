@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from services.notas import listar_notas, listar_notas_padron, listar_notas_evaluacion, crear_nota
 from utils import construir_error
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 notas_bp = Blueprint('notas', __name__)
 
@@ -24,6 +25,7 @@ def get_notas():
     return listar_notas(limit, offset)
 
 @notas_bp.route('/', methods=['POST'])
+@jwt_required()
 def post_nota():
     body = request.get_json()
 

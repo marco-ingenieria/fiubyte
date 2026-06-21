@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.historial import historial_completo, historial_usuario, eliminar_registro
 from utils import (construir_error)
 
@@ -38,5 +39,6 @@ def get_historial_usuario(id_user):
     return historial
 
 @historiales_bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_registro(id):
     return eliminar_registro(id)
