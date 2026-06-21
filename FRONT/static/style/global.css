@@ -263,4 +263,37 @@ footer {
     opacity: 0.75;
 }
 
+#usuario-profesor details {
+    position: relative;
+}
 
+#usuario-profesor summary {
+    cursor: pointer;
+    list-style: none;
+    font-weight: bold;
+}
+
+#usuario-profesor summary::-webkit-details-marker {
+    display: none;
+}
+
+#cerrar-sesion {
+    position: absolute;
+    right: 0;
+    top: 30px;
+
+    display: block;
+    padding: 10px 15px;
+
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+
+    text-decoration: none;
+    color: #d32f2f;
+    white-space: nowrap;
+}
+
+#cerrar-sesion:hover {
+    background-color: #f5f5f5;
+}
