@@ -1,6 +1,6 @@
-{%- extends 'base_sistema.html' -%}
-{%- block title -%}Evaluaciones – Panel Docente{%- endblock -%}
-{%- block content -%}
+{% extends 'base_sistema.html' %}
+{% block title %}Evaluaciones – Panel Docente{% endblock %}
+{% block content %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='style/registro_evaluaciones.css') }}">
 
@@ -11,69 +11,85 @@
             <p>Gestión de instancias de evaluación · Ciclo 2026</p>
         </div>
         <div id="page-header-actions">
-            <button id="btn-crear-tp" onclick="openModal('tp')"><span>+</span> Agregar TP</button>
-            <button id="btn-crear-eval" onclick="openModal('eval')"><span>+</span> Agregar Evaluación</button>
+            <button id="btn-crear-eval" onclick="document.getElementById('modal-overlay').setAttribute('data-state','open')">
+                <span>+</span> Agregar Evaluación
+            </button>
         </div>
     </div>
 
+    {% if error %}
+    <p id="error-msg">⚠️ {{ error }}</p>
+    {% endif %}
+
     <div id="filter-bar">
-        <input type="text" id="search-input" oninput="filterCards()" placeholder="Buscar por nombre...">
-        <select id="filter-tipo" onchange="filterCards()">
+        <input type="text" id="search-input" oninput="filtrar()" placeholder="Buscar por nombre...">
+        <select id="filter-tipo" onchange="filtrar()">
             <option value="">Todos los tipos</option>
-            <option value="tp-individual">TP Individual</option>
-            <option value="tp-grupal">TP Grupal</option>
-            <option value="parcial">Parcial</option>
-            <option value="final">Final</option>
-            <option value="recup">Recuperatorio</option>
+            <option value="Parcial">Parcial</option>
+            <option value="Oral">Oral</option>
+            <option value="Final">Final</option>
+            <option value="TP">TP</option>
+            <option value="Recuperatorio">Recuperatorio</option>
         </select>
     </div>
 
-    <div id="eval-list"></div>
+    <div id="eval-list">
+        {% for ev in evaluaciones %}
+        <div data-tipo="{{ ev.TIPO }}" data-nombre="{{ ev.NOMBRE|lower }}">
+            <div data-avatar="{{ ev.TIPO|lower }}">{{ ev.TIPO[0] }}</div>
+            <div>
+                <h2>{{ ev.NOMBRE }}</h2>
+                <span style="font-size:11px; font-weight:700; color:#4f46e5; text-transform:uppercase;">{{ ev.TIPO }}</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <form method="POST" action="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
+                    <input type="hidden" name="eliminar_evaluacion" value="{{ ev.ID }}">
+                    <button type="submit" style="background:none; border:none; cursor:pointer; font-size:16px;">🗑️</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
     <div id="empty-state"><p>📭 No se encontraron evaluaciones.</p></div>
 </div>
 
-<div id="modal-overlay" onclick="closeModalOutside(event)">
+<!-- Modal crear -->
+<div id="modal-overlay" onclick="cerrarSiAfuera(event)">
     <div id="modal">
         <div id="modal-header">
-            <h2 id="modal-title">Nueva Evaluación</h2>
+            <h2>Nueva Evaluación</h2>
         </div>
-        <div id="modal-body">s
-            <label>Nombre</label>
-            <input id="f-nombre" type="text" placeholder="Ej: 1er Parcial o TP - 2026">
-            
-            <label>Tipo</label>
-            <select id="f-tipo" onchange="toggleDateFields()">
-            </select>
+        <form method="POST" action="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
+            <input type="hidden" name="crear_evaluacion" value="1">
+            <div id="modal-body">
+                <label>Nombre</label>
+                <input type="text" name="nombre" placeholder="Ej: 1er Parcial 2026" required>
 
-            <div id="group-instancia">
-                <label>Instancia</label>
-                <select id="f-instancia">
-                    <option value="regular">Evaluación</option>
-                    <option value="recup">Recuperatorio</option>
+                <label>Tipo</label>
+                <select name="tipo" required>
+                    <option value="Parcial">Parcial</option>
+                    <option value="Oral">Oral</option>
+                    <option value="Final">Final</option>
+                    <option value="TP">TP</option>
+                    <option value="Recuperatorio">Recuperatorio</option>
+                </select>
+
+                <label>Curso</label>
+                <select name="id_materia" required>
+                    {% for curso in cursos %}
+                    <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
+                    {% endfor %}
                 </select>
             </div>
-
-            <div id="group-fecha-unica">
-                <label>Fecha de Evaluación</label>
-                <input id="f-fecha" type="date">
+            <div id="modal-footer">
+                <button type="button" onclick="document.getElementById('modal-overlay').removeAttribute('data-state')">Cancelar</button>
+                <button type="submit">Guardar</button>
             </div>
-
-            <div id="group-fechas-tp">
-                <label>Fecha de Inicio</label>
-                <input id="f-fecha-inicio" type="date">
-                <label>Fecha de Entrega</label>
-                <input id="f-fecha-entrega" type="date">
-            </div>
-
-            <label>Observaciones</label>
-            <textarea id="f-obs" placeholder="Nota adicionales..."></textarea>
-        </div>
-        <div id="modal-footer">
-            <button onclick="closeModal()">Cancelar</button>
-            <button onclick="saveModal()">Guardar Cambios</button>
-        </div>
+        </form>
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='javascript/registro_evaluaciones.js') }}"></script>
-{%- endblock -%}
+
+{% endblock %}
