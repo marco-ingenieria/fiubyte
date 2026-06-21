@@ -42,7 +42,7 @@
 </div>
 <dialog id="crear-alumno">
     <h3>Crear nuevo alumno</h3>
-    <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
+    <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos', nombre_profesor=nombre_profesor)}}">
         <label for="nombre">Nombre del Nuevo Alumno:</label>
         <input type="text" id="nombre" name="crear_alumno">
         <label for="apellido">Apellido</label>
