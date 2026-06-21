@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from services.materias import (listar_materias, crear_materia, obtener_materia,
-                               actualizar_materia, eliminar_materia)
+                               actualizar_materia, eliminar_materia, obtener_estadisticas_pdf)
 from utils import construir_error
 import json
 
@@ -27,6 +27,13 @@ def get_materia(id):
         return construir_error(400, "id_grupo debe ser un número entero positivo")
     
     return obtener_materia(id)
+
+@materias_bp.route("/pdf", methods=['GET'])
+def get_estadisticas_materia_pdf():
+    pdf = obtener_estadisticas_pdf()
+
+    return pdf
+
 
 @materias_bp.route("/", methods=['POST'])
 def post_materia():

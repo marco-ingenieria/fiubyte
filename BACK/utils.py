@@ -137,3 +137,39 @@ def pdf_listado_grupos(grupos):
         pdf.ln(pdf.font_size * 2)
 
     return pdf.output()
+
+def pdf_estadisticas(cursos):
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.set_font('Courier', size=20, style='BU')
+    pdf.cell(text="Estadisticas de cursos")
+    pdf.ln(pdf.font_size * 2)
+
+    for curso in cursos:
+        pdf.set_font('Courier', size=14, style='B')
+        pdf.cell(text=f"{curso['NOMBRE_MATERIA']} ({curso['CUATRIMESTRE']}C {curso['ANIO']})")
+        pdf.ln(pdf.font_size)
+
+        pdf.set_font('Courier', size=11)
+
+        pdf.cell(text=f"Total de alumnos: {curso['TOTAL_ALUMNOS']}")
+        pdf.ln(pdf.font_size)
+
+        pdf.cell(text=f"Porcentaje de aprobados: {curso['PORCENTAJE_APROBADOS']}%")
+        pdf.ln(pdf.font_size)
+
+        pdf.cell(text="Promedios por tipo de evaluacion:")
+        pdf.ln(pdf.font_size)
+
+        if curso["PROMEDIOS_EVALUACIONES"]:
+            for promedio in curso["PROMEDIOS_EVALUACIONES"]:
+                pdf.cell(text=f"* {promedio['TIPO']}: {promedio['PROMEDIO']}")
+                pdf.ln(pdf.font_size)
+        else:
+            pdf.cell(text="* Sin evaluaciones registradas")
+            pdf.ln(pdf.font_size)
+
+        pdf.ln(pdf.font_size * 2)
+
+    return pdf.output()

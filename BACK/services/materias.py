@@ -1,6 +1,7 @@
-from flask import jsonify
+from io import BytesIO
+from flask import jsonify, send_file
 from db.init_db import get_connection
-from utils import (construir_paginacion, construir_error, existe_en_bd)
+from utils import (construir_paginacion, construir_error, existe_en_bd, pdf_estadisticas)
 import traceback
 
 
@@ -226,6 +227,94 @@ def eliminar_materia(id_materia):
         traceback.print_exc()
         return construir_error(500, "Error inesperado del servidor")
     
+    finally:
+        if cursor:
+            cursor.close()
+        if connection and connection.is_connected():
+            connection.close()
+
+def obtener_estadisticas_pdf():
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT ID, NOMBRE_MATERIA, CUATRIMESTRE, ANIO
+            FROM MATERIAS
+            WHERE ELIMINADO = 0
+            ORDER BY ANIO DESC, CUATRIMESTRE DESC, NOMBRE_MATERIA
+        """)
+
+        cursos = cursor.fetchall()
+
+        for curso in cursos:
+
+            # total alumnos
+            cursor.execute("""
+                SELECT COUNT(*) AS TOTAL
+                FROM ALUMNOS
+                WHERE ID_CURSO = %s
+                  AND ELIMINADO = 0
+            """, (curso["ID"],))
+
+            curso["TOTAL_ALUMNOS"] = cursor.fetchone()["TOTAL"]
+
+            # % aprobados
+            cursor.execute("""
+                SELECT
+                    COUNT(*) AS TOTAL,
+                    SUM(CASE WHEN APROBO = 1 THEN 1 ELSE 0 END) AS APROBADOS
+                FROM ALUMNOS
+                WHERE ID_CURSO = %s
+                  AND ELIMINADO = 0
+            """, (curso["ID"],))
+
+            resultado = cursor.fetchone()
+
+            total = resultado["TOTAL"] or 0
+            aprobados = resultado["APROBADOS"] or 0
+
+            curso["PORCENTAJE_APROBADOS"] = (
+                round(aprobados * 100 / total, 2)
+                if total > 0 else 0
+            )
+
+            # nota promedio x tipo de evaluación
+            cursor.execute("""
+                SELECT
+                    E.TIPO,
+                    ROUND(AVG(N.NOTA), 2) AS PROMEDIO
+                FROM EVALUACIONES E
+                LEFT JOIN NOTAS N
+                    ON N.ID_EVALUACION = E.ID
+                    AND N.ELIMINADO = 0
+                WHERE E.ID_MATERIA = %s
+                  AND E.ELIMINADO = 0
+                GROUP BY E.TIPO
+                ORDER BY E.TIPO
+            """, (curso["ID"],))
+
+            curso["PROMEDIOS_EVALUACIONES"] = cursor.fetchall()
+
+        pdf = pdf_estadisticas(cursos)
+
+        if pdf:
+            return send_file(
+                BytesIO(pdf),
+                mimetype="application/pdf",
+                as_attachment=True,
+                download_name="estadisticas.pdf"
+            )
+        else:
+            return construir_error(500, "Error construyendo el pdf")
+
+    except Exception:
+        traceback.print_exc()
+        return construir_error(500, "Error inesperado del servidor")
+
     finally:
         if cursor:
             cursor.close()
