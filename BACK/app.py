@@ -8,8 +8,15 @@ from routes.notas import notas_bp
 from routes.clases import clases_bp
 from routes.materias import materias_bp
 from routes.asistencias import asistencias_bp
+from flask_jwt_extended import JWTManager
+from datetime import timedelta
 
 app = Flask(__name__)
+
+app.config["JWT_SECRET_KEY"] = "clave_ultra_secreta"#poner clave de verdad
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=3)
+
+jwt = JWTManager(app)
 
 app.register_blueprint(alumnos_bp, url_prefix='/alumnos')
 app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
@@ -20,6 +27,7 @@ app.register_blueprint(notas_bp, url_prefix='/notas')
 app.register_blueprint(clases_bp, url_prefix='/clases')
 app.register_blueprint(materias_bp, url_prefix='/materias')
 app.register_blueprint(asistencias_bp, url_prefix='/asistencias')
+
 
 @app.route("/")
 def index():

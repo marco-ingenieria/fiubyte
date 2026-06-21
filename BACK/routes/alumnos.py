@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.alumnos import (listar_alumnos, listar_alumno_curso, buscar_alumno, crear_alumno, actualizar_alumno, 
                               eliminar_alumno, eliminar_alumno_permanente, crear_alumnos_csv, listar_alumnos_pdf)
 from utils import (construir_error)
@@ -55,6 +56,7 @@ def post_alumnos_csv():
     return crear_alumnos_csv(listado_alumnos)
 
 @alumnos_bp.route('/', methods=['POST'])
+#@jwt_required()
 def post_alumno():
     body = request.get_json()
 

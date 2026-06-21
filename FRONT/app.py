@@ -1,5 +1,5 @@
 from io import BytesIO
-from flask import Flask, render_template, request, url_for, redirect, send_file
+from flask import Flask, render_template, request, url_for, redirect, send_file, session
 import requests
 from datetime import date, datetime, timedelta
 import json
@@ -7,6 +7,7 @@ import urllib.parse
 
 
 app = Flask(__name__)
+app.secret_key = "una-clave-secreta"
 
 @app.route('/buscar')
 def buscar_seccion():
@@ -32,6 +33,9 @@ def buscar_seccion():
 
     if texto.startswith('asistencia'):
         return redirect(url_for('seccion_asistencias',nombre_profesor=nombre))
+
+    if texto.startswith('curso'):
+        return redirect(url_for('seccion_cursos',nombre_profesor=nombre))
 
     return redirect(url_for('menu_principal', nombre_profesor=nombre, error_busqueda=True))
 
@@ -704,15 +708,20 @@ def seccion_alumnos():
     if crear_alumno:
         print("FORM COMPLETO:", dict(request.form), flush=True)
         try:
-            requests.post("http://backend:5000/alumnos/", json={
+            headers = {"authorization": f"Bearer {session.get('token')}"}
+            response = requests.post("http://backend:5000/alumnos/",
+                headers=headers,
+                json={
                 "nombre": request.form.get('crear_alumno'),
                 "apellido": request.form.get('apellido'),
                 "email": request.form.get('email'),
-                "padron": int(request.form.get('padron')),
-                "id_curso": int(request.form.get('id_curso')) 
+                "padron": request.form.get('padron'),
+                "id_curso": request.form.get('id_curso')
             })
+
+            print(response.json(), flush=True)
         except Exception as e:
-            print("Error al crear alumno")
+            print(f"Error al crear alumno {e}", flush=True)
     if eliminar_alumno:
         try:
             requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
@@ -848,8 +857,11 @@ def obtener_estadisticas_cursada():
         res_alumnos = requests.get("http://backend:5000/alumnos/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_alumnos.status_code == 200:
             datos = res_alumnos.json()
-            alumnos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
-            total_alumnos = sum(1 for al in alumnos_lista if al.get("ABANDONO") == 0)
+            alumnos_lista = datos.get("listado", [])
+            total_alumnos = 0
+            for al in alumnos_lista:
+                if al.get("ABANDONO") == 0:
+                    total_alumnos += 1
     except Exception:
         total_alumnos = 0
 
@@ -857,8 +869,7 @@ def obtener_estadisticas_cursada():
         res_clases = requests.get("http://backend:5000/clases/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_clases.status_code == 200:
             datos = res_clases.json()
-            clases_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
-            
+            clases_lista = datos.get("listado", []) 
             for c in clases_lista:
                 try:
                     fecha_obj = datetime.strptime(c.get("FECHA", ""), "%a, %d %b %Y %H:%M:%S %Z").date()
@@ -875,7 +886,7 @@ def obtener_estadisticas_cursada():
         res_grupos = requests.get("http://backend:5000/grupos/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_grupos.status_code == 200:
             datos = res_grupos.json()
-            grupos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            grupos_lista = datos.get("listado", []) 
             total_grupos = len(grupos_lista)
     except Exception:
         total_grupos = 0
@@ -884,7 +895,7 @@ def obtener_estadisticas_cursada():
         res_usuarios = requests.get("http://backend:5000/usuarios/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_usuarios.status_code == 200:
             datos = res_usuarios.json()
-            usuarios_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            usuarios_lista = datos.get("listado", []) 
             total_usuarios = len(usuarios_lista)
     except Exception:
         total_usuarios = 0
@@ -893,7 +904,7 @@ def obtener_estadisticas_cursada():
         res_cursos = requests.get("http://backend:5000/materias/", params={"limit": 500, "offset": 0}, timeout=2)
         if res_cursos.status_code == 200:
             datos = res_cursos.json()
-            cursos_lista = datos.get("listado", []) if isinstance(datos, dict) else datos
+            cursos_lista = datos.get("listado", []) 
             total_cursos = len(cursos_lista)
     except Exception:
         total_cursos = 0
@@ -930,17 +941,12 @@ def login():
                 "contrasenia": password
             })
             if response.status_code == 200:
-                t_alumnos, t_grupos, t_clases, t_usuarios, t_cursos, f_hoy = obtener_estadisticas_cursada()
-                return render_template(
-                    'menu_principal.html',
-                    nombre_profesor=nombre,
-                    total_alumnos=t_alumnos,
-                    total_grupos=t_grupos,
-                    total_clases=t_clases,
-                    total_usuarios=t_usuarios,
-                    total_cursos=t_cursos,
-                    fecha_actual=f_hoy
-                )
+                data = response.json()
+                session['token'] = data.get('access_token')
+                return redirect(url_for(
+                    'menu_principal',
+                    nombre_profesor=nombre
+                ))
             else:
                 return render_template("login.html", error="Usuario o contraseña incorrectos")
         except Exception as e:
@@ -966,6 +972,7 @@ def ver_grupo(id):
     except Exception as e:
         print('Hubo un error al obtener los alumnos del grupo')
     return render_template('detalle_grupo.html', integrantes=lista_alumnos,nombre_profesor=nombre,ID=id)
+
 # 9. ruta para listado de cursos y detalle de cada curso 
 @app.route('/cursos', methods=["POST", "GET"])
 def seccion_cursos():

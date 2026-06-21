@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.grupos import (listar_grupos, obtener_grupo, crear_grupo,
                              asignar_alumnos_a_grupo, actualizar_grupo,
                              obtener_alumnos, eliminar_grupo, asignar_tp,
@@ -10,6 +11,7 @@ import json
 grupos_bp = Blueprint('grupos', __name__)
 
 @grupos_bp.route("/", methods=['GET'])
+@jwt_required()
 def get_grupos():
 
     base_url = request.base_url

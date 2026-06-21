@@ -1,6 +1,4 @@
-/* =========================
-   VARIABLES GLOBALES
-========================= */
+
 :root {
     --degradado-fondo: linear-gradient(135deg, #f4f7ff 0%, #eaf4ff 100%);
     --color-primario: #4f46e5;
@@ -15,18 +13,12 @@
     --sombra-suave: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
 }
 
-/* =========================
-   RESET
-========================= */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* =========================
-   BODY
-========================= */
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 
@@ -41,9 +33,6 @@ body {
     min-height: 100vh;
 }
 
-/* =========================
-   MENÚ SUPERIOR
-========================= */
 #menu-superior {
     background: rgba(255, 255, 255, 0.7);
 
@@ -64,7 +53,6 @@ body {
     align-items: center;
 }
 
-/* Texto principal */
 #menu-superior strong {
     font-size: 28px;
     font-weight: 800;
@@ -75,7 +63,6 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-/* Lista */
 #menu-superior ul {
     display: flex;
 
@@ -83,85 +70,7 @@ body {
 
     gap: 25px;
 }
-/* ===== PANTALLA DE INICIO ===== */
 
-#inicio-bienvenida {
-    text-align: center;
-    padding: 40px 20px;
-}
-
-#inicio-bienvenida h1 {
-    font-size: 56px;
-    margin-bottom: 20px;
-    color: #0f172a;
-}
-
-#descripcion-inicio {
-    font-size: 18px;
-    max-width: 700px;
-    margin: 0 auto 40px auto;
-    line-height: 1.7;
-}
-
-#panel-info {
-    max-width: 700px;
-    margin: 0 auto 45px auto;
-    padding: 35px;
-
-    background: var(--blanco-vidrio);
-
-    border: 1px solid var(--borde-vidrio);
-
-    border-radius: 22px;
-
-    backdrop-filter: blur(10px);
-
-    box-shadow: var(--sombra-suave);
-}
-
-#panel-info h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-}
-
-#panel-info ul {
-    list-style: none;
-}
-
-#panel-info li {
-    margin-bottom: 14px;
-    font-size: 16px;
-    color: var(--texto-mutado);
-}
-
-#boton-login {
-    display: inline-block;
-
-    padding: 16px 38px;
-
-    background: var(--color-primario);
-
-    color: white;
-
-    text-decoration: none;
-
-    border-radius: 40px;
-
-    font-size: 17px;
-
-    font-weight: 700;
-
-    transition: 0.3s ease;
-
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
-}
-
-#boton-login:hover {
-    background: var(--color-primario-hover);
-
-    transform: translateY(-2px);
-}
-/* Links */
 #menu-superior a {
     color: inherit;
 
@@ -220,7 +129,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* Párrafos */
 #contenedor-principal p {
     margin-bottom: 35px;
 
@@ -231,9 +139,6 @@ body {
     font-weight: 500;
 }
 
-/* =========================
-   BOTONES
-========================= */
 #grupo-botones button {
     padding: 11px 22px;
 
@@ -267,9 +172,6 @@ body {
     transform: translateY(-1px);
 }
 
-/* =========================
-   TABLA
-========================= */
 table {
     width: 100%;
 
@@ -333,9 +235,6 @@ tr:hover td {
     color: var(--color-primario);
 }
 
-/* =========================
-   FOOTER
-========================= */
 footer {
     background: rgba(255,255,255,0.4);
 
