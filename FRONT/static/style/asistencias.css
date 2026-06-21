@@ -138,7 +138,7 @@
 
 #barra-filtros{
     display: flex;
-    margin: 20px -10px 25px -10px;
+    margin: -6px -10px 10px -10px; /* lo subimos sin afectar de mas abajo */
     position: relative;
 }
 
@@ -158,9 +158,23 @@
     position: relative;
     z-index: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin: 0;
+}
+
+/* Asegura alineación vertical y centrado visual de las dos cajas */
+#filtro-caja-curso, #filtro-caja-orden{
+    flex: 0 0 auto;
+}
+
+/* Evita que el label/select se “peguen” al borde y mantiene centrado con el buscador */
+#filtro-caja-curso{
+    margin-right: 15px;
+}
+
+#filtro-caja-orden{
+    margin-left: 15px;
 }
 
 /* Estilos de las cajas contenedoras internas */
@@ -174,11 +188,11 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 #filtro-caja-curso{
-    margin-right: auto;
+    margin-right: 15px;
 }
 
 #filtro-caja-orden{
-    margin-left: auto;
+    margin-left: 15px;
 }
 
 #barra-filtros label{

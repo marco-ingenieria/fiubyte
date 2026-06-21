@@ -75,9 +75,11 @@
 
 #qr-form {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   gap: 12px;
+  margin-top: -6px; /* sube un poco el selector para que quede más alineado */
 }
 
 #qr-form label {
