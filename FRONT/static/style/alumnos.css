@@ -144,3 +144,196 @@ form:has(#filtro-curso) label {
     font-size: 14px;
     color: var(--texto-oscuro);
 }
+
+#grupo-botones {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+#grupo-botones button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#grupo-botones button:hover {
+    background: var(--color-primario-hover);
+}
+
+#modal-csv,
+#modal-pdf {
+    border: none;
+    border-radius: 20px;
+    padding: 35px;
+    width: 380px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-sizing: border-box;
+    margin: auto;
+}
+
+#modal-csv::backdrop,
+#modal-pdf::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+}
+
+#modal-csv h3,
+#modal-pdf h3 {
+    margin-top: 0;
+    color: var(--texto-oscuro);
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#modal-csv p,
+#modal-pdf p {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+#campo-csv {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+#form-pdf-alumnos div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+#form-pdf-alumnos label {
+    font-size: 14px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#btn-csv-submit,
+#btn-pdf-submit {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--color-primario);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+#btn-csv-submit:hover,
+#btn-pdf-submit:hover {
+    background: var(--color-primario-hover);
+}
+
+#modal-csv div,
+#modal-pdf div:last-child {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#id_curso {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    cursor: pointer;
+    color: var(--texto-oscuro);
+    margin-bottom: 16px;
+}
+
+#id_curso:hover {
+    border-color: var(--color-primario);
+}
+
+#contenedor-buscador {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+#contenedor-buscador form,
+form:has(#filtro-curso) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0 !important;
+}
+
+search input[type="number"] {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    width: 180px;
+}
+
+search input[type="number"]:focus {
+    border-color: #5b51d8;
+}
+
+search button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #5b51d8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+search button:hover {
+    background: #4840c0;
+}
+
+search a {
+    font-size: 14px;
+    color: #5b51d8;
+    text-decoration: underline;
+    margin-left: 5px;
+}
+
+#contenedor-filtros {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+#contenedor-filtros form,
+#contenedor-buscador form {
+    margin-bottom: 0 !important;
+}

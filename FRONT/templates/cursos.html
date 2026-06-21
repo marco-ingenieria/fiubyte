@@ -1,7 +1,5 @@
 {% extends 'base_sistema.html' %} {% block title %}Cursos - Panel Docente{% endblock %} {% block content %} {% if error_asignar %}
-<script>
-    alert("{{ error_asignar }}");
-</script>
+<div id="mensaje-error">{{ error_asignar }}</div>
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/cursos.css') }}">
 <main>
@@ -16,11 +14,17 @@
         <h3>Crear nuevo curso</h3>
         <form id="form-crear" method="POST" action="{{url_for('seccion_cursos')}}">
             <label for="crear">Nombre del Nuevo Curso:</label>
-            <input type="text" id="nombre-crear" name="crear-curso">
+            <input type="text" id="nombre-crear" name="crear-curso" required minlength="3" maxlength="80">
+
             <label for="cuatrimestre">Cuatrimestre</label>
-            <input type="text" id="cuatrimestre" name="cuatrimestre-crear" min="1" max="2">
+            <select id="cuatrimestre" name="cuatrimestre-crear" title="El cuatrimestre es incorrecto">
+                <option value="">Selecciona</option>
+                <option value="1">1</option>
+                <option value="2">2</option></select>
+
             <label for="anio-crear">Año:</label>
-            <input type="number" id="anio-crear" name="anio-crear">
+            <input type="number" id="anio-crear" name="anio-crear" required min="2026" max="2030" title="El año ingresado es incorrecto">
+
             <div id="botones-crear">
                 <button type="submit" id="boton-guardar-crear">Guardar</button>
                 <button type="button" id="boton-cancelar-crear" onclick="document.getElementById('crear-curso').close()">Cancelar</button>
@@ -31,7 +35,7 @@
         <h3> Eliminar Curso</h3>
         <form id="form-eliminar" method="POST" action="{{ url_for('seccion_cursos', nombre_profesor=request.args.get('nombre_profesor', '')) }}">
             <label for="eliminar">Introduzca el id del curso:</label>
-            <input type="number" id="id-eliminar" name="eliminar-curso">
+            <input type="number" id="id-eliminar" name="eliminar-curso" title="El id del curso es incorrecto" required min="1">
             <div id="botones-eliminar">
                 <button type="submit" id="boton-eliminar-curso">Eliminar</button>
                 <button type="button" id="boton-cancelar-curso" onclick="document.getElementById('eliminar-curso').close()">Cancelar</button>

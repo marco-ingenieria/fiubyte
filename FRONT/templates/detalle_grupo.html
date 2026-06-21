@@ -6,7 +6,7 @@
     <button type="button" id="boton-eliminar-integrante" onclick="document.getElementById('eliminar-integrante').showModal()">Eliminar integrante</button>
     <section>
         {% for alumno in integrantes %}
-        <a href="{{ url_for('perfil_alumno','menu_pricipal', padron=alumno['PADRON'], nombre_profesor=nombre_profesor) }}">
+        <a href="{{ url_for('perfil_alumno', padron=alumno['PADRON'], nombre_profesor=nombre_profesor) }}">
             <img src="{{ url_for('static', filename='vilma.png')}}" alt="Avatar">
             <span>{{alumno['NOMBRE']}} (Padrón: {{ alumno['PADRON'] }})</span>
         </a>

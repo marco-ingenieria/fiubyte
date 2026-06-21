@@ -6,40 +6,40 @@
 <div id="grupo-botones">
     <button type="button" onclick="abrirModal('modal-pdf')">Exportar pdf</button>
     <button type="button" onclick="abrirModal('modal-csv')">Importar csv</button>
-    <dialog id="modal-csv">
-        <h3>Cargar archivo de alumnos</h3>
-        <p>Selecciona el archivo .csv con los alumnos. Verifica que el formato de cada fila sea "padrón, nombre, apellido, email"</p>
-
-        <form id="form-csv" method="POST" enctype=multipart/form-data action="/cargar_csv_alumnos?nombre_profesor={{ nombre_profesor }}">
-            <label for="alumnos">Archivo seleccionado:</label>
-            <input type="file" id="campo-csv" name="alumnos" required>
-            <div>
-                <button type="submit" id="btn-csv-submit">Subir</button>
-                <button type="button" onclick="cerrarModal('modal-csv', 'form-csv')">Cancelar</button>
-            </div>
-        </form>
-    </dialog>
-    <dialog id="modal-pdf">
-        <h3>Descargar listado de alumnos</h3>
-        <p>Selecciona los campos para incluir en el listado:</p>
-
-        <form id="form-pdf-alumnos" method="GET" action="/descargar_pdf_alumnos?nombre_profesor={{ nombre_profesor }}">
-            <div>
-                <label><input type="checkbox" name="columnas" value="padron"> Padrón</label>
-                <label><input type="checkbox" name="columnas" value="nombre"> Nombre</label>
-                <label><input type="checkbox" name="columnas" value="apellido"> Apellido</label>
-                <label><input type="checkbox" name="columnas" value="email"> Email</label>
-                <label><input type="checkbox" name="columnas" value="id_curso"> Curso</label>
-            </div>
-            <div>
-                <button type="submit" id="btn-pdf-submit">Descargar</button>
-                <button type="button" onclick="cerrarModal('modal-pdf', 'form-pdf-alumnos')">Cancelar</button>
-            </div>
-        </form>
-    </dialog>
     <button type="button" onclick="document.getElementById('crear-alumno').showModal()">Crear alumno</button>
     <button type="button" onclick="document.getElementById('eliminar-alumno').showModal()">Eliminar alumno</button>
 </div>
+<dialog id="modal-csv">
+    <h3>Cargar archivo de alumnos</h3>
+    <p>Selecciona el archivo .csv con los alumnos. Verifica que el formato de cada fila sea "padrón, nombre, apellido, email"</p>
+
+    <form id="form-csv" method="POST" enctype=multipart/form-data action="/cargar_csv_alumnos?nombre_profesor={{ nombre_profesor }}">
+        <label for="alumnos">Archivo seleccionado:</label>
+        <input type="file" id="campo-csv" name="alumnos" required>
+        <div>
+            <button type="submit" id="btn-csv-submit">Subir</button>
+            <button type="button" onclick="cerrarModal('modal-csv', 'form-csv')">Cancelar</button>
+        </div>
+    </form>
+</dialog>
+<dialog id="modal-pdf">
+    <h3>Descargar listado de alumnos</h3>
+    <p>Selecciona los campos para incluir en el listado:</p>
+
+    <form id="form-pdf-alumnos" method="GET" action="/descargar_pdf_alumnos?nombre_profesor={{ nombre_profesor }}">
+        <div>
+            <label><input type="checkbox" name="columnas" value="padron"> Padrón</label>
+            <label><input type="checkbox" name="columnas" value="nombre"> Nombre</label>
+            <label><input type="checkbox" name="columnas" value="apellido"> Apellido</label>
+            <label><input type="checkbox" name="columnas" value="email"> Email</label>
+            <label><input type="checkbox" name="columnas" value="id_curso"> Curso</label>
+        </div>
+        <div>
+            <button type="submit" id="btn-pdf-submit">Descargar</button>
+            <button type="button" onclick="cerrarModal('modal-pdf', 'form-pdf-alumnos')">Cancelar</button>
+        </div>
+    </form>
+</dialog>
 <dialog id="crear-alumno">
     <h3>Crear nuevo alumno</h3>
     <form id="form-crear" method="POST" action="{{url_for('seccion_alumnos')}}">
@@ -51,14 +51,15 @@
         <input type="email" id="email" name="email">
         <label for="padron">Padron</label>
         <input type="number" id="padron" name="padron">
-        
+
         <label for="id_curso">Curso</label>
         <select id="id_curso" name="id_curso" required>
+
             {% for curso in cursos %}
             <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
             {% endfor %}
         </select>
-        
+
         <div id="crear-botones-contenedor">
             <button type="submit" id="crear-boton-guardar">Guardar</button>
             <button type="button" id="crear-boton-cancelar" onclick="document.getElementById('crear-alumno').close()">Cancelar</button>
@@ -88,6 +89,15 @@
         </option>
         {% endfor %}
     </select>
+    <search>
+        <form method="GET" action="{{ url_for('seccion_alumnos') }}">
+            <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+            <label for="campo-busqueda">Buscar por padron:</label>
+            <input type="number" name="buscar_padron" placeholder="Buscar por padron" id="busqueda-padron" value="{{ buscar_padron }}">
+            <button type="submit">Buscar</button> {% if buscar_padron %}
+            <a href="{{ url_for('seccion_alumnos', nombre_profesor=nombre_profesor) }}">Limpiar búsqueda</a> {% endif %}
+        </form>
+    </search>
 </form>
 
 <table>
@@ -109,7 +119,7 @@
             <td>{{ alumno.PADRON }}</td>
 
             <td>{{ alumno.NOMBRE_MATERIA }}</td>
-            
+
             {% if alumno.ABANDONO %}
             <td>Abandonó</td>
             {% else %}
