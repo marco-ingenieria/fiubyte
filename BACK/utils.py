@@ -23,8 +23,6 @@ def construir_error(code: int, description: str = '') -> dict:
         }]
     }), code)
 
-
-
 def construir_paginacion(listado, base_url, limit, offset, total=None):
     if total is None:
         total = offset + len(listado)
@@ -42,8 +40,6 @@ def construir_paginacion(listado, base_url, limit, offset, total=None):
         "links": links
     }), codigo_HTTP)
 
-
-
 def existe_en_bd(cursor, tabla, campo, valor):
     cursor.execute(f"SELECT * FROM {tabla} WHERE {campo}=%s AND ELIMINADO=0", [valor])
     return cursor.fetchone() is not None
@@ -59,8 +55,6 @@ def validar_fecha(fecha):
             continue
     return False
     
-
-
 def enviar_mail(contenido, destinatario, asunto):
     user, password = credenciales_email
     with SMTP('smtp.gmail.com', 587) as smtp:
