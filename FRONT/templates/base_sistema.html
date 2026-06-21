@@ -15,9 +15,15 @@
     </a>
 
     <div id="usuario-profesor">
-        <p>Profesor: {{ nombre_profesor }}</p>
+    <details>
+        <summary>Profesor: {{ nombre_profesor }}</summary>
+
+        <a href="{{ url_for('logout') }}" id="cerrar-sesion">
+            Cerrar sesión
+        </a>
+    </details>
     </div>
-</div>
+    </div>
 
     <div id="contenedor-principal">
         {% block content %}{% endblock %}

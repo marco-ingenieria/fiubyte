@@ -48,6 +48,7 @@ def get_alumnos_pdf():
 
 
 @alumnos_bp.route('/csv', methods=['POST'])
+@jwt_required()
 def post_alumnos_csv():
     listado_alumnos = request.files.get('alumnos')
     if not listado_alumnos:
@@ -58,7 +59,7 @@ def post_alumnos_csv():
     return crear_alumnos_csv(listado_alumnos)
 
 @alumnos_bp.route('/', methods=['POST'])
-#@jwt_required()
+@jwt_required()
 def post_alumno():
     body = request.get_json()
 
@@ -78,6 +79,7 @@ def post_alumno():
     return alumno
 
 @alumnos_bp.route('/<int:id>', methods=['PATCH'])
+@jwt_required()
 def patch_alumno(id):
     body = request.get_json()
 
@@ -88,10 +90,12 @@ def patch_alumno(id):
     return alumno
 
 @alumnos_bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_alumno_virtual(id):
     return eliminar_alumno(id)
 
 @alumnos_bp.route('/perma/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_alumno(id):
     return eliminar_alumno_permanente(id)
 

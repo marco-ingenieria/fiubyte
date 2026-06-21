@@ -48,6 +48,7 @@ def get_grupos_pdf():
 
 
 @grupos_bp.route("/", methods=['POST'])
+@jwt_required()
 def post_grupo():
     data=request.get_json()
     nombre = data.get('nombre')
@@ -86,6 +87,7 @@ def validar_json_asignar_alumnos(data):
 
 
 @grupos_bp.route("/asignar-alumnos/", methods=['POST'])
+@jwt_required()
 def post_asignar_alumnos():
 
     data=request.get_json()
@@ -100,6 +102,7 @@ def post_asignar_alumnos():
     
 
 @grupos_bp.route("/<int:id>", methods=['PATCH'])
+@jwt_required()
 def patch_grupo(id):
 
     if id <= 0:
@@ -116,6 +119,7 @@ def patch_grupo(id):
     
 
 @grupos_bp.route("/<int:id>", methods=['DELETE'])
+@jwt_required()
 def delete_grupo(id):
     if id <= 0:
         return construir_error(400, "id_grupo debe ser un número entero positivo")
@@ -125,6 +129,7 @@ def delete_grupo(id):
 
 
 @grupos_bp.route("/tp", methods=['POST'])
+@jwt_required()
 def post_tp():
 
     data=request.get_json()
@@ -143,6 +148,7 @@ def post_tp():
 
 
 @grupos_bp.route("/alumnos", methods=['DELETE'])
+@jwt_required()
 def delete_alumno():
 
     data=request.get_json()

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 import json
 from services.usuarios import listar_usuarios, chequear_usuario, crear_usuario, eliminar_usuario
 from utils import (construir_error)
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
@@ -19,6 +20,7 @@ def post_login():
     return chequear_usuario(nombre, contrasenia)
 
 @usuarios_bp.route('/', methods=['POST'])
+@jwt_required()
 def post_usuario():
     body = request.get_json()
     if not body or len(body) == 0:
@@ -31,5 +33,6 @@ def post_usuario():
     return crear_usuario(nombre, contrasenia)
 
 @usuarios_bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_usuario(id):
     return eliminar_usuario(id)

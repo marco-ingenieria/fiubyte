@@ -200,6 +200,7 @@ def mostrar_qr():
         return render_template("qr.html", clase=None, error=error, success=success, cursos=cursos, curso_id=curso_id, qr_url=qr_url)
 
     try:
+        
         response = requests.get(f"http://backend:5000/clases/{id_clase_int}")
         if response.status_code == 200:
             clase_encontrada = response.json().get("clase")
@@ -243,7 +244,8 @@ def mostrar_qr():
                     "id_curso": int(curso_id),
                     "registro_base_url": request.host_url.rstrip("/")
                 }
-                response = requests.post(f"http://backend:5000/clases/{id_clase_int}/enviar-qr", json=payload, timeout=30)
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                response = requests.post(f"http://backend:5000/clases/{id_clase_int}/enviar-qr", headers=headers, json=payload, timeout=30)
                 if response.status_code == 200:
                     success = "QR enviado a los alumnos del curso seleccionado"
                 else:
@@ -352,7 +354,10 @@ def seccion_asistencias():
         
         else:
             try:
-                response = requests.post("http://backend:5000/clases/", json={
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                response = requests.post("http://backend:5000/clases/",
+                    headers=headers,
+                    json={
                     "profesores": profesores,
                     "fecha": fecha,
                     "horario": horario,
@@ -477,7 +482,10 @@ def editar_clase(id):
                                 orden=orden_actual))
     
     try:
-        response = requests.patch(f"http://backend:5000/clases/{id}", json={
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        response = requests.patch(f"http://backend:5000/clases/{id}",
+            headers=headers,
+            json={
             "profesores": profesores,
             "fecha": fecha,
             "horario": horario,
@@ -520,7 +528,8 @@ def eliminar_clase(id):
     curso_id_actual = request.args.get('curso_id', '')
     orden_actual = request.args.get('orden', '')
     try:
-        requests.delete(f"http://backend:5000/clases/{id}")
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        requests.delete(f"http://backend:5000/clases/{id}",headers=headers)
     except Exception as e:
         pass
     return redirect(url_for('seccion_asistencias', 
@@ -552,7 +561,9 @@ def api_get_notas():
 @app.route('/api/notas', methods=['POST'])
 def api_crear_nota():
     try:
+        headers = {"authorization": f"Bearer {session.get('token')}"}
         r = requests.post('http://backend:5000/notas/',
+                          headers=headers,
                           json=request.get_json())
         return r.json(), r.status_code
     except Exception:
@@ -578,7 +589,9 @@ def api_get_evaluaciones():
 @app.route('/api/evaluaciones', methods=['POST'])
 def api_crear_evaluacion():
     try:
+        headers = {"authorization": f"Bearer {session.get('token')}"}
         r = requests.post('http://backend:5000/evaluaciones/',
+                          headers=headers,
                           json=request.get_json())
         return r.json(), r.status_code
     except Exception:
@@ -588,7 +601,9 @@ def api_crear_evaluacion():
 @app.route('/api/evaluaciones/<int:id>', methods=['PATCH'])
 def api_editar_evaluacion(id):
     try:
+        headers = {"authorization": f"Bearer {session.get('token')}"}
         r = requests.patch(f'http://backend:5000/evaluaciones/{id}',
+                            headers=headers,
                            json=request.get_json())
         return r.json(), r.status_code
     except Exception:
@@ -598,7 +613,8 @@ def api_editar_evaluacion(id):
 @app.route('/api/evaluaciones/<int:id>', methods=['DELETE'])
 def api_eliminar_evaluacion(id):
     try:
-        r = requests.delete(f'http://backend:5000/evaluaciones/{id}')
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        r = requests.delete(f'http://backend:5000/evaluaciones/{id}',headers=headers)
         # 204 no tiene body
         if r.status_code == 204:
             return '', 204
@@ -621,7 +637,8 @@ def seccion_grupos():
 
         if eliminar:
             try:
-                r=requests.delete(f"http://backend:5000/grupos/{eliminar}")
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                r=requests.delete(f"http://backend:5000/grupos/{eliminar}",headers=headers)
                 if r.status_code == 404:
                     error = "El grupo no existe"
                 elif r.status_code != 200:
@@ -630,8 +647,11 @@ def seccion_grupos():
                 print("Error al eliminar grupo")
         elif crear:
             try:
+                headers = {"authorization": f"Bearer {session.get('token')}"}
                 id_curso_grupo = request.form.get('id_curso')
-                requests.post("http://backend:5000/grupos/", json={
+                requests.post("http://backend:5000/grupos/",
+                    headers=headers,
+                    json={
                     "nombre": crear,
                     "id_curso": int(id_curso_grupo) if id_curso_grupo else None
                 })
@@ -639,7 +659,10 @@ def seccion_grupos():
                 print("Error al crear grupo")
         elif padron_asignar and grupo_id:
             try:
-                r=requests.post("http://backend:5000/grupos/asignar-alumnos/", json={
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                r=requests.post("http://backend:5000/grupos/asignar-alumnos/",
+            headers=headers,
+            json={
             "id_grupo": int(grupo_id),
             "padrones_alumnos": [{"padron": int(padron_asignar)}]
                 })
@@ -728,7 +751,8 @@ def seccion_alumnos():
             print(f"Error al crear alumno {e}", flush=True)
     if eliminar_alumno:
         try:
-            requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}")
+            headers = {"authorization": f"Bearer {session.get('token')}"}
+            requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}", headers=headers)
         except Exception as e:
             print("Error al eliminar alumno")
     try:
@@ -761,7 +785,8 @@ def crear_alumnos_csv():
     nombre_profesor = request.args.get('nombre_profesor', '')
     csv = request.files.get('alumnos')
     try:
-        r = requests.post("http://backend:5000/alumnos/csv", files={"alumnos": (csv.filename, csv.stream, csv.content_type)})
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        r = requests.post("http://backend:5000/alumnos/csv", headers=headers, files={"alumnos": (csv.filename, csv.stream, csv.content_type)})
     except Exception as e:
         print(e)
     return redirect(url_for('seccion_alumnos',nombre_profesor=nombre_profesor))
@@ -811,7 +836,8 @@ def crear_usuario():
         return redirect(url_for('seccion_usuarios', nombre_profesor=nombre_profesor, error='Nombre y contraseña son obligatorios'))
 
     try:
-        response = requests.post("http://backend:5000/usuarios/", json={
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        response = requests.post("http://backend:5000/usuarios/",headers=headers, json={
             "nombre": nombre,
             "contrasenia": contrasenia
         }, timeout=10)
@@ -831,7 +857,8 @@ def eliminar_usuario():
     nombre_profesor = request.args.get('nombre_profesor', '')
     id = request.form.get('eliminar-usuario-id')
     try:
-        requests.delete(f"http://backend:5000/usuarios/{id}")
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        requests.delete(f"http://backend:5000/usuarios/{id}",headers=headers)
     except Exception as e:
         pass
     return redirect(url_for('seccion_usuarios',nombre_profesor=nombre_profesor))
@@ -940,7 +967,8 @@ def login():
         nombre = request.form["nombre_profesor"]
         password = request.form["password"]
         try:
-            response = requests.post("http://backend:5000/usuarios/login", json={
+            headers = {"authorization": f"Bearer {session.get('token')}"}
+            response = requests.post("http://backend:5000/usuarios/login", headers=headers, json={
                 "nombre": nombre,
                 "contrasenia": password
             })
@@ -966,7 +994,8 @@ def ver_grupo(id):
         eliminar_alumno= request.form.get('eliminar')
         if eliminar_alumno:
             try:
-                requests.delete("http://backend:5000/grupos/alumnos",
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                requests.delete("http://backend:5000/grupos/alumnos",headers=headers,
                 json={"id_grupo": id, "padron_alumno": int(eliminar_alumno)})
             except Exception as e:
                 print("Error al eliminar alumno del grupo")
@@ -987,7 +1016,8 @@ def seccion_cursos():
         eliminar_curso = request.form.get('eliminar-curso')
         if eliminar_curso:
             try:
-                r=requests.delete(f"http://backend:5000/materias/{eliminar_curso}")
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                r=requests.delete(f"http://backend:5000/materias/{eliminar_curso}",headers=headers)
                 if r.status_code == 404:
                     error = "El curso no existe"
                 elif r.status_code != 200:
@@ -996,7 +1026,8 @@ def seccion_cursos():
                 print("Error al eliminar curso")
         elif crear_curso:
             try:
-                r=requests.post("http://backend:5000/materias/", json={
+                headers = {"authorization": f"Bearer {session.get('token')}"}
+                r=requests.post("http://backend:5000/materias/", headers=headers, json={
                     "nombre_materia": crear_curso,
                     "cuatrimestre":int(request.form.get('cuatrimestre-crear')),
                     "anio":int(request.form.get('anio-crear',2026))})
@@ -1024,3 +1055,9 @@ def ver_curso(id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))

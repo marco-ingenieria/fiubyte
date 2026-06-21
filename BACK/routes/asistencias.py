@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 import json
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.asistencias import (enviar_mails_asistencia, listar_asistencias, crear_asistencia,obtener_porcentaje_asistencia_alumno)
 from utils import (construir_error)
 
@@ -20,6 +21,7 @@ def get_asistencias(clase_id):
     asistencias = listar_asistencias(limit, offset, base_url, clase_id)
     return asistencias
 
+#TO DO: seguridad
 @asistencias_bp.route('/mail/<int:clase_id>', methods=['GET', 'POST'])
 def get_mail_asistencia(clase_id):
     id_curso = None
@@ -37,6 +39,7 @@ def get_mail_asistencia(clase_id):
         id_curso = request.args.get('id_curso', type=int)
 
     return enviar_mails_asistencia(clase_id, id_curso)
+
 
 @asistencias_bp.route('/registro/<int:clase_id>', methods=['GET'])
 def get_registrar_asistencia(clase_id):
