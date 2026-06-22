@@ -1,101 +1,113 @@
 {%- extends 'base_sistema.html' -%}
 {%- block title -%}Notas - Panel Docente{%- endblock -%}
 {%- block content -%}
-
 <link rel="stylesheet" href="{{ url_for('static', filename='style/notas.css') }}">
-
 <nav id="nav-interno">
   <div id="nav-links">
     <a href="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">← Volver a Evaluaciones</a>
   </div>
 </nav>
-
 <div id="main-content">
-
   {% if error %}
-    <div id="page-header">
-      <h1>Planilla de Calificaciones</h1>
-    </div>
+    <div id="page-header"><h1>Planilla de Calificaciones</h1></div>
     <p id="error-msg">⚠️ {{ error }}</p>
-  {% else %}
 
-  <div id="page-header">
-    <div>
-      <h1>{{ evaluacion.NOMBRE if evaluacion else 'Planilla de Calificaciones' }}</h1>
-      {% if evaluacion %}
-      <p id="eval-subtitulo">{{ evaluacion.TIPO }}{% if evaluacion.FECHA_EVALUACION %} · Entrega: {{ evaluacion.FECHA_EVALUACION }}{% endif %}{% if evaluacion.FECHA_INICIO %} · Inicio: {{ evaluacion.FECHA_INICIO }}{% endif %}{% if evaluacion.FECHA_ENTREGA %} · Entrega: {{ evaluacion.FECHA_ENTREGA }}{% endif %}</p>
-      {% endif %}
-    </div>
-  </div>
-
-  {% if guardado %}
-  <p id="success-msg">✅ Notas guardadas correctamente.</p>
-  {% endif %}
-
-
-  <form method="POST" action="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}" id="form-notas">
-    <input type="hidden" name="id_evaluacion" value="{{ id_evaluacion }}">
-
-
-    <div id="toolbar">
-      <button type="submit" id="btn-guardar">💾 Guardar Cambios</button>
-    </div>
-
-    
-    <div id="stats-row">
-      <div id="stat-card-aprobados">
-        <div>Aprobados</div>
-        <div>{{ aprobados }}</div>
-      </div>
-      <div id="stat-card-desaprobados">
-        <div>Desaprobados</div>
-        <div>{{ desaprobados }}</div>
-      </div>
-      <div id="stat-card-promedio">
-        <div>Promedio</div>
-        <div>{{ promedio }}</div>
+  {% elif id_evaluacion %}
+    <!-- ===== Vista de una evaluación puntual (ya existente) ===== -->
+    <div id="page-header">
+      <div>
+        <h1>{{ evaluacion.NOMBRE if evaluacion else 'Planilla de Calificaciones' }}</h1>
+        {% if evaluacion %}
+        <p id="eval-subtitulo">{{ evaluacion.TIPO }}</p>
+        {% endif %}
       </div>
     </div>
+    {% if guardado %}
+    <p id="success-msg">✅ Notas guardadas correctamente.</p>
+    {% endif %}
+    <form method="POST" action="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}" id="form-notas">
+      <input type="hidden" name="id_evaluacion" value="{{ id_evaluacion }}">
+      <div id="toolbar">
+        <button type="submit" id="btn-guardar">💾 Guardar Cambios</button>
+      </div>
+      <div id="stats-row">
+        <div id="stat-card-aprobados"><div>Aprobados</div><div>{{ aprobados }}</div></div>
+        <div id="stat-card-desaprobados"><div>Desaprobados</div><div>{{ desaprobados }}</div></div>
+        <div id="stat-card-promedio"><div>Promedio</div><div>{{ promedio }}</div></div>
+      </div>
+      <div id="table-wrap">
+        <table>
+          <thead><tr><th>Padrón</th><th>Alumno</th><th>Nota</th></tr></thead>
+          <tbody id="tabla-body">
+            {% for alumno in alumnos %}
+            <tr>
+              <td>{{ alumno.PADRON }}</td>
+              <td><strong>{{ alumno.NOMBRE }} {{ alumno.APELLIDO }}</strong></td>
+              <td>
+                <input type="hidden" name="padron" value="{{ alumno.PADRON }}">
+                <input type="number" name="nota" min="0" max="10" step="0.01"
+                       value="{{ notas_por_padron.get(alumno.PADRON|string, '') }}"
+                       oninput="marcarColorNota(this)">
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No hay alumnos cargados para el curso de esta evaluación.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </form>
 
-
+  {% elif id_curso %}
+    <!-- ===== Tabla general: alumnos x evaluaciones ===== -->
+    <div id="page-header">
+      <h1>Planilla General de Notas</h1>
+      <p>Todas las evaluaciones del curso, por alumno</p>
+    </div>
     <div id="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Padrón</th>
             <th>Alumno</th>
-            <th>Nota</th>
+            {% for ev in planilla_evaluaciones %}
+            <th>{{ ev.NOMBRE }}</th>
+            {% endfor %}
           </tr>
         </thead>
-        <tbody id="tabla-body">
-          {% for alumno in alumnos %}
+        <tbody>
+          {% for alumno in planilla_alumnos %}
           <tr>
             <td>{{ alumno.PADRON }}</td>
             <td><strong>{{ alumno.NOMBRE }} {{ alumno.APELLIDO }}</strong></td>
+            {% for ev in planilla_evaluaciones %}
             <td>
-              <input type="hidden" name="padron" value="{{ alumno.PADRON }}">
-              <input
-                type="number"
-                name="nota"
-                min="0"
-                max="10"
-                step="0.01"
-                value="{{ notas_por_padron.get(alumno.PADRON|string, '') }}"
-                oninput="marcarColorNota(this)">
+              {{ planilla_notas.get(alumno.PADRON|string, {}).get(ev.ID, '—') }}
             </td>
+            {% endfor %}
           </tr>
           {% else %}
-          <tr>
-            <td colspan="3">No hay alumnos cargados para el curso de esta evaluación.</td>
-          </tr>
+          <tr><td colspan="{{ 2 + planilla_evaluaciones|length }}">No hay alumnos en este curso.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  </form>
 
+  {% else %}
+    <!-- ===== Selector de curso ===== -->
+    <div id="page-header">
+      <h1>Planilla de Calificaciones</h1>
+      <p>Elegí un curso para ver la planilla general de notas.</p>
+    </div>
+    <form method="GET" action="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}">
+      <select name="id_curso" onchange="this.form.submit()" required>
+        <option value="" disabled selected>Seleccionar curso...</option>
+        {% for curso in cursos %}
+        <option value="{{ curso.ID }}">{{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})</option>
+        {% endfor %}
+      </select>
+    </form>
   {% endif %}
 </div>
-
 <script src="{{ url_for('static', filename='javascript/notas.js') }}"></script>
 {%- endblock -%}

@@ -627,11 +627,20 @@ def seccion_notas():
                     "nota": float(n)
                 }, headers=headers)
         return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre, guardado=1))
-
+    
     id_evaluacion = request.args.get('id_evaluacion', type=int)
     guardado = request.args.get('guardado') == '1'
     evaluacion, alumnos, notas_por_padron = None, [], {}
     aprobados, desaprobados, promedio = 0, 0, 0
+    error = None
+
+    id_curso = request.args.get('id_curso', type=int)
+    id_curso = request.args.get('id_curso', type=int)
+    cursos = []
+
+    planilla_evaluaciones = []
+    planilla_alumnos = []
+    planilla_notas = {}  # {padron: {id_evaluacion: nota}}
 
     if id_evaluacion:
         resp_ev = requests.get(f"http://backend:5000/evaluaciones/{id_evaluacion}")
@@ -640,12 +649,42 @@ def seccion_notas():
             alumnos = requests.get(f"http://backend:5000/alumnos/curso/{evaluacion.get('ID_MATERIA')}").json().get("listado", [])
             notas_db = requests.get("http://backend:5000/notas/", params={"id_evaluacion": id_evaluacion}).json().get("listado", [])
             notas_por_padron = {str(n['PADRON_ALUMNO']): n['NOTA'] for n in notas_db}
-            
+
             valores = [float(n['NOTA']) for n in notas_db if n['NOTA'] not in (None, '')]
             if valores:
                 aprobados = len([n for n in valores if n >= 6])
                 desaprobados = len([n for n in valores if n < 6])
                 promedio = round(sum(valores) / len(valores), 2)
+
+    elif id_curso:
+        # Tabla general: todos los alumnos del curso x todas sus evaluaciones
+        resp_alumnos = requests.get(f"http://backend:5000/alumnos/curso/{id_curso}", params={"limit": 200})
+        planilla_alumnos = resp_alumnos.json().get("listado", []) if resp_alumnos.status_code == 200 else []
+
+        resp_evals = requests.get("http://backend:5000/evaluaciones/", params={"limit": 100, "id_materia": id_curso})
+        todas_evals = resp_evals.json().get("listado", []) if resp_evals.status_code == 200 else []        
+        planilla_evaluaciones = [e for e in todas_evals if e.get("ID_MATERIA") == id_curso]
+
+        for ev in planilla_evaluaciones:
+            resp_notas = requests.get("http://backend:5000/notas/", params={"id_evaluacion": ev["ID"], "limit": 200})
+            notas_ev = resp_notas.json().get("listado", []) if resp_notas.status_code == 200 else []            
+            for n in notas_ev:
+                padron = str(n["PADRON_ALUMNO"])
+                planilla_notas.setdefault(padron, {})[ev["ID"]] = n["NOTA"]
+    else:
+        # Sin evaluación ni curso elegido: mostrar selector de curso
+        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100})
+        if resp_cursos.status_code == 200:
+            cursos = resp_cursos.json().get("listado", [])
+
+    return render_template('notas.html',
+                           nombre_profesor=nombre, evaluacion=evaluacion, id_evaluacion=id_evaluacion,
+                           alumnos=alumnos, notas_por_padron=notas_por_padron, guardado=guardado,
+                           aprobados=aprobados, desaprobados=desaprobados, promedio=promedio, error=error,
+                           id_curso=id_curso, cursos=cursos,
+                           planilla_evaluaciones=planilla_evaluaciones,
+                           planilla_alumnos=planilla_alumnos,
+                           planilla_notas=planilla_notas)
 
     return render_template('notas.html', 
                            nombre_profesor=nombre, 
