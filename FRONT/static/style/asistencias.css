@@ -474,3 +474,21 @@ button[id^="btn-qr"]:active{
 #error-msg-edit[data-visible="true"] {
     display: block;
 }
+#paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+#paginacion a {
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+#paginacion span {
+    font-weight: bold;
+}
