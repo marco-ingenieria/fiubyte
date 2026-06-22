@@ -317,6 +317,11 @@ def registrar_asistencia_qr(clase_id):
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
     clases = []
+
+    LIMIT = 10
+    pagina = request.args.get("pagina", 1, type=int)
+    offset = (pagina - 1) * LIMIT
+
     hora_local = datetime.utcnow() - timedelta(hours=3)
     hoy_str = hora_local.strftime("%Y-%m-%d")
     nombre = request.args.get('nombre_profesor', '')
@@ -372,10 +377,22 @@ def seccion_asistencias():
                 error = "Error de conexión con el servidor"
 
     try:
-        response = requests.get("http://backend:5000/clases/", params={"limit": 100, "offset": 0})
-        clases_raw = response.json().get("listado", [])
-    except Exception as e:
+        response = requests.get(
+            "http://backend:5000/clases/",
+            params={
+                "limit": LIMIT,
+                "offset": offset
+            }
+        )
+
+        datos = response.json()
+
+        clases_raw = datos.get("listado", [])
+        links = datos.get("links", {})
+
+    except Exception:
         clases_raw = []
+        links = {}
 
     for c in clases_raw:
         try:
@@ -443,7 +460,8 @@ def seccion_asistencias():
         cursos=cursos,
         nombre_profesor=nombre,
         error=error,
-        edit_error_id=edit_error_id
+        edit_error_id=edit_error_id,
+        pagina=pagina
     )
 
 @app.route('/editar_clase/<int:id>', methods=['POST'])
