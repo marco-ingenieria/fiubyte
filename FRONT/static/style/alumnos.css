@@ -337,3 +337,13 @@ search a {
 #contenedor-buscador form {
     margin-bottom: 0 !important;
 }
+#paginacion {
+    margin-top: 5px;
+}
+#paginacion a {
+    text-decoration: none;
+    padding: 2px   
+}
+#paginacion a:hover {
+    background-color: #5b51d8;
+}
