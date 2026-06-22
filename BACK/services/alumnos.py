@@ -147,8 +147,13 @@ def actualizar_alumno(body, id):
         nombre      = nombre    or alumno["NOMBRE"]
         apellido    = apellido  or alumno["APELLIDO"]
         email       = email     or alumno["MAIL"]
-        aprobo      = aprobo    or alumno["APROBO"]
-        abandono    = abandono  or alumno["ABANDONO"]
+        aprobo = alumno["APROBO"] if aprobo is None else aprobo
+        abandono = alumno["ABANDONO"] if abandono is None else abandono
+
+        if aprobo:
+            abandono = False
+        elif abandono:
+            aprobo = False        
 
         update_stmt = """
         UPDATE ALUMNOS SET

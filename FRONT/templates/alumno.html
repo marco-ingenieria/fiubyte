@@ -1,96 +1,144 @@
 {% extends "base_sistema.html" %}
 
 {% block content %}
+
 <link rel="stylesheet" href="{{ url_for('static', filename='style/alumno.css') }}?v=3">
 
 <div id="contenedor-alumno">
 
-    <div id="cabecera-alumno">
-        
-        <div id="avatar-alumno">
-            {{ alumno.NOMBRE[0] if alumno.NOMBRE else "?" }}
-        </div>
+```
+<div id="cabecera-alumno">
 
-        <h1 id="titulo-alumno">
-            {{ alumno.NOMBRE }} {{ alumno.APELLIDO }}
-        </h1>
+    <div id="avatar-alumno">
+        {{ alumno.NOMBRE[0] if alumno.NOMBRE else "?" }}
+    </div>
 
-        <div id="cabecera-info">
+    <h1 id="titulo-alumno">
+        {{ alumno.NOMBRE }} {{ alumno.APELLIDO }}
+    </h1>
+
+    <div id="cabecera-info">
         <p id="padron-alumno">Padrón: {{ alumno.PADRON }}</p>
-
-        {% if alumno.ABANDONO %}
+        {% if alumno.APROBO %}
+            <span id="estado-aprobo">Aprobó</span>
+        {% elif alumno.ABANDONO %}
             <span id="estado-abandono">Abandonó</span>
         {% else %}
             <span id="estado-cursando">Cursando</span>
         {% endif %}
-    </div>
-        
-        <small>Email: {{ alumno.MAIL }}</small>
-        <small>Curso: {{ alumno.CURSO or "Sin curso asignado" }}</small>
-        
+        <br>
+        <form method="POST" action="{{ url_for('actualizar_alumno', nombre_profesor=nombre_profesor) }}">
+            <input type="hidden" name="padron" value="{{ alumno.PADRON }}">
+
+            <div class="estado-alumno">
+                <label>
+                    <input
+                        type="radio"
+                        name="estado"
+                        value="CURSANDO"
+                        {% if not alumno.ABANDONO and not alumno.APROBO %}checked{% endif %}
+                    >
+                    Cursando
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="estado"
+                        value="ABANDONO"
+                        {% if alumno.ABANDONO %}checked{% endif %}
+                    >
+                    Abandonó
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="estado"
+                        value="APROBO"
+                        {% if alumno.APROBO %}checked{% endif %}
+                    >
+                    Aprobó
+                </label>
+            </div>
+
+            <button type="submit">
+                Guardar estado
+            </button>
+        </form>
     </div>
 
-    <div id="datos-alumno">
-        <div>
-            <h3>Asistencias</h3>
-            <p>{{ alumno.ASISTENCIAS or 0 }}%</p>
-        </div>
-        <div>
-            <h3>Promedio General</h3>
-            <p>{{ alumno.PROMEDIO or 0 }}</p>
-        </div>
-        <div>
-            <h3>Porcentaje Evaluaciones</h3>
-            <p>{{ alumno.EVALUACIONES_RENDIDAS }} / {{ alumno.TOTAL_EVALUACIONES }}</p>
-        </div>
+    <small>Email: {{ alumno.MAIL }}</small>
+    <small>Curso: {{ alumno.CURSO or "Sin curso asignado" }}</small>
+
+</div>
+
+<div id="datos-alumno">
+    <div>
+        <h3>Asistencias</h3>
+        <p>{{ alumno.ASISTENCIAS or 0 }}%</p>
     </div>
 
-    <h4>Grupos Asignados</h4>
-    <div id="contenedor-grupos">
-        {% if alumno.GRUPOS %}
-            {% for grupo in alumno.GRUPOS %}
-                <a href="{{ url_for('ver_grupo', id=grupo['ID'], nombre_profesor=nombre_profesor) }}" >
-                    Grupo {{ grupo['NOMBRE'] }}
-                </a>
-            {% endfor %}
-        {% else %}
-            <p>Sin grupo asignado</p>
-        {% endif %}
+    <div>
+        <h3>Promedio General</h3>
+        <p>{{ alumno.PROMEDIO or 0 }}</p>
     </div>
 
-    <h4>Detalle de Evaluaciones</h4>
-    <div id="tabla-evaluaciones">
-        <table>
-            <thead>
+    <div>
+        <h3>Porcentaje Evaluaciones</h3>
+        <p>{{ alumno.EVALUACIONES_RENDIDAS }} / {{ alumno.TOTAL_EVALUACIONES }}</p>
+    </div>
+</div>
+
+<h4>Grupos Asignados</h4>
+<div id="contenedor-grupos">
+    {% if alumno.GRUPOS %}
+        {% for grupo in alumno.GRUPOS %}
+            <a href="{{ url_for('ver_grupo', id=grupo['ID'], nombre_profesor=nombre_profesor) }}">
+                Grupo {{ grupo['NOMBRE'] }}
+            </a>
+        {% endfor %}
+    {% else %}
+        <p>Sin grupo asignado</p>
+    {% endif %}
+</div>
+
+<h4>Detalle de Evaluaciones</h4>
+<div id="tabla-evaluaciones">
+    <table>
+        <thead>
+            <tr>
+                <th>Evaluación</th>
+                <th>Estado</th>
+                <th>Calificación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if alumno.NOTAS %}
+                {% for n in alumno.NOTAS %}
                 <tr>
-                    <th>Evaluación</th>
-                    <th>Estado</th>
-                    <th>Calificación</th>
+                    <td>{{ n.NOMBRE_EVALUACION }}</td>
+                    <td>
+                        {% if n.NOTA|float >= 6 %}
+                            Aprobado
+                        {% else %}
+                            Desaprobado
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ n.NOTA }}</strong>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% if alumno.NOTAS %}
-                    {% for n in alumno.NOTAS %}
-                    <tr>
-                        <td>{{ n.NOMBRE_EVALUACION }}</td>
-                        <td>
-                            {% if n.NOTA|float >= 6 %}
-                                Aprobado
-                            {% else %}
-                                Desaprobado
-                            {% endif %}
-                        </td>
-                        <td><strong>{{ n.NOTA }}</strong></td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="3">Sin evaluaciones cargadas</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">Sin evaluaciones cargadas</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+```
 
 </div>
 

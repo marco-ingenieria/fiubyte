@@ -87,7 +87,8 @@
 }
 #cabecera-info #padron-alumno,
 #cabecera-info #estado-cursando,
-#cabecera-info #estado-abandono {
+#cabecera-info #estado-abandono,
+#cabecera-info #estado-aprobo {
     margin: 0;
     vertical-align: middle;
 }
@@ -256,7 +257,8 @@
 }
 
 #estado-cursando,
-#estado-abandono {
+#estado-abandono,
+#estado-aprobo {
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 13px;
@@ -265,7 +267,7 @@
     letter-spacing: 0.5px;
 }
 
-#estado-cursando {
+#estado-cursando, #estado-aprobo {
     background: rgba(16, 185, 129, 0.12);
     color: #10b981;
 }
@@ -273,4 +275,58 @@
 #estado-abandono {
     background: rgba(239, 68, 68, 0.12);
     color: #ef4444;
+}
+
+form {
+    margin-top: 12px;
+}
+
+form div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+form label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+
+    background: #fff;
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+form label:hover {
+    background-color: #f5f5f5;
+}
+
+form input[type="radio"] {
+    margin: 0;
+}
+
+form button {
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #5b51d8;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #4840c0;
 }

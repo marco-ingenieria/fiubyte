@@ -148,6 +148,7 @@ def perfil_alumno(padron):
             "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail", ""),
             "PADRON": data_alumno.get("PADRON") or data_alumno.get("padron", padron),
             "ABANDONO": data_alumno.get("ABANDONO") or data_alumno.get("abandono", 0),
+            "APROBO": data_alumno.get("APROBO") or data_alumno.get("aprobo", 0),
             "ASISTENCIAS": asistencia_real,
             "CURSO": curso_nombre,
             "PROMEDIO": promedio,
@@ -170,6 +171,27 @@ def perfil_alumno(padron):
         }
         
     return render_template("alumno.html", alumno=alumno, nombre_profesor=nombre)
+
+@app.route("/actualizar_alumno", methods=["POST"])
+def actualizar_alumno():
+    nombre = request.args.get('nombre_profesor', '')
+    padron = request.form["padron"]
+    estado = request.form["estado"]
+
+    abandono = estado == "ABANDONO"
+    aprobo = estado == "APROBO"
+
+    try:
+        headers = {"authorization": f"Bearer {session.get('token')}"}
+        requests.patch(f"http://backend:5000/alumnos/{padron}", headers=headers, json={
+            "aprobo": aprobo,
+            "abandono": abandono
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+
+    return redirect(url_for('perfil_alumno', padron=padron, nombre_profesor=nombre))
 
 #7. Ruta para mostrar el QR de la clase actual
 
