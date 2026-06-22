@@ -16,7 +16,7 @@
     </div>
     <dialog id="crear-grupo">
         <h3>Crear nuevo grupo</h3>
-        <form id="form-crear" method="POST" action="{{url_for('seccion_grupos')}}">
+        <form id="form-crear" method="POST" action="{{url_for('seccion_grupos', nombre_profesor=nombre_profesor)}}">
             <label for="crear">Nombre del Nuevo Grupo:</label>
             <input type="text" id="nombre-crear" name="crear">
             <label for="id_curso_grupo">Curso:</label>

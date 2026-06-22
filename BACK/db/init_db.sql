@@ -163,7 +163,7 @@ INSERT INTO MATERIAS (NOMBRE_MATERIA, CUATRIMESTRE, ANIO) VALUES
 INSERT INTO ALUMNOS
 (PADRON, NOMBRE, APELLIDO, MAIL, ID_CURSO, ABANDONO, APROBO)
 VALUES
-(100001,'Ana','Garcia','ana.garcia@fiubyte.edu.ar',1,0,1),
+(100001,'Ana','Garcia','mleanza@fi.uba.ar',1,0,1),
 (100002,'Juan','Perez','juan.perez@fiubyte.edu.ar',1,0,1),
 (100003,'Lucia','Fernandez','lucia.fernandez@fiubyte.edu.ar',1,0,1),
 (100004,'Martin','Rodriguez','martin.rodriguez@fiubyte.edu.ar',1,0,0),
