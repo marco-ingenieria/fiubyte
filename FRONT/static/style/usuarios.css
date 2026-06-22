@@ -80,8 +80,6 @@ dialog button:disabled {
 #usuario-actual {
     background-color: #f2f2f2;
     opacity: 0.6;
-    pointer-events: none; /* Bloquea clicks, selección de texto y enlaces */
-    cursor: not-allowed;
 }
 
 /* Estilo discreto para el texto (Tú) */
