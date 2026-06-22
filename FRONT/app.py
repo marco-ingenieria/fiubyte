@@ -561,12 +561,13 @@ def seccion_evaluaciones():
         else:
             body["fecha_evaluacion"] = request.form.get('fecha_evaluacion')
 
+        headers = {"authorization": f"Bearer {session.get('token')}"}
         if id_editar:
-            requests.patch(f"http://backend:5000/evaluaciones/{id_editar}", json=body)
+            requests.patch(f"http://backend:5000/evaluaciones/{id_editar}", json=body, headers=headers)
         elif crear:
-            requests.post("http://backend:5000/evaluaciones/", json=body)
+            requests.post("http://backend:5000/evaluaciones/", json=body, headers=headers)
         if eliminar:
-            requests.delete(f"http://backend:5000/evaluaciones/{eliminar}")
+            requests.delete(f"http://backend:5000/evaluaciones/{eliminar}", headers=headers)
 
     evaluaciones = requests.get("http://backend:5000/evaluaciones/", params={"limit": 100}).json().get("listado", [])
     cursos = requests.get("http://backend:5000/materias/", params={"limit": 100}).json().get("listado", [])
@@ -582,13 +583,14 @@ def seccion_notas():
     if request.method == "POST":
         padrones = request.form.getlist('padron')
         notas = request.form.getlist('nota')
+        headers = {"authorization": f"Bearer {session.get('token')}"}
         for p, n in zip(padrones, notas):
             if n.strip(): # Solo registrar si hay valor
                 requests.post("http://backend:5000/notas/", json={
                     "padron": p,
                     "id_evaluacion": id_evaluacion,
                     "nota": float(n)
-                })
+                }, headers=headers)
         return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre, guardado=1))
 
     guardado = request.args.get('guardado') == '1'
