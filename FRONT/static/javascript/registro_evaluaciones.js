@@ -26,42 +26,20 @@ function filtrar() {
         }
     });
     
-    // "no encontrado"
     const emptyState = document.getElementById('empty-state');
     if (emptyState) {
         emptyState.setAttribute('data-state', visibles === 0 ? 'visible' : '');
     }
 }
 
-// Formulario
-document.addEventListener('DOMContentLoaded', () => {
-    const tipoSelect = document.getElementById('tipo-select');
-    const tpExtras = document.getElementById('tp-extras');
-    const fechaGeneral = document.getElementById('fecha-general');
-
-    if (tipoSelect) {
-        tipoSelect.addEventListener('change', function() {
-            if (this.value === 'TP') {
-                tpExtras.style.display = 'block';
-                fechaGeneral.style.display = 'none';
-            } else {
-                tpExtras.style.display = 'none';
-                fechaGeneral.style.display = 'block';
-            }
-        });
-    }
-});
-
-
 function abrirModalCrear() {
     document.getElementById('id_editar').value = '';
     document.getElementById('modal-titulo').textContent = 'Nueva Evaluación';
     document.getElementById('btn-modal-guardar').textContent = 'Guardar';
-    
+
     document.getElementById('input-nombre').value = '';
     document.getElementById('tipo-select').value = 'Parcial';
-    document.getElementById('textarea-notas').value = '';
-    
+
     document.getElementById('modal-overlay').setAttribute('data-state', 'open');
 }
 
@@ -69,17 +47,8 @@ function abrirModalEditar(id, nombre, tipo, idMateria, fechaEval, modalidad, fec
     document.getElementById('id_editar').value = id;
     document.getElementById('modal-titulo').textContent = 'Editar Evaluación';
     document.getElementById('btn-modal-guardar').textContent = 'Guardar Cambios';
-
     document.getElementById('input-nombre').value = nombre || '';
     document.getElementById('tipo-select').value = tipo || 'Parcial';
     document.querySelector('select[name="id_materia"]').value = idMateria || '';
-    document.getElementById('input-fecha-evaluacion').value = fechaEval || '';
-    document.getElementById('select-modalidad').value = modalidad || 'Individual';
-    document.getElementById('input-fecha-inicio').value = fechaIni || '';
-    document.getElementById('input-fecha-entrega').value = fechaEnt || '';
-    document.getElementById('textarea-notas').value = notas || '';
-
-    document.getElementById('tipo-select').dispatchEvent(new Event('change'));
-
     document.getElementById('modal-overlay').setAttribute('data-state', 'open');
 }

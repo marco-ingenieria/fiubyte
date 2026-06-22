@@ -556,18 +556,48 @@ def seccion_evaluaciones():
         if eliminar:
             requests.delete(f"http://backend:5000/evaluaciones/{eliminar}", headers=headers)
 
-    evaluaciones = requests.get("http://backend:5000/evaluaciones/", params={"limit": 100}).json().get("listado", [])
-    cursos = requests.get("http://backend:5000/materias/", params={"limit": 100}).json().get("listado", [])
-    return render_template('registro_evaluaciones.html', nombre_profesor=nombre, evaluaciones=evaluaciones, cursos=cursos, error=error)
+    limit = request.args.get('limit', type=int) or 10
+    offset = request.args.get('offset', type=int) or 0
+
+    evaluaciones = []
+    hay_anterior = False
+    hay_siguiente = False
+    try:
+        resp_eval = requests.get("http://backend:5000/evaluaciones/", params={"limit": limit, "offset": offset})
+        if resp_eval.status_code in (200, 204):
+            data_eval = resp_eval.json()
+            evaluaciones = data_eval.get("listado", [])
+            links = data_eval.get("links", {})
+
+            ultimo_offset = 0
+            if links.get("_last"):
+                ultimo_offset = int(links["_last"].split("offset=")[-1])
+
+            hay_anterior = offset > 0
+            hay_siguiente = offset < ultimo_offset
+    except Exception as e:
+        evaluaciones = []
+
+    cursos = []
+    try:
+        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100})
+        if resp_cursos.status_code == 200:
+            cursos = resp_cursos.json().get("listado", [])
+    except Exception as e:
+        cursos = []
+
+    return render_template('registro_evaluaciones.html', nombre_profesor=nombre, evaluaciones=evaluaciones,
+                           cursos=cursos, error=error, limit=limit, offset=offset,
+                           hay_anterior=hay_anterior, hay_siguiente=hay_siguiente)
 
 # 7. Ruta de la sección de NOTAS
 @app.route('/notas', methods=['GET', 'POST'])
 def seccion_notas():
     nombre = request.args.get('nombre_profesor', '')
-    id_evaluacion = request.args.get('id_evaluacion', type=int)
     guardado = False
-    
+
     if request.method == "POST":
+        id_evaluacion = request.form.get('id_evaluacion', type=int)
         padrones = request.form.getlist('padron')
         notas = request.form.getlist('nota')
         headers = {"authorization": f"Bearer {session.get('token')}"}
@@ -580,6 +610,7 @@ def seccion_notas():
                 }, headers=headers)
         return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre, guardado=1))
 
+    id_evaluacion = request.args.get('id_evaluacion', type=int)
     guardado = request.args.get('guardado') == '1'
     evaluacion, alumnos, notas_por_padron = None, [], {}
     aprobados, desaprobados, promedio = 0, 0, 0

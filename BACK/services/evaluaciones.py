@@ -13,10 +13,16 @@ def listar_evaluaciones(limit, offset, base_url):
         select_stmt = "SELECT * FROM EVALUACIONES WHERE ELIMINADO = 0 ORDER BY ID_MATERIA, FECHA_CREACION, ID LIMIT %s OFFSET %s"
         cursor.execute(select_stmt, [limit, offset])
 
+
         evaluaciones = cursor.fetchall()
-        listado = construir_paginacion(evaluaciones, base_url, limit, offset)
-        
+
+        cursor.execute("SELECT COUNT(*) as total FROM EVALUACIONES WHERE ELIMINADO = 0")
+        total = cursor.fetchone()["total"]
+
+        listado = construir_paginacion(evaluaciones, base_url, limit, offset, total)
+
         return listado
+    
     except Exception as e:
         traceback.print_exc()
 
