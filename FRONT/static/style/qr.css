@@ -79,7 +79,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin-top: -6px; /* sube un poco el selector para que quede más alineado */
+  margin-top: -6px;
 }
 
 #qr-form label {

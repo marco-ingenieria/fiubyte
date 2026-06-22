@@ -2,7 +2,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style/usuarios.css') }}">
 <h1 style="text-align: center;">Listado de Usuarios</h1>
 <p style="text-align: center;">Administre los usuarios del sistema, incluyendo docentes y alumnos.</p>
-<!-- Caja para dar estilo a los botones -->
 <div id="grupo-botones">
     <button type="button" onclick="abrirModal('crear')">Crear Usuario</button>
     <button type="button" onclick="abrirModal('eliminar')">Eliminar Usuario</button>
@@ -62,20 +61,16 @@
         </div>
     </form>
 </dialog>
-<!-- Tabla tradicional -->
 <table>
     <thead>
         <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <!-- <th>Email</th>
-            <th>Rol</th> -->
             <th>Historiales</th> 
         </tr>
     </thead>
     <tbody>
         {% for usuario in usuarios %}
-        <!-- Cambiado: Compara el campo NOMBRE de la API contra la variable nombre_profesor -->
         <tr {% if usuario.NOMBRE == nombre_profesor %}id="usuario-actual"{% endif %}>
             <td>{{ usuario.ID_USUARIO }}</td>
             <td>
@@ -84,8 +79,6 @@
                     <span>(Tú)</span>
                 {% endif %}
             </td>
-            <!-- <td>{{ usuario.Email }}</td> -->
-            <!-- <td>{{ usuario.Rol }}</td> -->
             <td>
                 <a href="{{ url_for('seccion_historial', nombre_profesor=nombre_profesor, id=usuario.ID_USUARIO) }}">
                     Ver Historial

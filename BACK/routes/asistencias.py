@@ -21,7 +21,6 @@ def get_asistencias(clase_id):
     asistencias = listar_asistencias(limit, offset, base_url, clase_id)
     return asistencias
 
-#TO DO: seguridad
 @asistencias_bp.route('/mail/<int:clase_id>', methods=['GET', 'POST'])
 def get_mail_asistencia(clase_id):
     id_curso = None

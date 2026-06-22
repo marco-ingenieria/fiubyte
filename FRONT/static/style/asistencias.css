@@ -138,7 +138,7 @@
 
 #barra-filtros{
     display: flex;
-    margin: -6px -10px 10px -10px; /* lo subimos sin afectar de mas abajo */
+    margin: -6px -10px 10px -10px;
     position: relative;
 }
 
@@ -163,12 +163,10 @@
     margin: 0;
 }
 
-/* Asegura alineación vertical y centrado visual de las dos cajas */
 #filtro-caja-curso, #filtro-caja-orden{
     flex: 0 0 auto;
 }
 
-/* Evita que el label/select se “peguen” al borde y mantiene centrado con el buscador */
 #filtro-caja-curso{
     margin-right: 15px;
 }
@@ -177,7 +175,6 @@
     margin-left: 15px;
 }
 
-/* Estilos de las cajas contenedoras internas */
 #filtro-caja-curso, #filtro-caja-orden{
     display: flex;
     align-items: center;
@@ -360,7 +357,6 @@ button[id^="btn-qr"]:active{
     z-index: 9999;
 }
 
-/* Caja del modal */
 #modal {
     background: #fff;
     width: 420px;
