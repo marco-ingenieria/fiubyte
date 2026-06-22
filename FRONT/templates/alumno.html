@@ -15,9 +15,15 @@
             {{ alumno.NOMBRE }} {{ alumno.APELLIDO }}
         </h1>
 
-        <p id="padron-alumno">
-            Padrón {{ alumno.PADRON }}
-        </p>
+        <div id="cabecera-info">
+        <p id="padron-alumno">Padrón: {{ alumno.PADRON }}</p>
+
+        {% if alumno.ABANDONO %}
+            <span id="estado-abandono">Abandonó</span>
+        {% else %}
+            <span id="estado-cursando">Cursando</span>
+        {% endif %}
+    </div>
         
         <small>Email: {{ alumno.MAIL }}</small>
         <small>Curso: {{ alumno.CURSO or "Sin curso asignado" }}</small>

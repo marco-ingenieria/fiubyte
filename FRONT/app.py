@@ -147,6 +147,7 @@ def perfil_alumno(padron):
             "APELLIDO": data_alumno.get("APELLIDO") or data_alumno.get("apellido", ""),
             "MAIL": data_alumno.get("MAIL") or data_alumno.get("mail", ""),
             "PADRON": data_alumno.get("PADRON") or data_alumno.get("padron", padron),
+            "ABANDONO": data_alumno.get("ABANDONO") or data_alumno.get("abandono", 0),
             "ASISTENCIAS": asistencia_real,
             "CURSO": curso_nombre,
             "PROMEDIO": promedio,

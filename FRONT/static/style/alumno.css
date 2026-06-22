@@ -83,7 +83,13 @@
     padding: 6px 16px;
     border-radius: 20px;
     display: inline-block;
-    margin: 0 0 12px 0;
+    margin: 0;
+}
+#cabecera-info #padron-alumno,
+#cabecera-info #estado-cursando,
+#cabecera-info #estado-abandono {
+    margin: 0;
+    vertical-align: middle;
 }
 #datos-alumno {
     display: grid;
@@ -235,4 +241,36 @@
 #tabla-evaluaciones tr:last-child td span {
     background-color: #f1f5f9;
     color: #64748b;
+}
+#cabecera-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+#cabecera-info small {
+    display: inline-block;
+    margin: 0;
+}
+
+#estado-cursando,
+#estado-abandono {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#estado-cursando {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+#estado-abandono {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
 }
