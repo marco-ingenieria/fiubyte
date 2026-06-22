@@ -68,11 +68,22 @@ def crear_nota(padron_alumno, id_evaluacion, nota):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        create_stmt = "INSERT INTO NOTAS (PADRON_ALUMNO, ID_EVALUACION, NOTA) VALUES(%s, %s, %s)"
-        cursor.execute(create_stmt, [padron_alumno, id_evaluacion, nota])
-        connection.commit()
-        id_nota = cursor.lastrowid
-        return (jsonify({"id": id_nota}), 201)
+        
+        select_stmt = "SELECT ID FROM NOTAS WHERE PADRON_ALUMNO = %s AND ID_EVALUACION = %s AND ELIMINADO = 0"
+        cursor.execute(select_stmt, [padron_alumno, id_evaluacion])
+        existente = cursor.fetchone()
+
+        if existente:
+            update_stmt = "UPDATE NOTAS SET NOTA = %s WHERE ID = %s"
+            cursor.execute(update_stmt, [nota, existente["ID"]])
+            connection.commit()
+            return (jsonify({"id": existente["ID"]}), 200)
+        else:
+            create_stmt = "INSERT INTO NOTAS (PADRON_ALUMNO, ID_EVALUACION, NOTA) VALUES(%s, %s, %s)"
+            cursor.execute(create_stmt, [padron_alumno, id_evaluacion, nota])
+            connection.commit()
+            id_nota = cursor.lastrowid
+            return (jsonify({"id": id_nota}), 201)
     except Exception as e:
         return construir_error(500, f"Error inesperado: {e}")
     finally:

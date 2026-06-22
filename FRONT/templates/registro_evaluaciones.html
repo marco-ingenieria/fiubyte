@@ -48,14 +48,24 @@
             </div>
             <div id="card-actions">
                 <a href="{{ url_for('seccion_notas', id_evaluacion=ev.ID, nombre_profesor=nombre_profesor) }}">📊 Cargar notas</a>
-                <button type="button" onclick="abrirModalEditar({{ ev.ID }}, {{ ev.NOMBRE|tojson }}, {{ ev.TIPO|tojson }}, {{ ev.ID_MATERIA|tojson }}, {{ (ev.FECHA_EVALUACION or '')|tojson }}, {{ (ev.MODALIDAD or '')|tojson }}, {{ (ev.FECHA_INICIO or '')|tojson }}, {{ (ev.FECHA_ENTREGA or '')|tojson }}, {{ (ev.NOTAS or '')|tojson }})">✏️ Editar</button>
-                <form method="POST" action="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor) }}">
-                    <input type="hidden" name="eliminar_evaluacion" value="{{ ev.ID }}">
+                    <button type="button" onclick='abrirModalEditar({{ ev.ID }}, {{ ev.NOMBRE|tojson }}, {{ ev.TIPO|tojson }}, {{ ev.ID_MATERIA|tojson }})'>✏️ Editar</button>                    <input type="hidden" name="eliminar_evaluacion" value="{{ ev.ID }}">
                     <button type="submit">🗑️</button>
                 </form>
             </div>
         </div>
         {% endfor %}
+    </div>
+    <div id="pagination-bar">
+        {% if hay_anterior %}
+        <a href="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor, limit=limit, offset=offset-limit) }}">← Anterior</a>
+        {% endif %}
+
+        {% if hay_siguiente %}
+        <a href="{{ url_for('seccion_evaluaciones', nombre_profesor=nombre_profesor, limit=limit, offset=offset+limit) }}">Siguiente →</a>
+        {% endif %}
+    </div>
+
+    <div id="empty-state"><p>📭 No se encontraron evaluaciones.</p></div>
     </div>
     <div id="empty-state"><p>📭 No se encontraron evaluaciones.</p></div>
 </div>
@@ -88,25 +98,6 @@
                     {% endfor %}
                 </select>
 
-                <div id="fecha-general">
-                    <label>Fecha de entrega</label>
-                    <input type="date" name="fecha_evaluacion" id="input-fecha-evaluacion">
-                </div>
-
-                <div id="tp-extras" style="display: none;">
-                    <label>Modalidad</label>
-                    <select name="modalidad_tp" id="select-modalidad">
-                        <option value="Individual">Individual</option>
-                        <option value="Grupal">Grupal</option>
-                    </select>
-                    <label>Fecha de Inicio</label>
-                    <input type="date" name="fecha_inicio" id="input-fecha-inicio">
-                    <label>Fecha de Entrega</label>
-                    <input type="date" name="fecha_entrega" id="input-fecha-entrega">
-                </div>
-
-                <label>Notas adicionales</label>
-                <textarea name="notas" id="textarea-notas" placeholder="Escribe aquí notas adicionales..." rows="3"></textarea>
             </div>
             <div id="modal-footer">
                 <button type="button" onclick="document.getElementById('modal-overlay').removeAttribute('data-state')">Cancelar</button>

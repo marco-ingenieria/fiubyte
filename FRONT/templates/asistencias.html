@@ -216,6 +216,35 @@
         {% endfor %}
 
     </div>
+    <div id="paginacion">
+
+    {% if pagina > 1 %}
+        <a href="{{ url_for(
+            'seccion_asistencias',
+            nombre_profesor=nombre_profesor,
+            pagina=pagina-1,
+            curso_id=request.args.get('curso_id', ''),
+            orden=request.args.get('orden', '')
+        ) }}">
+            ← Anterior
+        </a>
+    {% endif %}
+
+    <span>Página {{ pagina }}</span>
+
+    {% if clases|length == 10 %}
+        <a href="{{ url_for(
+            'seccion_asistencias',
+            nombre_profesor=nombre_profesor,
+            pagina=pagina+1,
+            curso_id=request.args.get('curso_id', ''),
+            orden=request.args.get('orden', '')
+        ) }}">
+            Siguiente →
+        </a>
+    {% endif %}
+
+    </div>
 
 </div>
 

@@ -317,6 +317,11 @@ def registrar_asistencia_qr(clase_id):
 @app.route("/asistencias", methods=["GET", "POST"])
 def seccion_asistencias():
     clases = []
+
+    LIMIT = 10
+    pagina = request.args.get("pagina", 1, type=int)
+    offset = (pagina - 1) * LIMIT
+
     hora_local = datetime.utcnow() - timedelta(hours=3)
     hoy_str = hora_local.strftime("%Y-%m-%d")
     nombre = request.args.get('nombre_profesor', '')
@@ -372,10 +377,22 @@ def seccion_asistencias():
                 error = "Error de conexión con el servidor"
 
     try:
-        response = requests.get("http://backend:5000/clases/", params={"limit": 100, "offset": 0})
-        clases_raw = response.json().get("listado", [])
-    except Exception as e:
+        response = requests.get(
+            "http://backend:5000/clases/",
+            params={
+                "limit": LIMIT,
+                "offset": offset
+            }
+        )
+
+        datos = response.json()
+
+        clases_raw = datos.get("listado", [])
+        links = datos.get("links", {})
+
+    except Exception:
         clases_raw = []
+        links = {}
 
     for c in clases_raw:
         try:
@@ -443,7 +460,8 @@ def seccion_asistencias():
         cursos=cursos,
         nombre_profesor=nombre,
         error=error,
-        edit_error_id=edit_error_id
+        edit_error_id=edit_error_id,
+        pagina=pagina
     )
 
 @app.route('/editar_clase/<int:id>', methods=['POST'])
@@ -556,9 +574,39 @@ def seccion_evaluaciones():
         if eliminar:
             requests.delete(f"http://backend:5000/evaluaciones/{eliminar}", headers=headers)
 
-    evaluaciones = requests.get("http://backend:5000/evaluaciones/", params={"limit": 100}).json().get("listado", [])
-    cursos = requests.get("http://backend:5000/materias/", params={"limit": 100}).json().get("listado", [])
-    return render_template('registro_evaluaciones.html', nombre_profesor=nombre, evaluaciones=evaluaciones, cursos=cursos, error=error)
+    limit = request.args.get('limit', type=int) or 10
+    offset = request.args.get('offset', type=int) or 0
+
+    evaluaciones = []
+    hay_anterior = False
+    hay_siguiente = False
+    try:
+        resp_eval = requests.get("http://backend:5000/evaluaciones/", params={"limit": limit, "offset": offset})
+        if resp_eval.status_code in (200, 204):
+            data_eval = resp_eval.json()
+            evaluaciones = data_eval.get("listado", [])
+            links = data_eval.get("links", {})
+
+            ultimo_offset = 0
+            if links.get("_last"):
+                ultimo_offset = int(links["_last"].split("offset=")[-1])
+
+            hay_anterior = offset > 0
+            hay_siguiente = offset < ultimo_offset
+    except Exception as e:
+        evaluaciones = []
+
+    cursos = []
+    try:
+        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100})
+        if resp_cursos.status_code == 200:
+            cursos = resp_cursos.json().get("listado", [])
+    except Exception as e:
+        cursos = []
+
+    return render_template('registro_evaluaciones.html', nombre_profesor=nombre, evaluaciones=evaluaciones,
+                           cursos=cursos, error=error, limit=limit, offset=offset,
+                           hay_anterior=hay_anterior, hay_siguiente=hay_siguiente)
 
 # 7. Ruta de la sección de NOTAS
 @app.route('/notas', methods=['GET', 'POST'])
@@ -567,8 +615,9 @@ def seccion_notas():
     id_evaluacion = request.args.get('id_evaluacion', type=int)
     id_materia = request.args.get('id_materia', '')
     guardado = False
-    
+
     if request.method == "POST":
+        id_evaluacion = request.form.get('id_evaluacion', type=int)
         padrones = request.form.getlist('padron')
         notas = request.form.getlist('nota')
         headers = {"authorization": f"Bearer {session.get('token')}"}
@@ -581,6 +630,7 @@ def seccion_notas():
                 }, headers=headers)
         return redirect(url_for('seccion_notas', id_evaluacion=id_evaluacion, nombre_profesor=nombre, guardado=1))
 
+    id_evaluacion = request.args.get('id_evaluacion', type=int)
     guardado = request.args.get('guardado') == '1'
     evaluacion, alumnos, notas_por_padron = None, [], {}
     aprobados, desaprobados, promedio = 0, 0, 0
@@ -740,54 +790,192 @@ def seccion_alumnos():
     crear_alumno = request.form.get('crear_alumno')
     eliminar_alumno = request.form.get('eliminar_alumno')
     buscar_padron = request.args.get('buscar_padron', '').strip()
-    
+    page = request.args.get('page')
+    current_links = request.args.get('links')
+
+    if current_links:
+        current_links = json.loads(current_links)
+
     if crear_alumno:
         print("FORM COMPLETO:", dict(request.form), flush=True)
         try:
             headers = {"authorization": f"Bearer {session.get('token')}"}
-            response = requests.post("http://backend:5000/alumnos/",
+            response = requests.post(
+                "http://backend:5000/alumnos/",
                 headers=headers,
                 json={
-                "nombre": request.form.get('crear_alumno'),
-                "apellido": request.form.get('apellido'),
-                "email": request.form.get('email'),
-                "padron": request.form.get('padron'),
-                "id_curso": request.form.get('id_curso')
-            })
+                    "nombre": request.form.get('crear_alumno'),
+                    "apellido": request.form.get('apellido'),
+                    "email": request.form.get('email'),
+                    "padron": request.form.get('padron'),
+                    "id_curso": request.form.get('id_curso')
+                }
+            )
 
             print(response.json(), flush=True)
         except Exception as e:
             print(f"Error al crear alumno {e}", flush=True)
+
     if eliminar_alumno:
         try:
             headers = {"authorization": f"Bearer {session.get('token')}"}
-            requests.delete(f"http://backend:5000/alumnos/{eliminar_alumno}", headers=headers)
+            requests.delete(
+                f"http://backend:5000/alumnos/{eliminar_alumno}",
+                headers=headers
+            )
         except Exception as e:
             print("Error al eliminar alumno")
+
     try:
-        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
+        resp_cursos = requests.get("http://backend:5000/materias/")
         cursos = resp_cursos.json().get("listado", [])
     except Exception as e:
         cursos = []
+
+    links = None
+
     try:
         if buscar_padron:
-           
-            response = requests.get("http://backend:5000/alumnos/", params={"limit": 100, "offset": 0})
+            response = requests.get("http://backend:5000/alumnos/")
+
         elif id_curso:
-            response = requests.get(f"http://backend:5000/alumnos/curso/{id_curso}", params={"limit": 100, "offset": 0})
+            if page and current_links:
+                response = requests.get(
+                    f"http://backend:5000/alumnos/curso/{id_curso}?{current_links.get(page, '')}"
+                )
+            else:
+                response = requests.get(
+                    f"http://backend:5000/alumnos/curso/{id_curso}"
+                )
+
         else:
-            response = requests.get("http://backend:5000/alumnos/", params={"limit": 100, "offset": 0})
-            
+            if page and current_links:
+                response = requests.get(
+                    f"http://backend:5000/alumnos/?{current_links.get(page, '')}"
+                )
+            else:
+                response = requests.get(
+                    "http://backend:5000/alumnos/"
+                )
+
         alumnos = response.json().get("listado", [])
+
+        links = response.json().get("links", {})
+        for key, url in links.items():
+            links[key] = urllib.parse.urlparse(url).query
+
     except Exception as e:
         alumnos = []
+        print(e, flush=True)
+
     if buscar_padron:
         alumnos = [
-            a for a in alumnos 
-            if str(a.get('PADRON', '')) == str(buscar_padron)]
+            a for a in alumnos
+            if str(a.get('PADRON', '')) == str(buscar_padron)
+        ]
 
     return render_template(
-        'alumnos.html', nombre_profesor=nombre, alumnos=alumnos, cursos=cursos, id_curso=id_curso,buscar_padron=buscar_padron)   
+        'alumnos.html',
+        nombre_profesor=nombre,
+        alumnos=alumnos,
+        cursos=cursos,
+        id_curso=id_curso,
+        buscar_padron=buscar_padron,
+        links=links
+    )
+    nombre = request.args.get('nombre_profesor', '')
+    id_curso = request.args.get('id_curso', '')
+    crear_alumno = request.form.get('crear_alumno')
+    eliminar_alumno = request.form.get('eliminar_alumno')
+    buscar_padron = request.args.get('buscar_padron', '').strip()
+    page = request.args.get('page')
+    current_links = request.args.get('links')
+
+    if current_links:
+        current_links = json.loads(current_links)
+
+    if crear_alumno:
+        print("FORM COMPLETO:", dict(request.form), flush=True)
+        try:
+            headers = {"authorization": f"Bearer {session.get('token')}"}
+            response = requests.post(
+                "http://backend:5000/alumnos/",
+                headers=headers,
+                json={
+                    "nombre": request.form.get('crear_alumno'),
+                    "apellido": request.form.get('apellido'),
+                    "email": request.form.get('email'),
+                    "padron": request.form.get('padron'),
+                    "id_curso": request.form.get('id_curso')
+                }
+            )
+
+            print(response.json(), flush=True)
+        except Exception as e:
+            print(f"Error al crear alumno {e}", flush=True)
+
+    if eliminar_alumno:
+        try:
+            headers = {"authorization": f"Bearer {session.get('token')}"}
+            requests.delete(
+                f"http://backend:5000/alumnos/{eliminar_alumno}",
+                headers=headers
+            )
+        except Exception as e:
+            print("Error al eliminar alumno")
+
+    try:
+        resp_cursos = requests.get("http://backend:5000/materias/")
+        cursos = resp_cursos.json().get("listado", [])
+    except Exception as e:
+        cursos = []
+
+    links = None
+    try:
+        if buscar_padron:
+            response = requests.get("http://backend:5000/alumnos/")
+        elif id_curso:
+            if page:
+                response = requests.get(
+                    f"http://backend:5000/alumnos/curso/{id_curso}?{current_links.get(page, '')}"
+                )
+            else:
+                response = requests.get(
+                    f"http://backend:5000/alumnos/curso/{id_curso}"
+                )
+        else:
+            if page:
+                response = requests.get(
+                    f"http://backend:5000/alumnos/?{current_links.get(page, '')}"
+                )
+            else:
+                response = requests.get("http://backend:5000/alumnos/")
+
+        alumnos = response.json().get("listado", [])
+
+        links = response.json().get("links", {})
+        for key, url in links.items():
+            links[key] = urllib.parse.urlparse(url).query
+
+    except Exception as e:
+        alumnos = []
+        print(e, flush=True)
+
+    if buscar_padron:
+        alumnos = [
+            a for a in alumnos
+            if str(a.get('PADRON', '')) == str(buscar_padron)
+        ]
+
+    return render_template(
+        'alumnos.html',
+        nombre_profesor=nombre,
+        alumnos=alumnos,
+        cursos=cursos,
+        id_curso=id_curso,
+        buscar_padron=buscar_padron,
+        links=links
+    )
 
 @app.route('/cargar_csv_alumnos', methods=['POST'])
 def crear_alumnos_csv():
