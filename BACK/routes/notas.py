@@ -46,7 +46,6 @@ def post_nota():
 
 
 @notas_bp.route('/planilla', methods=['GET'])
-#@jwt_required()
 def get_planilla():
     id_materia = request.args.get('id_materia', type=int)
     if not id_materia:

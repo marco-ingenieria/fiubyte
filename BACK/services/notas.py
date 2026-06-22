@@ -88,21 +88,18 @@ def listar_planilla_notas(id_materia):
     try:
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-
-        # evaluaciones del curso (van a ser las columnas)
+        
         cursor.execute(
             "SELECT ID, NOMBRE, TIPO FROM EVALUACIONES WHERE ID_MATERIA=%s AND ELIMINADO=0 ORDER BY FECHA_CREACION",
             [id_materia]
         )
         evaluaciones = cursor.fetchall()
 
-        # alumnos (van a ser las filas) -- ajustar el JOIN según cómo asocies alumno-curso
         cursor.execute(
             "SELECT PADRON, NOMBRE, APELLIDO FROM ALUMNOS WHERE ELIMINADO=0 ORDER BY APELLIDO"
         )
         alumnos = cursor.fetchall()
 
-        # todas las notas de esas evaluaciones
         if evaluaciones:
             ids_eval = [ev["ID"] for ev in evaluaciones]
             placeholders = ",".join(["%s"] * len(ids_eval))
@@ -114,13 +111,11 @@ def listar_planilla_notas(id_materia):
         else:
             notas = []
 
-        # armo un diccionario para acceso rápido: notas[padron][id_evaluacion] = nota
         notas_dict = {}
         for n in notas:
             padron = n["PADRON_ALUMNO"]
             notas_dict.setdefault(padron, {})[n["ID_EVALUACION"]] = n["NOTA"]
 
-        # le agrego a cada alumno sus notas ya emparejadas por evaluación
         for alumno in alumnos:
             alumno["notas"] = [
                 notas_dict.get(alumno["PADRON"], {}).get(ev["ID"], "")
