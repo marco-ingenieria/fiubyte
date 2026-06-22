@@ -11,7 +11,7 @@
     </div>
     <dialog id="crear-curso">
         <h3>Crear nuevo curso</h3>
-        <form id="form-crear" method="POST" action="{{url_for('seccion_cursos')}}">
+        <form id="form-crear" method="POST" action="{{url_for('seccion_cursos',  nombre_profesor=nombre_profesor)}}">
             <label for="crear">Nombre del Nuevo Curso:</label>
             <input type="text" id="nombre-crear" name="crear-curso" required minlength="3" maxlength="80">
 
