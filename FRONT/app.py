@@ -565,6 +565,7 @@ def seccion_evaluaciones():
 def seccion_notas():
     nombre = request.args.get('nombre_profesor', '')
     id_evaluacion = request.args.get('id_evaluacion', type=int)
+    id_materia = request.args.get('id_materia', '')
     guardado = False
     
     if request.method == "POST":
@@ -583,7 +584,8 @@ def seccion_notas():
     guardado = request.args.get('guardado') == '1'
     evaluacion, alumnos, notas_por_padron = None, [], {}
     aprobados, desaprobados, promedio = 0, 0, 0
-
+    evaluaciones_planilla, alumnos_planilla = [], []
+    seccion_alumnos
     if id_evaluacion:
         resp_ev = requests.get(f"http://backend:5000/evaluaciones/{id_evaluacion}")
         if resp_ev.status_code == 200:
@@ -598,6 +600,22 @@ def seccion_notas():
                 desaprobados = len([n for n in valores if n < 6])
                 promedio = round(sum(valores) / len(valores), 2)
 
+    try:
+        resp_cursos = requests.get("http://backend:5000/materias/", params={"limit": 100, "offset": 0})
+        cursos = resp_cursos.json().get("listado", [])
+    except Exception as e:
+        cursos = []
+
+    if id_materia:
+        try:
+            resp_planilla = requests.get("http://backend:5000/notas/planilla", params={"id_materia": id_materia})
+            if resp_planilla.status_code == 200:
+                data_planilla = resp_planilla.json()
+                evaluaciones_planilla = data_planilla.get("evaluaciones", [])
+                alumnos_planilla = data_planilla.get("alumnos", [])
+        except Exception:
+            pass
+
     return render_template('notas.html', 
                            nombre_profesor=nombre, 
                            evaluacion=evaluacion, 
@@ -607,8 +625,12 @@ def seccion_notas():
                            aprobados=aprobados,
                            desaprobados=desaprobados,
                            promedio=promedio,
-                           guardado=guardado)
-
+                           guardado=guardado,
+                           cursos=cursos,
+                           evaluaciones_planilla=evaluaciones_planilla,
+                           alumnos_planilla=alumnos_planilla,
+                           id_materia=id_materia)
+    
 
 @app.route('/grupos', methods=["POST", "GET"])
 def seccion_grupos():

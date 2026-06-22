@@ -32,16 +32,16 @@
   <p id="success-msg">✅ Notas guardadas correctamente.</p>
   {% endif %}
 
+  {% if id_evaluacion %}
 
+  {# ── MODO CARGA: viene desde una evaluación específica ── #}
   <form method="POST" action="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}" id="form-notas">
     <input type="hidden" name="id_evaluacion" value="{{ id_evaluacion }}">
-
 
     <div id="toolbar">
       <button type="submit" id="btn-guardar">💾 Guardar Cambios</button>
     </div>
 
-    
     <div id="stats-row">
       <div id="stat-card-aprobados">
         <div>Aprobados</div>
@@ -56,7 +56,6 @@
         <div>{{ promedio }}</div>
       </div>
     </div>
-
 
     <div id="table-wrap">
       <table>
@@ -94,7 +93,66 @@
     </div>
   </form>
 
+
+
+  {% else %}
+
+  <form method="GET" action="{{ url_for('seccion_notas', nombre_profesor=nombre_profesor) }}">
+    <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+    <label for="filtro-curso">Filtrar por curso:</label>
+    <select name="id_materia" id="filtro-curso"   onchange="this.form.submit()">
+      <option value="" disabled {% if not id_materia %}selected{% endif %}>Seleccioná un curso...</option>
+      {% for curso in cursos %}
+      <option value="{{ curso.ID }}" {% if id_materia == curso.ID|string %}selected{% endif %}>
+        {{ curso.NOMBRE_MATERIA }} – {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})
+      </option>
+      {% endfor %}
+    </select>
+  </form>
+
+  {% if evaluaciones_planilla %}
+  <div id="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Padrón</th>
+          <th>Alumno</th>
+          {% for ev in evaluaciones_planilla %}
+          <th>{{ ev.NOMBRE }}<br><small>{{ ev.TIPO }}</small></th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody id="tabla-body">
+        {% for alumno in alumnos_planilla %}
+        <tr>
+          <td>{{ alumno.PADRON }}</td>
+          <td><strong>{{ alumno.APELLIDO }}, {{ alumno.NOMBRE }}</strong></td>
+          {% for nota_val in alumno.notas %}
+          <td>
+            {% if nota_val != '' and nota_val is not none %}
+              {{ nota_val | float | round(2) }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="{{ (evaluaciones_planilla|length) + 2 }}">No hay alumnos cargados para este curso.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif id_materia %}
+  <p>No hay evaluaciones cargadas para este curso.</p>
   {% endif %}
+
+  {% endif %}
+
+  {% endif %}
+
 </div>
 
 <script src="{{ url_for('static', filename='javascript/notas.js') }}"></script>

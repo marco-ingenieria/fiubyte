@@ -150,3 +150,28 @@ table input[data-color="baja"] {
     background: rgba(239, 68, 68, .05);
     color: #b91c1c;
 }
+
+
+#filtro-curso {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--texto-oscuro);
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+#filtro-curso:hover {
+    border-color: var(--color-primario);
+}
+
+form:has(#filtro-curso) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}

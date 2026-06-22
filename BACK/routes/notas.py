@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from services.notas import listar_notas, listar_notas_padron, listar_notas_evaluacion, crear_nota
+from services.notas import listar_notas, listar_notas_padron, listar_notas_evaluacion, crear_nota, listar_planilla_notas
 from utils import construir_error
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.historial import registrar
@@ -42,3 +42,13 @@ def post_nota():
         return construir_error(400, "Faltan campos obligatorios")
 
     return crear_nota(padron, id_evaluacion, nota)
+
+
+
+@notas_bp.route('/planilla', methods=['GET'])
+#@jwt_required()
+def get_planilla():
+    id_materia = request.args.get('id_materia', type=int)
+    if not id_materia:
+        return construir_error(400, "Falta id_materia")
+    return listar_planilla_notas(id_materia)
