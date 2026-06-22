@@ -138,8 +138,9 @@
 
 #barra-filtros{
     display: flex;
-    margin: -6px -10px 10px -10px;
-    position: relative;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 #barra-filtros::before{
@@ -154,12 +155,6 @@
 }
 
 #barra-filtros form{
-    width: 100%;
-    position: relative;
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     margin: 0;
 }
 

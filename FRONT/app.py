@@ -31,7 +31,7 @@ def buscar_seccion():
     if texto.startswith('nota'):
         return redirect(url_for('seccion_notas',nombre_profesor=nombre))
 
-    if texto.startswith('asistencia'):
+    if texto.startswith('clase'):
         return redirect(url_for('seccion_asistencias',nombre_profesor=nombre))
 
     if texto.startswith('curso'):
@@ -320,13 +320,8 @@ def seccion_asistencias():
     hoy_str = hora_local.strftime("%Y-%m-%d")
     nombre = request.args.get('nombre_profesor', '')
 
-    error_url = request.args.get("error_msg")
+    error = request.args.get("error_msg")
     edit_error_id = request.args.get("edit_error_id")
-
-    if edit_error_id in ["None", "", "null"]:
-        edit_error_id = None
-
-    global_error = error_url if error_url else None
 
     cursos = []
     try:
@@ -350,7 +345,7 @@ def seccion_asistencias():
         profesores = [d for d in [docente1, docente2, docente3] if d]
 
         if not fecha or not tema or not horario:
-            global_error="Fecha, curso y horario obligatorios"
+            error="Fecha, curso y horario obligatorios"
         
         else:
             try:
@@ -369,11 +364,11 @@ def seccion_asistencias():
                                             curso_id=request.args.get('curso_id', ''),
                                             orden=request.args.get('orden', '')))
                 elif response.status_code == 400:
-                    global_error = response.json().get("error", "El curso seleccionado no existe")
+                    error = response.json().get("error", "El curso seleccionado no existe")
                 else:
-                    global_error = "Campos obligatorios incompletos o inválidos"
+                    error = "Campos obligatorios incompletos o inválidos"
             except Exception:
-                global_error = "Error de conexión con el servidor"
+                error = "Error de conexión con el servidor"
 
     try:
         response = requests.get("http://backend:5000/clases/", params={"limit": 100, "offset": 0})
@@ -440,22 +435,13 @@ def seccion_asistencias():
         resto = [c for c in clases if c["estado"] != "HOY"]
         clases = clases_actuales + resto
 
-    if not error_url or error_url in ["None","","null"]:
-        edit_error_id = ""
-        global_error = ""
-    else:
-        global_error=error_url
-        if edit_error_id in ["None","","null"]:
-            edit_error_id=""
 
-    print(request.args)
-    
     return render_template(
         "asistencias.html",
         clases=clases,
         cursos=cursos,
         nombre_profesor=nombre,
-        error=global_error,
+        error=error,
         edit_error_id=edit_error_id
     )
 
