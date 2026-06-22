@@ -28,17 +28,27 @@ def construir_paginacion(listado, base_url, limit, offset, total=None):
         total = offset + len(listado)
 
     codigo_HTTP = 200 if len(listado) > 0 else 204
+
+    links = {}
+
+    if len(listado) > 0:
+        links["_first"] = f"{base_url}?limit={limit}&offset=0"
+
+    if offset > 0 and len(listado) > 0:
+        links["_prev"] = f"{base_url}?limit={limit}&offset={max(0, offset - limit)}"
+
+    if len(listado) == limit and (offset + limit) > offset:
+        links["_next"] = f"{base_url}?limit={limit}&offset={offset + limit}"
+
     ultimo_offset = ((total - 1) // limit) * limit if total > 0 else 0
-    links = {
-        "_first": f"{base_url}?limit={limit}&offset=0",
-        "_prev":  f"{base_url}?limit={limit}&offset={max(0, offset - limit)}",
-        "_next":  f"{base_url}?limit={limit}&offset={offset + limit}",
-        "_last":  f"{base_url}?limit={limit}&offset={ultimo_offset}"
-    }
+    if len(listado) > 0:
+        links["_last"] = f"{base_url}?limit={limit}&offset={ultimo_offset}"
+
     return (jsonify({
         "listado": listado,
         "links": links
     }), codigo_HTTP)
+
 
 def existe_en_bd(cursor, tabla, campo, valor):
     cursor.execute(f"SELECT * FROM {tabla} WHERE {campo}=%s AND ELIMINADO=0", [valor])
@@ -70,7 +80,6 @@ def enviar_mail(contenido, destinatario, asunto):
         smtp.send_message(contenido)
 
 def enviar_mail_asistencia(link, fecha, mail_alumno):
-    #Preparar el mensaje con la librería email
     msg = EmailMessage()
     qr_cid = make_msgid(domain="fiubyte.local")
     msg.set_content("Este correo requiere soporte HTML.")
@@ -94,9 +103,6 @@ def enviar_mail_asistencia(link, fecha, mail_alumno):
     enviar_mail(msg, mail_alumno, "Registrar asistencia a la clase")
 
 def get_anchos_maximos(filas):
-    #Se recorren todas las filas de cada columna para buscar el string más largo y aplicar un largo máximo
-    #Sino las columnas quedan desfasadas
-    #Máximo fijo no es viable porque puede pasarse del ancho de página o cortar un dato
     anchos_maximos = []
     for i in range(len(filas[0])):
         anchos_maximos.append(max([len(str(fila[i])) for fila in filas]))

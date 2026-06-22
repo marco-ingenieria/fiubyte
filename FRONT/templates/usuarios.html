@@ -1,4 +1,7 @@
-{% extends 'base_sistema.html' %} {% block title %}Usuarios - Panel Docente{% endblock %} {% block content %}
+{% extends 'base_sistema.html' %}
+{% block title %}Usuarios - Panel Docente{% endblock %}
+{% block content %}
+
 <link rel="stylesheet" href="{{ url_for('static', filename='style/usuarios.css') }}">
 <h1 style="text-align: center;">Listado de Usuarios</h1>
 <p style="text-align: center;">Administre los usuarios del sistema, incluyendo docentes y alumnos.</p>
@@ -88,5 +91,25 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div class="paginacion" style="text-align:center; margin:16px 0;">
+    {% if links %}
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+            {% if links._prev %}
+                <a class="btn-cargar-mas" href="{{ url_for('seccion_usuarios', nombre_profesor=nombre_profesor, limit=limit, offset=offset-limit) }}">Anterior</a>
+            {% endif %}
+
+            {% if links._next %}
+                <a class="btn-cargar-mas" href="{{ url_for('seccion_usuarios', nombre_profesor=nombre_profesor, limit=limit, offset=offset+limit) }}">Siguiente</a>
+            {% endif %}
+
+            {% if not links._prev and not links._next %}
+                <span style="opacity:0.7;">Estás en la única página</span>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+
 <script src="{{ url_for('static', filename='javascript/usuarios.js') }}"></script>
 {% endblock %}

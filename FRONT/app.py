@@ -293,9 +293,6 @@ def mostrar_qr():
     )
 
 # 7. Ruta de la sección de Asistencias
-
- #la idea de dejarla afuera es para q acumule las clses agregadas, si la dejo adentro se reinicia cada vez que se hace un POST
-
 @app.route("/asistencias/registro/<int:clase_id>")
 def registrar_asistencia_qr(clase_id):
     padron = request.args.get("padron", type=int)
@@ -1036,14 +1033,37 @@ def seccion_usuarios():
     nombre = request.args.get('nombre_profesor', '')
     mensaje = request.args.get('mensaje', '')
     error = request.args.get('error', '')
+
+    limit = request.args.get('limit', type=int) or 10
+    offset = request.args.get('offset', type=int) or 0
+
+    usuarios = []
+    links = {}
+
     try:
-        response = requests.get("http://backend:5000/usuarios/", params={"limit": 30, "offset": 0})
-        usuarios = response.json().get("listado", [])
-    except Exception as e:
+        response = requests.get(
+            "http://backend:5000/usuarios/",
+            params={"limit": limit, "offset": offset}
+        )
+        data = response.json() if response.content else {}
+        usuarios = data.get("listado", [])
+        links = data.get("links", {})
+    except Exception:
         usuarios = []
         if not error:
             error = "No se pudo cargar la lista de usuarios"
-    return render_template('usuarios.html', nombre_profesor=nombre, usuarios=usuarios, mensaje=mensaje, error=error)
+
+    return render_template(
+        'usuarios.html',
+        nombre_profesor=nombre,
+        usuarios=usuarios,
+        mensaje=mensaje,
+        error=error,
+        limit=limit,
+        offset=offset,
+        links=links
+    )
+
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():

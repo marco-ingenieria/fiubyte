@@ -16,13 +16,11 @@ dialog {
     background-color: #eaf4ff;
 }
 
-/* El fondo oscuro cuando el dialog está abierto */
 dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
 }
 
-/* El formulario interno */
 dialog form {
     display: flex;
     flex-direction: column;
@@ -37,7 +35,6 @@ dialog input[type="password"] {
     border-radius: 4px;
 }
 
-/* El contenedor de los botones (el div de abajo) */
 dialog form > div {
     display: flex;
     justify-content: flex-end;
@@ -45,7 +42,6 @@ dialog form > div {
     margin-top: 10px;
 }
 
-/* Estilo general para los botones de los modales */
 dialog button {
     padding: 8px 16px;
     border: none;
@@ -53,7 +49,6 @@ dialog button {
     cursor: pointer;
 }
 
-/* Estilos específicos usando IDs o atributos */
 #modal-crear button[type="submit"] {
     background-color: #28a745;
     color: white;
@@ -64,25 +59,22 @@ dialog button {
     color: white;
 }
 
-/* Botones de cancelar (los que son de tipo "button") */
 dialog button[type="button"] {
     background-color: #6c757d;
     color: white;
 }
 
-/* Botón deshabilitado */
 dialog button:disabled {
     background-color: #e9ecef;
     color: #6c757d;
     cursor: not-allowed;
 }
-/* Estilo para deshabilitar visualmente la fila del usuario logueado */
+
 #usuario-actual {
     background-color: #f2f2f2;
     opacity: 0.6;
 }
 
-/* Estilo discreto para el texto (Tú) */
 #usuario-actual span {
     font-weight: bold;
     color: #666666;
