@@ -80,11 +80,15 @@
 
 <form method="GET" action="{{ url_for('seccion_alumnos') }}">
     <input type="hidden" name="nombre_profesor" value="{{ nombre_profesor }}">
+
     <label for="filtro-curso">Filtrar por curso:</label>
+
     <select name="id_curso" id="filtro-curso" onchange="this.form.submit()">
         <option value="">Todos los cursos</option>
+
         {% for curso in cursos %}
-        <option value="{{ curso.ID }}" {% if id_curso == curso.ID|string %}selected{% endif %}>
+        <option value="{{ curso.ID }}"
+                {% if id_curso == curso.ID|string %}selected{% endif %}>
             {{ curso.NOMBRE_MATERIA }} - {{ curso.ANIO }} (C{{ curso.CUATRIMESTRE }})
         </option>
         {% endfor %}
@@ -130,5 +134,46 @@
         {% endfor %}
     </tbody>
 </table>
+<div id="paginacion">
+    <a href="{{ url_for(
+        'seccion_alumnos',
+        nombre_profesor=nombre_profesor,
+        id_curso=id_curso,
+        page='_first',
+        links=links|tojson
+    ) }}">
+        Primera
+    </a>
+    |
+    <a href="{{ url_for(
+        'seccion_alumnos',
+        nombre_profesor=nombre_profesor,
+        id_curso=id_curso,
+        page='_prev',
+        links=links|tojson
+    ) }}">
+        Anterior
+    </a>
+    |
+    <a href="{{ url_for(
+        'seccion_alumnos',
+        nombre_profesor=nombre_profesor,
+        id_curso=id_curso,
+        page='_next',
+        links=links|tojson
+    ) }}">
+        Siguiente
+    </a>
+    |
+    <a href="{{ url_for(
+        'seccion_alumnos',
+        nombre_profesor=nombre_profesor,
+        id_curso=id_curso,
+        page='_last',
+        links=links|tojson
+    ) }}">
+        Última
+    </a>
+</div>
 <script src="{{ url_for('static', filename='javascript/alumnos.js') }}"></script>
 {%endblock%}
